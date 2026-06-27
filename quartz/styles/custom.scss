@@ -2,15 +2,33 @@
 
 // put your custom CSS here!
 
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@mixin rainbow-text {
+  background: linear-gradient(90deg, #ff0080, #ff8c00, #ffe000, #40e0d0, #7b6cf0, #ff0080);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow 4s linear infinite;
+}
+
 /* Права панель — прибрати */
 .right.sidebar {
   display: none !important;
 }
 
-/* Ліва панель — прозорий фон (успадковує від сторінки, збігається з .center) */
+/* Ліва панель */
 .left.sidebar {
-  background: transparent !important;
-  border-right: none !important;
+  background: var(--light) !important;
+  border-right: 1px solid var(--lightgray) !important;
   width: 220px !important;
   min-width: 220px !important;
   flex: 0 0 220px !important;
@@ -30,6 +48,12 @@
   margin: 0;
 }
 
+.left.sidebar .page-title a {
+  @include rainbow-text;
+  font-weight: 500;
+  text-decoration: none;
+}
+
 .left.sidebar .darkmode {
   grid-column: 2;
   grid-row: 1;
@@ -42,11 +66,86 @@
   grid-column: 1 / -1;
 }
 
+/* Search — кругла кнопка + модальний оверлей */
+.search-button {
+  border-radius: 8px;
+}
+
+.search-container.active .search-space {
+  background: var(--lightgray) !important;
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+}
+
+.search-bar {
+  font-family: inherit;
+}
+
+/* Explorer */
+.explorer .folder-title,
+.explorer .nav-file-title {
+  font-size: 0.9rem;
+}
+
+.explorer .nav-file-title.active,
+.explorer .nav-file-title.is-active {
+  @include rainbow-text;
+  font-weight: 500;
+}
+
 /* Теги */
-a[href*="/tags/"] {
-  background: none !important;
-  background-color: transparent !important;
+.tags a.tag-link {
+  @include rainbow-text;
   border: 1px solid var(--secondary) !important;
   padding: 2px 8px !important;
   border-radius: 4px !important;
+  font-weight: 500;
+}
+
+/* Картки списків (теги/папки) у стилі book-card */
+.section-li {
+  list-style: none;
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: var(--secondary);
+  }
+}
+
+.section-li .section .desc h3 a {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.section-li .section .meta {
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+/* Breadcrumbs */
+.breadcrumb-container {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.breadcrumb-element a {
+  color: var(--gray);
+  text-decoration: none;
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--dark);
+  }
+}
+
+.breadcrumb-element p {
+  color: var(--gray);
 }
