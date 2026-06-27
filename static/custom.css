@@ -3,33 +3,45 @@
   display: none !important;
 }
 
-/* Ліва панель — такий самий фон як контент, без бордера */
+/* Ліва панель — прозорий фон (успадковує від сторінки, збігається з .center) */
 .left.sidebar {
-  background: var(--light) !important;
+  background: transparent !important;
   border-right: none !important;
   width: 220px !important;
   min-width: 220px !important;
   flex: 0 0 220px !important;
-}
-
-/* Внутрішній відступ панелі */
-.sidebar-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  row-gap: 20px;
+  column-gap: 8px;
   padding: 32px 24px !important;
 }
 
-/* Назва сайту і darkmode на одному рядку */
+/* PageTitle і Darkmode на одному рядку */
 .left.sidebar .page-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  margin: 0;
+}
+
+.left.sidebar .darkmode {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+}
+
+/* Search і Explorer — повна ширина */
+.left.sidebar .search,
+.left.sidebar .explorer {
+  grid-column: 1 / -1;
 }
 
 /* Теги */
 a[href*="/tags/"] {
   background: none !important;
+  background-color: transparent !important;
   border: 1px solid var(--secondary) !important;
   padding: 2px 8px !important;
   border-radius: 4px !important;
