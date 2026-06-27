@@ -23,6 +23,8 @@ a[href*="/tags/"] {
   padding: 24px 20px;
 }
 
-.explorer {
-  display: none !important;
+.left-sidebar .page-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
