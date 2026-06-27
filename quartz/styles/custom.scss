@@ -29,9 +29,9 @@
 .left.sidebar {
   background: var(--light) !important;
   border-right: 1px solid var(--lightgray) !important;
-  width: 220px !important;
-  min-width: 220px !important;
-  flex: 0 0 220px !important;
+  width: 280px !important;
+  min-width: 280px !important;
+  flex: 0 0 280px !important;
   display: grid !important;
   grid-template-columns: 1fr auto auto;
   align-content: start;
@@ -40,12 +40,14 @@
   padding: 32px 24px !important;
 }
 
-/* PageTitle, Search і Darkmode на одному верхньому рядку */
+/* PageTitle, Search і Darkmode на одному верхньому рядку, з лінією після них */
 .left.sidebar .page-title {
   grid-column: 1;
   grid-row: 1;
   align-self: center;
   margin: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--lightgray);
 }
 
 .left.sidebar .page-title a {
@@ -58,12 +60,16 @@
   grid-column: 2;
   grid-row: 1;
   align-self: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--lightgray);
 }
 
 .left.sidebar .darkmode {
   grid-column: 3;
   grid-row: 1;
   align-self: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--lightgray);
 }
 
 /* Explorer — повна ширина, окремий рядок */
@@ -98,10 +104,20 @@
   }
 }
 
-/* Search — кругла кнопка + модальний оверлей */
+/* Search — кругла кнопка-іконка + модальний оверлей */
 .search-button {
-  border-radius: 8px;
-  width: auto;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+.search-button p {
+  display: none !important;
 }
 
 .search-container.active .search-space {
@@ -126,13 +142,57 @@
   font-weight: 500;
 }
 
-/* Теги */
+/* Прибрати заголовок "Провідник", лишити лише іконку згортання */
+.explorer .title-button h2,
+.explorer-toggle h2 {
+  display: none !important;
+}
+
+.explorer .title-button {
+  justify-content: flex-end;
+}
+
+/* Прибрати сіру "активну" рамку/фон навколо папок/файлів в Explorer */
+.explorer .folder-container,
+.explorer .folder-outer,
+.explorer li,
+.explorer .folder-title,
+.explorer .nav-file-title,
+.explorer .folder-title.active,
+.explorer .nav-file-title.active,
+.explorer .nav-file-title.is-active,
+.explorer .folder-outer.active,
+.explorer li.active {
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Теги — градієнт-текст, без рамки і фону, скрізь */
+.tags {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tags li {
+  list-style: none !important;
+}
+
 .tags a.tag-link {
   @include rainbow-text;
-  border: 1px solid var(--secondary) !important;
-  padding: 2px 8px !important;
-  border-radius: 4px !important;
+  border: none !important;
+  background-color: transparent !important;
+  background-image: linear-gradient(90deg, #ff0080, #ff8c00, #ffe000, #40e0d0, #7b6cf0, #ff0080) !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
   font-weight: 500;
+  text-decoration: none !important;
 }
 
 /* Картки списків (теги/папки) у стилі book-card */
@@ -159,26 +219,61 @@
   color: var(--gray);
 }
 
-/* Breadcrumbs */
+.section-li .section .tags {
+  margin-top: 8px;
+}
+
+/* Вирівнювання контенту — однаковий відступ на всіх типах сторінок */
+.center {
+  padding-left: 40px !important;
+  padding-right: 40px !important;
+  box-sizing: border-box;
+}
+
+/* Заголовки — трохи легші й щільніші, ближче до макету */
+h1,
+h2,
+h3 {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.left.sidebar .page-title a {
+  font-size: 1.1rem;
+}
+
+/* Breadcrumbs — завжди в одну лінію по лівому краю */
 .breadcrumb-container {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap !important;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
   overflow: hidden;
+  min-width: 0;
 }
 
-.breadcrumb-element a {
+.breadcrumb-element {
+  display: inline-flex;
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.breadcrumb-element a,
+.breadcrumb-element p {
   color: var(--gray);
   text-decoration: none;
   transition: color 0.15s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 100%;
 
   &:hover {
     color: var(--dark);
   }
-}
-
-.breadcrumb-element p {
-  color: var(--gray);
 }
