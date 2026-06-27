@@ -153,10 +153,7 @@ plugins:
   - source: github:quartz-community/tag-page
     enabled: true
   - source: github:quartz-community/explorer
-    enabled: true
-    layout:
-      position: left
-      priority: 50
+    enabled: false
   - source: github:quartz-community/graph
     enabled: false
   - source: github:quartz-community/search

@@ -8,3 +8,23 @@ a[href*="/tags/"] {
   padding: 2px 8px !important;
   border-radius: 4px !important;
 }
+
+.left-sidebar {
+  background: var(--light) !important;
+  border-right: 1px solid var(--lightgray) !important;
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 20px;
+}
+
+.explorer {
+  display: none !important;
+}
+
+.left-sidebar {
+  background: var(--light) !important;
+}
