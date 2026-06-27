@@ -1,30 +1,36 @@
-.right {
+/* Права панель — прибрати */
+.right.sidebar {
   display: none !important;
 }
 
-a[href*="/tags/"] {
-  background: none !important;
-  border: 1px solid var(--secondary) !important;
-  padding: 2px 8px !important;
-  border-radius: 4px !important;
-}
-
-.left-sidebar {
+/* Ліва панель — такий самий фон як контент, без бордера */
+.left.sidebar {
   background: var(--light) !important;
+  border-right: none !important;
   width: 220px !important;
   min-width: 220px !important;
   flex: 0 0 220px !important;
 }
 
+/* Внутрішній відступ панелі */
 .sidebar-inner {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 24px 20px;
+  padding: 32px 24px !important;
 }
 
-.left-sidebar .page-title {
+/* Назва сайту і darkmode на одному рядку */
+.left.sidebar .page-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+/* Теги */
+a[href*="/tags/"] {
+  background: none !important;
+  border: 1px solid var(--secondary) !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
 }
