@@ -161,9 +161,6 @@ plugins:
     layout:
       position: left
       priority: 20
-      group: toolbar
-      groupOptions:
-        grow: true
   - source: github:quartz-community/backlinks
     enabled: false
   - source: github:quartz-community/article-title
@@ -187,17 +184,9 @@ plugins:
       position: left
       priority: 10
   - source: github:quartz-community/darkmode
-    enabled: true
-    layout:
-      position: left
-      priority: 30
-      group: toolbar
+    enabled: false
   - source: github:quartz-community/reader-mode
-    enabled: true
-    layout:
-      position: left
-      priority: 35
-      group: toolbar
+    enabled: false
   - source: github:quartz-community/breadcrumbs
     enabled: true
     layout:
@@ -221,13 +210,7 @@ plugins:
   - source: github:quartz-community/recent-notes
     enabled: false
   - source: github:quartz-community/spacer
-    enabled: true
-    options: {}
-    order: 25
-    layout:
-      position: left
-      priority: 25
-      display: mobile-only
+    enabled: false
   - source: github:quartz-community/bases-page
     enabled: true
     options: {}
@@ -268,11 +251,6 @@ plugins:
     options: {}
     order: 50
 layout:
-  groups:
-    toolbar:
-      priority: 35
-      direction: row
-      gap: 0.5rem
   byPageType:
     "404":
       positions:
