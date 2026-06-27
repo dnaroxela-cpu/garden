@@ -156,10 +156,10 @@ plugins:
     enabled: true
     options:
       links:
-        - title: Home
-          slug: /
         - title: Research Topics
           slug: research-topics/
+        - title: Books
+          slug: tags/book/
     layout:
       position: left
       priority: 28
