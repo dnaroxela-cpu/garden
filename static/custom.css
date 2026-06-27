@@ -24,7 +24,3 @@ a[href*="/tags/"] {
 .explorer {
   display: none !important;
 }
-
-.left-sidebar {
-  background: var(--light) !important;
-}
