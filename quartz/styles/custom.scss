@@ -33,14 +33,14 @@
   min-width: 220px !important;
   flex: 0 0 220px !important;
   display: grid !important;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   align-content: start;
   row-gap: 20px;
   column-gap: 8px;
   padding: 32px 24px !important;
 }
 
-/* PageTitle і Darkmode на одному рядку */
+/* PageTitle, Search і Darkmode на одному верхньому рядку */
 .left.sidebar .page-title {
   grid-column: 1;
   grid-row: 1;
@@ -54,14 +54,19 @@
   text-decoration: none;
 }
 
-.left.sidebar .darkmode {
+.left.sidebar .search {
   grid-column: 2;
   grid-row: 1;
   align-self: center;
 }
 
-/* Search і Explorer — повна ширина */
-.left.sidebar .search,
+.left.sidebar .darkmode {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+}
+
+/* Explorer — повна ширина, окремий рядок */
 .left.sidebar .explorer {
   grid-column: 1 / -1;
 }
@@ -69,6 +74,7 @@
 /* Search — кругла кнопка + модальний оверлей */
 .search-button {
   border-radius: 8px;
+  width: auto;
 }
 
 .search-container.active .search-space {
