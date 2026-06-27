@@ -152,17 +152,6 @@ plugins:
     enabled: true
   - source: github:quartz-community/tag-page
     enabled: true
-  - source: ./plugins-local/static-nav
-    enabled: true
-    options:
-      links:
-        - title: Home
-          slug: /
-        - title: Research Topics
-          slug: research-topics/
-    layout:
-      position: left
-      priority: 28
   - source: github:quartz-community/explorer
     enabled: true
     layout:
