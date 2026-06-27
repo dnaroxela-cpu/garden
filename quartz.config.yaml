@@ -7,7 +7,7 @@ configuration:
   analytics:
     provider: plausible
   locale: uk-UA
-  baseUrl: garden.dnaroxela.xyz
+  baseUrl: dnaroxela-cpu.github.io/garden
   ignorePatterns:
     - private
     - templates
