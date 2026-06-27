@@ -1,0 +1,24 @@
+{
+  "name": "static-nav",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./components/index.mjs",
+  "exports": {
+    "./components": "./components/index.mjs"
+  },
+  "quartz": {
+    "name": "static-nav",
+    "displayName": "Static Navigation",
+    "description": "Fixed top-level navigation links shown above the Explorer tree",
+    "version": "1.0.0",
+    "category": ["component"],
+    "components": {
+      "StaticNav": {
+        "name": "static-nav",
+        "displayName": "Static Navigation",
+        "description": "Fixed top-level navigation links",
+        "version": "1.0.0"
+      }
+    }
+  }
+}
