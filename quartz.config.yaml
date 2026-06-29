@@ -159,7 +159,7 @@ plugins:
         - title: Research Topics
           slug: research-topics/
         - title: Books
-          slug: tags/book/
+          slug: books/
     layout:
       position: left
       priority: 28
@@ -240,7 +240,7 @@ plugins:
         - description
         - aliases
       excludedProperties: []
-      hidePropertiesView: false
+      hidePropertiesView: true
       delimiters: ---
       language: yaml
     order: 5
