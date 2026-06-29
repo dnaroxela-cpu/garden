@@ -213,7 +213,16 @@ body[data-slug^="books"] .left.sidebar .explorer {
 .explorer .title-button {
   justify-content: flex-end !important;
   border: none !important;
+  background: none !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   padding: 0 !important;
+  margin: 0 0 6px 0 !important;
+}
+
+.explorer .mobile-explorer {
+  display: none !important;
 }
 
 /* Folder row: arrow + name on one line, normal weight */
@@ -331,6 +340,14 @@ body[data-slug^="books"] .left.sidebar .explorer {
 
 /* note-properties renders tags again in its own panel — fully hidden below */
 .note-properties.metadata-container {
+  display: none !important;
+}
+
+/* parseTags (obsidian-flavored-markdown) converts any "#tag" typed inline in
+   the note body into another a.internal.tag-link with the same highlight-box
+   styling as TagList — these duplicate the frontmatter tags shown above the
+   article, so they're hidden everywhere outside the .tags pill list. */
+article a.internal.tag-link:not(.tags a) {
   display: none !important;
 }
 
