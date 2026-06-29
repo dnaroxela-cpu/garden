@@ -1,0 +1,19 @@
+- To feel deeply is dangerous. To do anything else is a tragedy. ᔥ “Something in the Woods Loves You”, Jarod K. Anderson 
+- Words are events, they do things, change things . ᔥ Ursula Le Guin
+- If the day and the night are such that you greet them with joy and life emits a fragrance like flowers sweet-scented herbs, is more elastic, more starry, more immortal — that is your success. ᔥ Henry David Thoreau  
+- An inner world becomes a stand-in for the World.  ᔥ Maria Popova, on Sanctuary
+- Forget inspiration. Habit is more dependable ᔥ Octavia Butler
+- There are as many ways to love as there are to walk a forest  ᔥ Maria Popova
+- We don’t get meaning from answers; we get it from understanding the most important questions.  ᔥ Arthur Brooks
+- Turn everything off. Boredom is the space where your brain finds its best ideas.  ᔥ Arthur Brooks
+- Mother Nature wants you to focus on yourself. And to get peace and perspective you need to stand in awe of the universe and get little.  ᔥ Arthur Brooks
+- “Beautiful sentences are rare as eclipses” ᔥ William H Gass
+- “Do stuff. Be clenched, curious. Not waiting for inspiration’s shove or society’s kiss on your forehead” ᔥ Susan Sontag 
+- “Ideas are fragile. If they were resolved, they would not be ideas, they would be products. It takes determined effort not to be consumed by the problems of a new idea.” ᔥJony Ive
+- Design is a way into learning about, supporting, improving and magnifying the world. ᔥ Abbot Miller
+- For Kuhn, science is an ever-growing body of knowledge that is constantly shedding its own skin; discarding unnecessary exoskeletons to retain only what is strictly necessary for the training of new students and the discovery of new ideas within the current paradigm. If science is a tower of giants, it’s an unusual tower indeed, because you could remove the base and the whole operation would remain stable.
+- Леон Ледерман, директор Лабораторії Фермі та лауреат Нобелівської премії з фізики 1988 року, сказав: _«Діти народжуються вченими. Вони роблять усе, що роблять вчені. Вони перевіряють, наскільки міцні речі. Вони вимірюють падіння тіл... вони вивчають фізику навколишнього світу. Вони всі досконалі вчені... Вони ставлять запитання, вони зводять батьків з розуму, кажучи: «Чому? Чому? Чому?»_. 
+- Curiosity is the cure for boredom. There is no cure for curiosity. ᔥEllen Parr 
+- Nobody can go back and start a new beginning, but anyone can start today and make a new ending.  ᔥ MARIA ROBINSON
+- Curiosity will conquer fear even more than bravery will.  ᔥ JAMES STEPHENS
+- Curiosity has its own reason for existence. One cannot help but be in awe when he contemplates the mysteries of eternity, of life, of the marvelous structure of reality. It is enough if one tries merely to comprehend a little of this mystery each day. Never lose a holy curiosity. ᔥ Einstein

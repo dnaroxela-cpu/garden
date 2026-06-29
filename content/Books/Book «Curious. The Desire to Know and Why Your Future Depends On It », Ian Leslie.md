@@ -247,5 +247,4 @@ _A Technique for Producing Ideas (1960), by Webb Young:_ «Кожна дійсн
 - Лише проявляючи цікавість до інших та іншого, припустив Уоллес, ми можемо звільнитися від нашої жорсткої одержимості собою. Ми повинні робити це не лише тому, що це доброчесно, а тому, що це найкращий спосіб впоратися з «нудьгою, рутиною та дрібним розчаруванням» повсякденного життя.
 
 [^1]: [https://iamjamesward.wordpress.com](https://iamjamesward.wordpress.com/)
-
 [^2]: [https://boringconference.wordpress.com](https://boringconference.wordpress.com/)
