@@ -12,83 +12,141 @@
 }
 
 @mixin rainbow-text {
-  background: linear-gradient(90deg, #ff0080, #ff8c00, #ffe000, #40e0d0, #7b6cf0, #ff0080);
-  background-size: 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: rainbow 4s linear infinite;
+  background: linear-gradient(90deg, #ff0080, #ff8c00, #ffe000, #40e0d0, #7b6cf0, #ff0080) !important;
+  background-size: 200% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  animation: rainbow 4s linear infinite !important;
 }
 
-/* Права панель — прибрати */
+/* ===== Base layout ===== */
 .right.sidebar {
   display: none !important;
 }
 
-/* Чорний фон скрізь, незалежно від теми */
 body,
 .center,
-article {
+article,
+.popover-inner {
   background: #000 !important;
 }
 
-/* Ліва панель */
+/* ===== Left sidebar ===== */
 .left.sidebar {
   background: #000 !important;
-  border-right: none !important;
-  width: 280px !important;
-  min-width: 280px !important;
-  flex: 0 0 280px !important;
+  border-right: 1px solid #222 !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  flex: 0 0 260px !important;
   display: flex !important;
-  flex-direction: column;
+  flex-direction: column !important;
   align-content: start;
-  gap: 28px;
-  padding: 36px 24px !important;
+  gap: 32px !important;
+  padding: 36px 28px !important;
 }
 
 .left.sidebar > * {
   width: 100%;
 }
 
-/* Верхній рядок: назва сайту + іконки, без лінії-розділювача */
+/* Top row: site title + icons, no divider line */
 .left.sidebar .page-title {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   border: none !important;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: space-between;
   order: 1;
 }
 
+.left.sidebar .page-title h2 {
+  margin: 0 !important;
+}
+
 .left.sidebar .page-title a {
   @include rainbow-text;
-  font-weight: 500;
+  font-weight: 500 !important;
   font-size: 18px !important;
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .left.sidebar .search {
   order: 1;
-  padding: 0;
+  padding: 0 !important;
   border: none !important;
+  width: auto !important;
 }
 
 .left.sidebar .darkmode {
   order: 1;
-  padding: 0;
+  padding: 2px !important;
   border: none !important;
+  background: none !important;
+  width: auto !important;
 }
 
-/* Іконки пошуку/теми — тонкі, без рамок */
-.search-button svg,
-.darkmode svg {
+/* Thin round icon style — search is stroke-based, already matches mockup */
+.search-button svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.search-button .search-path {
+  stroke: var(--gray) !important;
   stroke-width: 1.2 !important;
+}
+
+.search-button .search-path path,
+.search-button .search-path circle {
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
 }
 
-/* Навігація — Research Topics / Books */
+/* Darkmode icons are filled silhouettes in Quartz; replicate mockup's thin
+   sun/moon outline glyphs via CSS masks instead of relying on stroke props. */
+.darkmode svg {
+  display: none !important;
+}
+
+.darkmode {
+  width: 22px !important;
+  height: 22px !important;
+  position: relative;
+}
+
+.darkmode::before {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-color: var(--gray);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: 18px 18px;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: 18px 18px;
+}
+
+body[saved-theme="light"] .darkmode::before,
+body:not([saved-theme]) .darkmode::before {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>');
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>');
+}
+
+body[saved-theme="dark"] .darkmode::before {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>');
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>');
+}
+
+.darkmode:hover::before {
+  background-color: var(--dark);
+}
+
+/* ===== Static nav (Research Topics / Books) ===== */
 .left.sidebar .static-nav {
   order: 2;
 }
@@ -99,14 +157,24 @@ article {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px !important;
 }
 
-.static-nav-item a {
+.static-nav-item a,
+.static-nav-action {
   display: block;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--dark);
+  width: 100%;
+  text-align: left;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  color: var(--gray) !important;
+  -webkit-text-fill-color: var(--gray) !important;
+  background: none;
+  border: none;
+  padding: 6px 0 !important;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
   text-decoration: none;
   transition: color 0.15s;
 
@@ -119,108 +187,91 @@ article {
   @include rainbow-text;
 }
 
-/* Explorer — окремий блок, з'являється лише на сторінках Research Topics / Books */
+/* ===== Explorer — only shown on Books pages, redesigned as bordered box ===== */
 .left.sidebar .explorer {
   order: 3;
-  display: none;
+  display: none !important;
 }
 
 body[data-slug^="books"] .left.sidebar .explorer {
-  display: block;
-}
-
-/* Graph — потрібен лише прихований глобальний граф + його тригер-кнопка,
-   власний міні-граф у сайдбарі не показуємо (відкривається через "Research Topics") */
-.left.sidebar .graph h3,
-.left.sidebar .graph .graph-outer {
-  display: none !important;
-}
-
-.left.sidebar .graph {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.static-nav-action {
-  display: block;
-  width: 100%;
-  text-align: left;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--dark);
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font-family: inherit;
-  transition: color 0.15s;
-
-  &:hover {
-    @include rainbow-text;
-  }
-}
-
-/* Search — кругла кнопка-іконка + модальний оверлей */
-.search-button {
   display: flex !important;
-  align-items: center;
-  justify-content: center;
-  width: 36px !important;
-  height: 36px !important;
-  min-width: 36px !important;
-  padding: 0 !important;
-  border-radius: 50% !important;
-  background: none !important;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px !important;
+  border: 1px solid var(--lightgray) !important;
+  border-radius: 8px !important;
+  margin: 0 !important;
 }
 
-.search-button p {
+/* Hide "Provider/Провідник" header entirely, keep only collapse caret */
+.explorer .title-button h2,
+.explorer-toggle h2,
+.explorer .mobile-explorer {
   display: none !important;
 }
 
-.search-container.active .search-space {
-  background: var(--lightgray) !important;
-  border: 1px solid var(--gray);
-  border-radius: 8px;
+.explorer .title-button {
+  justify-content: flex-end !important;
+  border: none !important;
+  padding: 0 !important;
 }
 
-.search-bar {
-  font-family: inherit;
+/* Folder row: arrow + name on one line, normal weight */
+.explorer .folder-container.nav-folder-title.tree-item-self {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: var(--gray) !important;
+  padding: 3px 0 !important;
 }
 
-/* Explorer — рамка-контейнер у стилі макету */
-.explorer {
-  border: 1px solid var(--lightgray);
-  border-radius: 8px;
-  padding: 12px 14px;
+.explorer .folder-button {
+  display: flex !important;
+  align-items: center !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
 }
 
-.explorer .folder-title,
-.explorer .nav-file-title {
-  font-size: 14px;
-  font-weight: 400;
+.explorer .folder-title {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+}
+
+.explorer .folder-icon {
+  width: 10px !important;
+  height: 10px !important;
+  color: var(--gray) !important;
+}
+
+.explorer .folder-outer {
+  padding-left: 14px !important;
+}
+
+.explorer .content.tree-item-children {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Notes (files) — larger text per mockup, rainbow when active */
+.explorer .nav-file-title.tree-item-self {
+  font-size: 14px !important;
+  color: var(--gray) !important;
+  padding: 3px 0 3px 12px !important;
+  display: block !important;
+  text-decoration: none !important;
 }
 
 .explorer .nav-file-title.active,
 .explorer .nav-file-title.is-active {
   @include rainbow-text;
-  font-weight: 500;
+  font-weight: 400 !important;
 }
 
-/* Прибрати заголовок "Провідник", лишити лише іконку згортання */
-.explorer .title-button h2,
-.explorer-toggle h2 {
-  display: none !important;
-}
-
-.explorer .title-button {
-  justify-content: flex-end;
-  border: none !important;
-}
-
-/* Прибрати сіру "активну" рамку/фон і зайві лінії-розділювачі всередині Explorer */
+/* Remove active/hover backgrounds, borders, extra divider lines */
 .explorer .folder-container,
 .explorer .folder-outer,
 .explorer li,
@@ -238,83 +289,65 @@ body[data-slug^="books"] .left.sidebar .explorer {
   border: none !important;
 }
 
-/* Теги — лише градієнт-текст; жовта панель властивостей повністю прибрана через hidePropertiesView */
+/* ===== Graph — used only as the hidden "Research Topics" trigger ===== */
+.left.sidebar .graph h3,
+.left.sidebar .graph .graph-outer {
+  display: none !important;
+}
+
+.left.sidebar .graph {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ===== Tags ===== */
 .tags {
   list-style: none !important;
   margin: 0 !important;
   padding: 0 !important;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 10px !important;
 }
 
 .tags li {
   list-style: none !important;
+  margin: 0 !important;
 }
 
+.tags a.internal.tag-link,
 .tags a.tag-link {
   @include rainbow-text;
   border: none !important;
   background-color: transparent !important;
   background-image: linear-gradient(90deg, #ff0080, #ff8c00, #ffe000, #40e0d0, #7b6cf0, #ff0080) !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
   padding: 0 !important;
+  margin: 0 !important;
   border-radius: 0 !important;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 14px !important;
+  font-weight: 400 !important;
   text-decoration: none !important;
 }
 
-/* На випадок, якщо панель властивостей все одно рендериться — прибрати повністю */
-.note-properties,
-.frontmatter-properties,
-.properties-container {
+/* note-properties renders tags again in its own panel — fully hidden below */
+.note-properties.metadata-container {
   display: none !important;
 }
 
-/* Картки списків (теги/папки) у стилі book-card */
-.section-li {
-  list-style: none;
-  border: 1px solid var(--lightgray);
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  transition: border-color 0.15s;
-
-  &:hover {
-    border-color: var(--secondary);
-  }
-}
-
-.section-li .section .desc h3 a {
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.section-li .section .meta {
-  font-size: 0.85rem;
-  color: var(--gray);
-}
-
-.section-li .section .tags {
-  margin-top: 8px;
-}
-
-/* Вирівнювання контенту — однаковий відступ на всіх типах сторінок */
+/* ===== Content area ===== */
 .center {
   padding: 36px 64px 80px !important;
   box-sizing: border-box;
 }
 
-/* Заголовок H1 статті */
+/* H1 article title */
 h1.article-title,
 .article-title {
   font-size: 26px !important;
   font-weight: 500 !important;
-  line-height: 1.3;
+  line-height: 1.3 !important;
   color: #fff !important;
-  margin-bottom: 8px;
+  margin: 0 0 8px 0 !important;
 }
 
 h1,
@@ -324,56 +357,56 @@ h3 {
   letter-spacing: -0.01em;
 }
 
-/* Дата / час читання */
+/* Date / reading time */
 .content-meta,
 .page-listing .meta,
 p.content-meta {
   font-size: 13px !important;
-  color: var(--gray);
-  margin-bottom: 32px;
+  color: var(--gray) !important;
+  margin-bottom: 32px !important;
 }
 
-/* Тіло статті */
+/* Article body */
 article p,
 .popover-inner p {
-  font-size: 16px;
-  line-height: 1.75;
-  margin-bottom: 14px;
+  font-size: 16px !important;
+  line-height: 1.75 !important;
+  margin-bottom: 14px !important;
 }
 
 article h2 {
   font-size: 18px !important;
   font-weight: 500 !important;
-  margin: 32px 0 12px;
+  margin: 32px 0 12px !important;
 }
 
 article h3 {
   font-size: 15px !important;
   font-weight: 500 !important;
   margin-top: 20px !important;
-  margin-bottom: 8px;
+  margin-bottom: 8px !important;
 }
 
 article ul,
 article ol {
-  padding-left: 20px;
-  margin-bottom: 16px;
+  padding-left: 20px !important;
+  margin-bottom: 16px !important;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 10px !important;
 }
 
 article li {
-  font-size: 16px;
-  line-height: 1.75;
+  font-size: 16px !important;
+  line-height: 1.75 !important;
 }
 
-/* Breadcrumbs — завжди в одну лінію по лівому краю */
+/* ===== Breadcrumbs ===== */
 .breadcrumb-container {
   display: flex !important;
   flex-wrap: nowrap !important;
   align-items: center;
-  gap: 6px;
+  gap: 6px !important;
   width: max-content !important;
   max-width: 100%;
   overflow: visible !important;
@@ -385,19 +418,48 @@ article li {
   display: inline-flex;
   flex-shrink: 0;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 13px !important;
 }
 
 .breadcrumb-element a,
 .breadcrumb-element p {
-  color: var(--gray);
-  text-decoration: none;
+  color: var(--gray) !important;
+  text-decoration: none !important;
   transition: color 0.15s;
   white-space: nowrap;
   display: inline-block;
-  font-size: 13px;
+  font-size: 13px !important;
 
   &:hover {
-    color: var(--dark);
+    color: var(--dark) !important;
   }
+}
+
+/* ===== Book cards ===== */
+.section-li {
+  list-style: none;
+  border: 1px solid var(--lightgray) !important;
+  border-radius: 8px !important;
+  padding: 16px 20px !important;
+  margin-bottom: 16px !important;
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: var(--secondary) !important;
+  }
+}
+
+.section-li .section .desc h3 a {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+}
+
+.section-li .section .meta {
+  font-size: 13px !important;
+  color: var(--gray) !important;
+}
+
+.section-li .section .tags {
+  margin-top: 8px !important;
 }
