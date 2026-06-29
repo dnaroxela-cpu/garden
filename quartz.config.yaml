@@ -157,7 +157,7 @@ plugins:
     options:
       links:
         - title: Research Topics
-          slug: research-topics/
+          action: open-graph
         - title: Books
           slug: books/
     layout:
@@ -169,7 +169,10 @@ plugins:
       position: left
       priority: 30
   - source: github:quartz-community/graph
-    enabled: false
+    enabled: true
+    layout:
+      position: left
+      priority: 29
   - source: github:quartz-community/search
     enabled: true
     layout:

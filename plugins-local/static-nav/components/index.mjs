@@ -21,9 +21,20 @@ export const StaticNav = (userOpts) => {
           h(
             "li",
             { class: "static-nav-item" },
-            link.external
-              ? h("a", { href: link.slug, target: "_blank", rel: "noopener noreferrer" }, link.title)
-              : h("a", { href: resolveRelative(fileData.slug, link.slug) }, link.title),
+            link.action === "open-graph"
+              ? h(
+                  "button",
+                  {
+                    type: "button",
+                    class: "static-nav-action",
+                    onclick:
+                      "document.querySelector('.global-graph-icon')?.click()",
+                  },
+                  link.title,
+                )
+              : link.external
+                ? h("a", { href: link.slug, target: "_blank", rel: "noopener noreferrer" }, link.title)
+                : h("a", { href: resolveRelative(fileData.slug, link.slug) }, link.title),
           ),
         ),
       ),

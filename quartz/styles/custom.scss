@@ -125,9 +125,39 @@ article {
   display: none;
 }
 
-body[data-slug^="research-topics"] .left.sidebar .explorer,
 body[data-slug^="books"] .left.sidebar .explorer {
   display: block;
+}
+
+/* Graph — потрібен лише прихований глобальний граф + його тригер-кнопка,
+   власний міні-граф у сайдбарі не показуємо (відкривається через "Research Topics") */
+.left.sidebar .graph h3,
+.left.sidebar .graph .graph-outer {
+  display: none !important;
+}
+
+.left.sidebar .graph {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.static-nav-action {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--dark);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+
+  &:hover {
+    @include rainbow-text;
+  }
 }
 
 /* Search — кругла кнопка-іконка + модальний оверлей */
