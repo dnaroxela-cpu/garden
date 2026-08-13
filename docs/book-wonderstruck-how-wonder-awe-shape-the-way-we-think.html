@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book «Wonderstruck. How Wonder & Awe Shape the Way We Think» — Sasha's Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root[data-theme="dark"] { --bg:#000; --bg2:#111; --border:#222; --text-muted:#555; --text:#999; --text-strong:#fff; }
+:root[data-theme="light"] { --bg:#f5f5f0; --bg2:#e8e8e0; --border:#ddd; --text-muted:#aaa; --text:#555; --text-strong:#111; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; transition:background 0.2s; }
+.sidebar { width:260px; min-width:260px; padding:36px 28px; display:flex; flex-direction:column; gap:28px; background:var(--bg); position:sticky; top:0; height:100vh; overflow-y:auto; }
+.sidebar-top { display:flex; align-items:center; justify-content:space-between; }
+.site-title { font-size:18px; font-weight:500; text-decoration:none; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+@keyframes rainbow { 0%{background-position:0%} 100%{background-position:200%} }
+.sidebar-icons { display:flex; gap:12px; align-items:center; }
+.icon-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; transition:color 0.15s; }
+.icon-btn:hover { color:var(--text-strong); }
+.icon-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; }
+nav.main-nav { display:flex; flex-direction:column; gap:4px; }
+.nav-item { font-size:15px; color:var(--text); padding:6px 0; display:block; text-decoration:none; border:none; background:none; font-family:'DM Sans',sans-serif; text-align:left; width:100%; -webkit-text-fill-color:var(--text); transition:color 0.15s; cursor:pointer; }
+.nav-item:hover { color:var(--text-strong); -webkit-text-fill-color:var(--text-strong); }
+.nav-item.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.folder-tree { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border:1px solid var(--border); border-radius:8px; }
+.folder { font-size:13px; font-weight:400; color:var(--text); padding:3px 0; display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+.folder-arrow { font-size:10px; color:var(--text-muted); transition:transform 0.15s; display:inline-block; }
+.folder-arrow.closed { transform:rotate(-90deg); }
+.subfolder { padding-left:14px; display:flex; flex-direction:column; gap:2px; }
+.note-link { font-size:12px; color:var(--text-muted); padding:3px 0 3px 12px; line-height:1.4; display:block; text-decoration:none; transition:color 0.15s; -webkit-text-fill-color:var(--text-muted); }
+.note-link:hover { color:var(--text); -webkit-text-fill-color:var(--text); }
+.note-link.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.content { flex:1; padding:36px 64px 80px; max-width:800px; }
+.breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
+.breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
+.breadcrumbs a:hover { color:var(--text-strong); }
+.breadcrumbs span,.bc-current { color:var(--text-muted); }
+h1.article-title { font-size:26px; font-weight:500; line-height:1.3; color:var(--text-strong); margin-bottom:8px; }
+.meta { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+.tags { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:32px; }
+.tag { font-size:14px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; text-decoration:none; cursor:pointer; transition:opacity 0.15s; }
+.tag:hover { opacity:0.7; }
+.article-body .footnotes { margin-top:40px; padding-top:20px; border-top:1px solid var(--border); }
+.article-body .footnotes ol { padding-left:20px; }
+.article-body .footnotes li { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:6px; }
+.article-body .footnotes a { color:#9d8cff; }
+.article-body sup { font-size:11px; line-height:0; vertical-align:super; }
+.article-body sup a { color:#9d8cff; text-decoration:none; }
+.article-body sup a:hover { text-decoration:underline; }
+.article-body h2 { font-size:18px; font-weight:500; color:var(--text-strong); margin:32px 0 12px; }
+.article-body h3 { font-size:15px; font-weight:500; color:var(--text); margin:20px 0 8px; }
+.article-body h4 { font-size:14px; font-weight:500; color:var(--text-muted); margin:16px 0 6px; }
+.article-body p { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.article-body ul,.article-body ol { padding-left:20px; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
+.article-body li { font-size:16px; line-height:1.75; color:var(--text); }
+.article-body li strong { color:var(--text-strong); font-weight:500; }
+.article-body em { font-style:italic; }
+.article-body mark { background:rgba(157,140,255,0.2); color:var(--text-strong); border-radius:3px; padding:0 2px; }
+.article-body a { color:#9d8cff; }
+hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
+.last-modified { font-size:13px; color:var(--text-muted); }
+.home-intro { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.books-grid { display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+.book-card { padding:16px 20px; border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:border-color 0.15s; text-decoration:none; display:block; }
+.book-card:hover { border-color:#9d8cff; }
+.book-card h3 { font-size:15px; font-weight:500; color:var(--text-strong); margin-bottom:4px; }
+.book-card p { font-size:13px; color:var(--text-muted); }
+/* Graph */
+.graph-container { width:100%; height:400px; border:1px solid var(--border); border-radius:8px; margin-top:24px; position:relative; overflow:hidden; }
+canvas#graph { width:100%; height:100%; }
+.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
+.search-overlay.open { display:flex; }
+.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
+.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
+.search-input::placeholder { color:var(--text-muted); }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <a class="site-title" href="index.html">Sasha's Garden</a>
+    <div class="sidebar-icons">
+      <button class="icon-btn" onclick="toggleSearch()">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()">
+        <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a class="nav-item " href="research.html">Research Topics</a>
+    <a class="nav-item " href="books.html">Book Reviews</a>
+    <a class="nav-item " href="blog.html">Blog Notes</a>
+    <button class="nav-item" onclick="goRandom()">Random Note</button>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+  </nav>
+  
+</aside>
+
+<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
+  </div>
+</div>
+
+<main class="content">
+      <nav class="breadcrumbs"><a href="index.html">Home</a><span>›</span><span>Book Reviews</span><span>›</span><span class="bc-current">Book «Wonderstruck. How Wonder & Awe Shape the Way We Think»</span></nav>
+      <h1 class="article-title">Book «Wonderstruck. How Wonder & Awe Shape the Way We Think»</h1>
+      <p class="meta">29 червня 2026 р. · 1 хв читання</p>
+      <div class="tags"><a class="tag" href="tag-book.html" target="_blank">#book</a><a class="tag" href="tag-curiosity.html" target="_blank">#curiosity</a><a class="tag" href="tag-awe.html" target="_blank">#awe</a><a class="tag" href="tag-wonder.html" target="_blank">#wonder</a><a class="tag" href="tag-science.html" target="_blank">#science</a><a class="tag" href="tag-magic.html" target="_blank">#magic</a><a class="tag" href="tag-morality.html" target="_blank">#morality</a></div>
+      <article class="article-body"><h2>1. Freedom to Wonder</h2>
+<h3>Визначення</h3>
+<ul>
+<li>Awe це емоція яку ми відчуваємо коли сприймаємо неосяжність, в поєднанні з потребою в когнітивному сховищі. Когнітивне сховище значить бажання знайти простір в нашому розумі для цієї неосяжної речі. Неосяжність може бути фізична (розмір) чи концептуальна (складність). Наприклад, ми можемо відчувати цю емоцію завдяки нічному небу, великій будівлі як храму чи піраміди, науковій теорії, подвигам якоїсь людини чи істоти, чи математичному розв&#39;язанню проблеми.</li>
+<li>Wonder це емоція яка з&#39;являється в результаті погляду на невідому теориторію, яка лежить прям на кордоні нашого теперішнього розуміння. Як Awe, вона спонукає потребу в когнітивному сховищі, але не обов&#39;язково має вимір неосяжності. Приклади – неочікувана складність комах під мікроскопом, незвична скамянілість чи дивної форми кристал, або ж рідкісна астрономічна подія.</li>
+</ul>
+<h3>Епістемічні емоції</h3>
+<ul>
+<li>Awe та Wonder об&#39;єднує дві речі. </li>
+<li>По-перше, це дві <mark><em>емістемічні емоції</em></mark>, тобто вони мотивують нас досліджувати наше середовище. До інших епістемічних емоцій відносять цікавість, сумнів та неочікуваність. Деякі емістемічні емоції допомагають нам відчути те, що ми вже знаємо – відчуття знання, впевненності, правильності. Інші епістемічні емоції направлять нашу увагу до того, чого ми ще не знаємо. Це Curiosity, Awe та Wonder.</li>
+<li>По-друге, вони <mark>само-трансцендентні емоції.</mark>, тобто вони допомагають нам змістити фокус з нас самих та наших проблем. Вони включають також: співчуття, любов, вдячність. </li>
+<li>Ці два аспекти працюють разом в Awe та Wonder: щоб дізнатися більше про світ і про себе, нам необхідно зробити себе незнайомими (defamiliarize). Ці дві емоції дозволяють нам побачити щось або вперше або <em>ніби як</em> вперше.</li>
+</ul>
+<h4>Awe та Wonder як першість</h4>
+<ul>
+<li></li>
+</ul>
+</article>
+      <hr class="divider">
+      <p class="last-modified">Оновлено: 29 червня 2026 р.</p>
+    </main>
+
+<script>
+// Theme persistence
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.dataset.theme = t;
+  if (t === 'light') {
+    const m = document.getElementById('icon-moon'), s = document.getElementById('icon-sun');
+    if (m) m.style.display = 'none';
+    if (s) s.style.display = '';
+  }
+})();
+function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
+function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
+function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
+function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
+const current=window.location.pathname.split('/').pop();
+document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
+const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","book-curious-the-desire-to-know-and-why-your-future-depends-on-it-ian-leslie.html","book-wait-what-and-life-s-other-essential-questions-james-ryan-2017-.html","book-wonderstruck-how-wonder-awe-shape-the-way-we-think.html"];
+function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_NOTES[Math.floor(Math.random()*RANDOM_NOTES.length)];}
+</script>
+</body>
+</html>

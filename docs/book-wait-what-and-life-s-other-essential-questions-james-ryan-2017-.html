@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book «Wait, What? And Life’s Other Essential Questions», James Ryan (2017) — Sasha's Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root[data-theme="dark"] { --bg:#000; --bg2:#111; --border:#222; --text-muted:#555; --text:#999; --text-strong:#fff; }
+:root[data-theme="light"] { --bg:#f5f5f0; --bg2:#e8e8e0; --border:#ddd; --text-muted:#aaa; --text:#555; --text-strong:#111; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; transition:background 0.2s; }
+.sidebar { width:260px; min-width:260px; padding:36px 28px; display:flex; flex-direction:column; gap:28px; background:var(--bg); position:sticky; top:0; height:100vh; overflow-y:auto; }
+.sidebar-top { display:flex; align-items:center; justify-content:space-between; }
+.site-title { font-size:18px; font-weight:500; text-decoration:none; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+@keyframes rainbow { 0%{background-position:0%} 100%{background-position:200%} }
+.sidebar-icons { display:flex; gap:12px; align-items:center; }
+.icon-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; transition:color 0.15s; }
+.icon-btn:hover { color:var(--text-strong); }
+.icon-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; }
+nav.main-nav { display:flex; flex-direction:column; gap:4px; }
+.nav-item { font-size:15px; color:var(--text); padding:6px 0; display:block; text-decoration:none; border:none; background:none; font-family:'DM Sans',sans-serif; text-align:left; width:100%; -webkit-text-fill-color:var(--text); transition:color 0.15s; cursor:pointer; }
+.nav-item:hover { color:var(--text-strong); -webkit-text-fill-color:var(--text-strong); }
+.nav-item.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.folder-tree { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border:1px solid var(--border); border-radius:8px; }
+.folder { font-size:13px; font-weight:400; color:var(--text); padding:3px 0; display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+.folder-arrow { font-size:10px; color:var(--text-muted); transition:transform 0.15s; display:inline-block; }
+.folder-arrow.closed { transform:rotate(-90deg); }
+.subfolder { padding-left:14px; display:flex; flex-direction:column; gap:2px; }
+.note-link { font-size:12px; color:var(--text-muted); padding:3px 0 3px 12px; line-height:1.4; display:block; text-decoration:none; transition:color 0.15s; -webkit-text-fill-color:var(--text-muted); }
+.note-link:hover { color:var(--text); -webkit-text-fill-color:var(--text); }
+.note-link.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.content { flex:1; padding:36px 64px 80px; max-width:800px; }
+.breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
+.breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
+.breadcrumbs a:hover { color:var(--text-strong); }
+.breadcrumbs span,.bc-current { color:var(--text-muted); }
+h1.article-title { font-size:26px; font-weight:500; line-height:1.3; color:var(--text-strong); margin-bottom:8px; }
+.meta { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+.tags { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:32px; }
+.tag { font-size:14px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; text-decoration:none; cursor:pointer; transition:opacity 0.15s; }
+.tag:hover { opacity:0.7; }
+.article-body .embed-figure { margin:24px 0; }
+.article-body .embed-figure img { max-width:100%; border-radius:8px; display:block; }
+.article-body .embed-figure video { max-width:100%; border-radius:8px; display:block; background:#000; }
+.article-body .embed-figure audio { width:100%; margin:8px 0; }
+.article-body img { max-width:100%; border-radius:8px; margin:16px 0; display:block; }
+.article-body .footnotes ol { padding-left:20px; }
+.article-body .footnotes li { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:6px; }
+.article-body .footnotes a { color:#9d8cff; }
+.article-body sup { font-size:11px; line-height:0; vertical-align:super; }
+.article-body sup a { color:#9d8cff; text-decoration:none; }
+.article-body sup a:hover { text-decoration:underline; }
+.article-body h2 { font-size:18px; font-weight:500; color:var(--text-strong); margin:32px 0 12px; }
+.article-body h3 { font-size:15px; font-weight:500; color:var(--text); margin:20px 0 8px; }
+.article-body h4 { font-size:14px; font-weight:500; color:var(--text-muted); margin:16px 0 6px; }
+.article-body p { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.article-body ul,.article-body ol { padding-left:20px; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
+.article-body li { font-size:16px; line-height:1.75; color:var(--text); }
+.article-body li strong { color:var(--text-strong); font-weight:500; }
+.article-body em { font-style:italic; }
+.article-body mark { background:rgba(157,140,255,0.2); color:var(--text-strong); border-radius:3px; padding:0 2px; }
+.article-body a { color:#9d8cff; }
+hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
+.last-modified { font-size:13px; color:var(--text-muted); }
+.home-intro { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.books-grid { display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+.book-card { padding:16px 20px; border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:border-color 0.15s; text-decoration:none; display:block; }
+.book-card:hover { border-color:#9d8cff; }
+.book-card h3 { font-size:15px; font-weight:500; color:var(--text-strong); margin-bottom:4px; }
+.book-card p { font-size:13px; color:var(--text-muted); }
+/* Graph */
+.graph-container { width:100%; height:400px; border:1px solid var(--border); border-radius:8px; margin-top:24px; position:relative; overflow:hidden; }
+canvas#graph { width:100%; height:100%; }
+.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
+.search-overlay.open { display:flex; }
+.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
+.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
+.search-input::placeholder { color:var(--text-muted); }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <a class="site-title" href="index.html">Sasha's Garden</a>
+    <div class="sidebar-icons">
+      <button class="icon-btn" onclick="toggleSearch()">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()">
+        <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a class="nav-item " href="research.html">Research Topics</a>
+    <a class="nav-item " href="books.html">Book Reviews</a>
+    <a class="nav-item " href="blog.html">Blog Notes</a>
+    <button class="nav-item" onclick="goRandom()">Random Note</button>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+  </nav>
+  
+</aside>
+
+<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
+  </div>
+</div>
+
+<main class="content">
+      <nav class="breadcrumbs"><a href="index.html">Home</a><span>›</span><span>Book Reviews</span><span>›</span><span class="bc-current">Book «Wait, What? And Life’s Other Essential Questions», James Ryan (2017)</span></nav>
+      <h1 class="article-title">Book «Wait, What? And Life’s Other Essential Questions», James Ryan (2017)</h1>
+      <p class="meta">27 червня 2026 р. · 14 хв читання</p>
+      <div class="tags"><a class="tag" href="tag-questions.html" target="_blank">#questions</a><a class="tag" href="tag-graduation.html" target="_blank">#graduation</a><a class="tag" href="tag-book.html" target="_blank">#book</a></div>
+      <article class="article-body"><h3>Чому ця книга?</h3>
+<ul>
+<li>Мене завжди захоплювали питання, я був майже одержим ними. Як і більшість дітей, я ставив багато запитань, коли був молодшим. Проблема, особливо для моїх друзів та родини, полягає в тому, що я так і не позбувся цієї звички. Я згадую, з деяким соромом, багато сповнених питань розмов за вечерею з батьками та моєю бідною сестрою.</li>
+<li>З віком мої запитання стали менше на кшталт «чому небо блакитне» і більше схожі на запитання, які може поставити адвокат під час перехресного допиту свідка, хоча вони були більш наполегливими, ніж вороже налаштованими. Або мені так подобалося думати. Я питав батьків, чому вони вважають певні речі правдивими, і чи мають вони якісь докази на підтвердження своїх переконань. Тож я запитав маму, які в неї є докази того, що Рональд Рейган буде хорошим президентом, а тата — які в нього є докази того, що Рейган буде поганим президентом. Я запитав їх обох, які у них є реальні докази того, що Папа Римський є представником Бога на Землі. Не всі теми були такими піднесеними. Я був так само готовий допитувати батьків на більш буденні теми, наприклад, чому вони вважають важливим, щоб я їв брюссельську капусту, або чому хтось вважає печінку та цибулю їжею.</li>
+<li>Мені ніколи не бракувало запитань, тому мій батько неодноразово казав мені, що мені краще стати юристом. Він не міг уявити, щоб я заробляв на життя іншим способом. Зрештою, я послухався поради батька і після закінчення коледжу вступив до юридичного факультету.</li>
+<li>Після 15 років викладання права в Університеті Вірджинії я несподівано отримав пропозицію стати деканом педагогічного факультету Гарварду.</li>
+</ul>
+<h3>Промови</h3>
+<ul>
+<li>Як я виявив у свій перший рік роботи, деканам доводиться виголошувати багато промов. Найважливіша промова — це та, що виголошується на випускному.</li>
+<li>Перша промова. Я не зовсім знав, про що говорити у своїй першій випускній промові, тому відродив промову, яку виголосив на випускному у старшій школі. (Так, я був трохи у відчаї.) Темою моєї промови був «час», і в старшій школі вся промова складалася з незв&#39;язаних цитат відомих людей, взятих зі «Знайомих цитат» Бартлетта, про святість часу — отже, Гелен Келлер про час, Ейнштейн про час, Йогі Берра про час. Коли я переробляв промову для випускників Гарварду 2014 року, я зрозумів, що тридцять років тому я намагався сказати, що ми не повинні витрачати час на страх — минулого, майбутнього, невизначеності, інших людей, нових ідей чи нових ситуацій. Я досі вірю, що це правда.</li>
+<li>Друга промова. На другому курсі я говорив про іншу тему, яка довго займала мою увагу: гріх упущення (бездіяння?/the sin of omission). Я виріс у католицькій церкві, щотижня відвідував месу та служив вівтарником. Католики, якщо ви ще не знаєте, дуже ставляться до гріха, а особливо до гріха упущення.</li>
+<li>Спочатку мене бентежила думка про те, що можна грішити, нічого не роблячи, але з роками я дійшов висновку, що гріхи бездіяльності часто є більш шкідливими — для інших і для нас самих — ніж гріхи вчинення дій. Дійсно, я вважаю, що вони зазвичай є джерелом наших найглибших жалів, тому я зрештою розповів батькам про підпал на задньому дворі. Саме тому я також говорив про гріх бездіяльності під час своєї другої випускної промови на посаді декана. Я запропонував студентам звернути пильну увагу на те, чого вони не роблять.</li>
+<li>Предметом третьої промови стала тема важливості поставлення та слухання запитань. У наступних розділах буде розглянуто <mark><em>п&#39;ять основних питань, а також останнє, бонусне, питання</em></mark>. Але перш ніж ми перейдемо до цих конкретних питань, можливо, буде корисно розглянути їх у ширшому контексті. Тож дозвольте мені зробити дві пропозиції щодо питань загалом.</li>
+</ul>
+<h4>Поради щодо питань</h4>
+<ol>
+<li>Перша порада — <mark>витратити більше часу на роздуми про правильні запитання.</mark></li>
+<li>Багато хто з нас витрачає забагато часу, турбуючись про те, чи ми маємо правильні відповіді. Я пережив це явище, коли став деканом. Спочатку я думав, що велика частина моєї роботи полягає в тому, щоб мати всі відповіді. Зрештою, лідери повинні сформулювати бачення. Формулювання бачення – це, певною мірою, відповідь на ключове питання: чим, зрештою, є цей заклад? Зізнаюся, на початку у мене не було чіткого бачення. Я ледве знав, де знайти найближчий туалет. Відсутність відповідей, не кажучи вже про бачення, спочатку нервувала мене, доводячи до відчаю та час від часу до паніки.</li>
+<li>Однак через деякий час мені набридло вдавати, що я знаю відповіді, тому я почав ставити запитання, навіть відповідаючи на запитання. Наприклад: «Це гарне запитання. Що ви думаєте?»</li>
+<li>Це не означає, що відповіді нерелевантні чи неважливі. Натомість, це означає, що питання так само важливі, як і відповіді, а часто й важливіші. Проста істина полягає в тому, що відповідь може бути настільки ж хорошою, наскільки добре поставлене питання. Якщо ви поставите неправильне питання, ви отримаєте неправильну відповідь.</li>
+<li>Ставити хороші питання складніше, ніж може здатися. Ставити хороші питання складно, тому що це вимагає від вас бачити далі простих відповідей і зосереджуватися на складному, хитрому, таємничому, незручному, а іноді й болісному. </li>
+<li>Наприклад, хороші вчителі розуміють, що добре поставлені запитання оживляють знання та створюють іскру, яка запалює полум’я цікавості. І немає кращого дару для дітей, ніж дар допитливості. Ефективні лідери, навіть великі, визнають, що вони не мають усіх відповідей. Але вони знають, як ставити правильні запитання — запитання, які змушують інших та самих себе відійти від старих і набридлих відповідей, запитання, які відкривають можливості, які до виникнення запитання залишалися непоміченими.</li>
+<li>Новатори в будь-якій галузі розуміють мудрість Джонаса Солка, який розробив вакцину проти поліомієліту: «Те, що люди вважають моментом відкриття, — зауважив Солк, — насправді є відкриттям питання». Потрібен час, щоб знайти питання, але це час, витрачений недарма. Ейнштейн, який твердо вірив у важливість ставити питання, відомо сказав, що якби у нього була година на вирішення проблеми, і від цього залежало б його життя, він би витратив перші п&#39;ятдесят п&#39;ять хвилин на визначення правильного питання. Можливо, вам варто витратити трохи більше часу на вирішення, ніж Ейнштейн, але ви зрозуміли суть.</li>
+<li>Posing irresistible questions, I believe, is an art worth cultivating.</li>
+<li>Дійсно, вміння ставити хороші запитання – це частина того, що робить нас людьми. Пабло Пікассо колись сказав, що вважає комп’ютери марними, бо все, що вони можуть надати, це відповіді. Це трохи надмірно, і Пікассо висловив своє судження задовго до появи Siri та Google, не кажучи вже про Watson. Але якщо подумати, Siri, Google та Watson чудово справляються з відповідями на деякі основні запитання, але вони не дуже добре їх ставлять.</li>
+<li>Два приклади запитань. Незграбні запитання можуть бути способом того, хто ставить запитання, краще вас пізнати, або ж вони можуть бути просто результатом тривоги та невігластва, жодне з яких не заслуговує на моральну осуд. Єдині справді погані запитання – це взагалі не запитання. Це твердження, замасковані під запитання, які мають на меті принизити вас або збити з пантелику. Варто обережно ставитися до таких «запитань», але я вважаю, що також варто залишатися відкритим і щедрим до всіх інших справжніх запитань, включаючи незграбні.</li>
+<li>Запитання — як ключі. Правильне запитання, поставлене у потрібний час, відкриє двері до чогось, чого ви ще не знаєте, чогось, чого ви ще не усвідомили, або чогось, про що ви навіть не замислювалися — про інших та про себе. Я маю на увазі, що п’ять наступних запитань — це як п’ять найважливіших ключів на кільці ключів. Хоча вам, безумовно, час від часу знадобляться інші ключі, ви ніколи не захочете обійтися без цих п’яти.</li>
+</ol>
+<h3>1 essential question — Wait, what?</h3>
+<ul>
+<li>Запитання «Зачекай, що?» – це гарний спосіб уникнути поспіхів із висновками чи поспішних суджень. Занадто часто ми дуже рано вирішуємо, чи погоджуємося ми з кимось чи з ідеєю, чи ні, не докладаючи зусиль, щоб по-справжньому зрозуміти людину чи суть. Наші публічні розмови, і особливо розмови в соціальних мережах, часто здаються вправами з вибору сторони та команд. Ми чуємо або читаємо щось, а потім відкидаємо тих, з ким ми не згодні, як невігласів чи злих. Якби ми витратили більше часу на розуміння ідей та перспектив, особливо нових та складних, ми могли б бути менш зневажливими, а натомість більш допитливими. Навіть якщо краще розуміння ідеї чи перспективи не змінить вашої думки, воно, ймовірно, змусить вас поважати або, принаймні, цінувати людину, яка пропонує ідею, більше, ніж ви б в іншому випадку.</li>
+<li>Майже в кожному випадку краще спочатку поставити уточнюючі запитання, а потім вже сперечатися. Перш ніж відстоювати позицію, обов’язково запитайте: «Зачекай, що?». Іншими словами, дослідження завжди має передувати відстоюванню.</li>
+</ul>
+<h3>2 essential question — I wonder why.../I wonder If...?</h3>
+<ul>
+<li>Цей розділ присвячений цим двом варіаціям однієї теми, а саме питанням «Цікаво, чому?» та «Цікаво, якщо?»</li>
+<li>Якщо ви зобов&#39;яжетеся запитувати себе: «Цікаво, чому?», ви можете спонукати себе залишатися допитливими. Навіть якщо інші втомлюються чути це питання або не можуть відповісти на нього, ви ніколи не повинні припиняти ставити його собі. Я не маю на увазі, що ви повинні кинути роботу чи витрачати весь свій час на мрії. Я лише пропоную вам знайти час, щоб озирнутися навколо — чи то на людей поруч із вами, чи на ваше фізичне оточення — і не забути запитати: «Цікаво, чому?».</li>
+<li>Занадто часто ми бачимо світ як статичний, не усвідомлюючи, що те, що ми бачимо перед собою, є продуктом минулого — сил, яких більше не видно.</li>
+<li>Куди не глянь — якщо справді приділити цьому час — всюди є історії. Вулиці, будівлі, зірки, дерева, поїзди, човни, тварини — усі вони мають своє минуле та історію. Це особливо стосується людей навколо вас, незалежно від того, чи сидять вони поруч із вами в лекційній залі, чи в сусідній кабінці. У кожного є своя унікальна історія.</li>
+<li>Хоча питання «Цікаво, чи?» варто поставити самостійно, воно також тісно пов’язане з питанням «Цікаво, чому?». Як тільки ви почнете питати «Цікаво, чому?», і особливо якщо отримаєте незадовільну відповідь, ви неминуче запитаєте: «Цікаво, чи все могло б бути інакше?». Іншими словами, питання «Цікаво, чому?» щодо сьогодення природно породжує питання «Цікаво, чи?» щодо майбутнього.</li>
+<li>Підсумовуючи, питання «Цікаво, чому?» є важливим, оскільки воно лежить в основі цікваості, і постановка цього питання — це спосіб залишатися зацікавленим у навколишньому світі, включаючи ваше місце в ньому. Запитання «Цікаво, якщо?» є не менш важливим, оскільки це спосіб залишатися зацікавленим у світі та почати думати про способи покращити свій куточок у ньому. Якщо ви не поставите ці питання, ви ризикуєте втратити радощі та можливості, про існування яких ви навіть не підозрюєте.</li>
+</ul>
+<h3>3 essential question — Couldn’t We at Least . . . ?</h3>
+<ul>
+<li>Коли ви запитуєте: «Чи не могли б ми хоча б...?», ви, по суті, пропонуєте іншим спробувати щось зробити, чи то дійти до певної згоди, чи то розпочати щось. Якщо ви не задасте цього питання, то навряд чи спробуєте. І, я вважаю, що нездатність спробувати є джерелом деяких наших найглибших жалю — власне, саме тому я говорив про гріх бездіяльності у своїй другій випускній промові в Гарварді. Я вважаю, що те, чого ми не робимо, часто переслідує нас більше, ніж те, що ми робимо насправді.</li>
+<li><mark>Бонні Вейр (Bonnie Ware),</mark> медсестра, яка доглядала за вмираючими пацієнтами, опублікувала книгу про найпоширеніші жалі, які висловлювали її пацієнти. Найгіршим жалем була нездатність здійснити свої мрії — по суті, нездатність спробувати або почати.</li>
+</ul>
+<h3>4 essential question — How can I Help. . . ?</h3>
+<ul>
+<li>Те, як ви допомагаєте, має таке ж значення, як і те, що ви дійсно допомагаєте, тому важливо почати з питання: «Як я можу допомогти?» Якщо ви починаєте з цього питання, ви зі смиренням просите про скерування. Ви визнаєте, що інші є експертами у власному житті, і ви надаєте їм можливість залишатися керівними, навіть якщо ви надаєте певну допомогу.
+Приклади</li>
+<li>Нещодавно я почув чудову історію на The Moth, яка підкреслила важливість питання про те, як ви можете допомогти. The Moth – це радіопрограма та подкаст, що розповідає правдиві історії в прямому ефірі від людей з усього світу. Ці історії захоплюють, зокрема нещодавня історія жінки за вісімдесят, яка розповіла, як цінує свою незалежність. Їй подобалося, що вона завжди піклувалася про себе і що вона все ще може це робити у свої вісімдесят років. А потім у неї стався інсульт. Поки вона була в лікарні, її сусіди в її нью-йоркському багатоквартирному будинку зробили незначний ремонт у її квартирі, щоб полегшити їй життя з ходунками, які їй знадобляться після інсульту. Спочатку вона була вражена, оскільки була привітною, але не дуже подругою зі своїми сусідами. Але їхній жест доброї волі надихнув її усвідомити, що певна залежність від інших насправді може збагатити її життя, особливо якщо вона відповість взаємністю. Тож вона повісила на двері своєї квартири табличку, запрошуючи своїх сусідів зайти на розмову. Потім вона розповіла, як її сусіди часто приходили поговорити, і з вдячністю наголосила, що коли вони пропонували допомогу, то завжди питали, чим вони можуть допомогти. Запитуючи її, як вони можуть допомогти, пояснила вона, вони дозволяють їй зберегти свою незалежність і гідність.</li>
+<li>Церебральна малярія</li>
+<li>Якщо ви запитуєте інших, як ви можете допомогти, ви запрошуєте їх взяти на себе відповідальність за власні проблеми. З цієї причини це корисне питання для друзів, родини та колег. Я виявив, що це особливо корисне питання для дітей та молодих людей.</li>
+</ul>
+<h3>5 essential question — What Truly Matters?</h3>
+<ul>
+<li>Запитувати себе та інших про те, що справді важливо, однаково корисно як на робочому місці, так і в школі. Це дозволяє вам відкинути відволікаючі фактори, дотичні теми та недоречні деталі й зосередитися на реальних і важливих завданнях, які потрібно виконати. Згадайте медсестру, яка запропонувала зателефонувати лікарю, або самого лікаря, який за лічені хвилини точно зрозумів, чого вимагає ситуація. І медсестра, і лікар чітко запитали себе: «Що справді важливо?», оцінюючи ситуацію, що стояла перед ними.</li>
+<li>Я думаю, що більшість людей, які запитують себе, що справді важливо у загальних рисах їхнього життя, включили б сім&#39;ю до своєї відповіді, незалежно від того, як вони визначають сім&#39;ю. Насправді, це останнє з п&#39;яти важливих питань дещо відрізняється від інших тим, що відповіді досить передбачувані, принаймні на перший погляд. Я думаю, що майже кожен, хто ставить це питання, визначить сім&#39;ю, друзів, роботу та, можливо, доброту як речі, які справді важливі для них.</li>
+<li>Іншими словами, тільки вам потрібно вирішити, що дійсно важливо у вашій роботі, вашій родині, ваших друзях і як бути добрими. І вам потрібно вирішити, як збалансувати ці цінності, коли вони перебувають у напрузі або повноцінному конфлікті, як-от постійна потреба балансувати роботу та сім&#39;ю.</li>
+<li>Запитати себе: «Що справді важливо?» перед написанням меморіалу – це гарний спосіб підбити підсумки свого життя, і саме тому це гарне питання, яке варто ставити собі щороку на Новий рік.</li>
+<li>Але що ще важливіше, ви повинні поставити собі це питання та відповісти на нього чесно та безстрашно. Якщо ви це зробите, це питання не лише допоможе вам дістатися до суті проблеми чи проблеми. Воно також допоможе вам дістатися до суті вашого життя.</li>
+</ul>
+<h3>The Bonus Question</h3>
+<ul>
+<li>Нещодавно я натрапив на це бонусне запитання, коли був на поминальній службі за дуже близьким другом і колишнім сусідом по кімнаті в юридичному факультеті, Дагом Кендаллом. Як ви, можливо, пам’ятаєте з третього розділу, Даг — це юрист, який заснував Центр конституційної підзвітності, запитуючи, по суті, «Чи не могли б ми хоча б домовитися?» щодо базового підходу до тлумачення Конституції. Даг був надзвичайно талановитим юристом, далекоглядним лідером і надзвичайно відданим другом, батьком і чоловіком. Він також мав особливий хист ставити чудові — можна навіть сказати, важливі — запитання.</li>
+<li>Даг помер від раку товстої кишки у 2016 році у віці п&#39;ятдесяти одного року. На звороті програми його поминальної служби був вірш Реймонда Карвера під назвою «Late Fragment». Вірш починається з того, що я називаю бонусним питанням, яке, ймовірно, є найважливішим питанням, з яким будь-хто з нас коли-небудь зіткнеться: «І чи отримав ти те, чого хотів від цього життя, попри все?»</li>
+<li>«Попри все» в кінці питання, на мою думку, ідеально відображає реальність того, що біль і розчарування неминуче є частиною повноцінного життя, але також надію на те, що життя, навіть якщо так, пропонує можливість радості та задоволення. Я підозрюю, що Карвер, який помирав від раку, коли писав вірш, думав про власне життя, яке було сповнене любові та душевного болю, невдачі та спокути.</li>
+<li>Звичайно, я не можу гарантувати, що якщо ви просто задасте п&#39;ять основних запитань у цій книзі, то зможете відповісти «Я зробив» на бонусне запитання. Але я вважаю, що ці запитання допоможуть вам досягти цього, якщо ви будете ставити їх регулярно, оскільки вони можуть служити дуже корисним посібником для повноцінного життя. Зрештою, ці запитання охоплюють багато важливих тем:
+<em>«Зачекайте, а що?» — це основа будь-якого розуміння.</em>
+<em>«Цікаво...?» — це основа будь-якої допитливості.</em>
+<em>«Чи не могли б ми хоча б...?» — це початок будь-якого прогресу.</em>
+<em>«Як я можу допомогти?» — це основа всіх добрих стосунків.</em>
+<em>А «Що справді важливо?» допомагає вам дійти до суті життя.</em></li>
+<li>Якщо ви живете життям, наповненим поєднанням цікавості та розуміння; якщо ви залишаєтеся готовими пробувати нове, допомагати іншим та вчитися у них; і якщо ви зосереджуєтесь на тому, що справді важливо для вас, я вважаю, що ви зможете сказати «Я зробив це», коли настане час поставити собі бонусне запитання.</li>
+<li>Після запитання: «І чи отримав ти те, що хотів від цього життя, навіть попри це?» вірш продовжується: 
+<em>Я отримав.</em> 
+<em>А чого ти хотів?</em> 
+<em>Назвати себе коханим,</em> 
+*відчути себе коханим на землі</li>
+<li>Дуг ставив важливі запитання та уважно слухав наші відповіді. Він глибоко розумів силу та красу хороших запитань. Його любили рідні, друзі та колеги, і він змушував усіх нас відчувати себе коханими у відповідь. Дійсно, життя Дуга було доказом того, що вірний спосіб відчути себе коханим – це допомогти іншим відчути те саме. А якщо ви не знаєте, як це зробити, просто запитайте.</li>
+</ul>
+</article>
+      <hr class="divider">
+      <p class="last-modified">Оновлено: 27 червня 2026 р.</p>
+    </main>
+
+<script>
+// Theme persistence
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.dataset.theme = t;
+  if (t === 'light') {
+    const m = document.getElementById('icon-moon'), s = document.getElementById('icon-sun');
+    if (m) m.style.display = 'none';
+    if (s) s.style.display = '';
+  }
+})();
+function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
+function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
+function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
+function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
+const current=window.location.pathname.split('/').pop();
+document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
+const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","maленьк-початки.html","в-део-про-глибокий-океан.html","про-красу-та-мораль.html","список-фантаз-й-курс-в-р-чарда-сола-вурмана.html","цитата-з-figuring.html","як-допомогти-д-тям-культивувати-дивування-та-мницям-поради-з-sense-of-wonder-рейчал-карсон.html","book-curious-the-desire-to-know-and-why-your-future-depends-on-it-ian-leslie-2014-.html","book-the-sense-of-wonder-рейчал-карсон.html","book-wait-what-and-life-s-other-essential-questions-james-ryan-2017-.html","book-wonderstruck-how-wonder-awe-shape-the-way-we-think-helen-de-cruz-2024-.html","book-чому-сну-св-т-екзистенц-йний-детектив-джим-голт.html","ideas-list.html","reading-list.html"];
+function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_NOTES[Math.floor(Math.random()*RANDOM_NOTES.length)];}
+</script>
+</body>
+</html>

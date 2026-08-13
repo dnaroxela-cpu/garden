@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Technique for Producing Ideas (1940) — Sasha's Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root[data-theme="dark"] { --bg:#000; --bg2:#111; --border:#222; --text-muted:#555; --text:#999; --text-strong:#fff; }
+:root[data-theme="light"] { --bg:#f5f5f0; --bg2:#e8e8e0; --border:#ddd; --text-muted:#aaa; --text:#555; --text-strong:#111; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; transition:background 0.2s; }
+.sidebar { width:260px; min-width:260px; padding:36px 28px; display:flex; flex-direction:column; gap:28px; background:var(--bg); position:sticky; top:0; height:100vh; overflow-y:auto; }
+.sidebar-top { display:flex; align-items:center; justify-content:space-between; }
+.site-title { font-size:18px; font-weight:500; text-decoration:none; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+@keyframes rainbow { 0%{background-position:0%} 100%{background-position:200%} }
+.sidebar-icons { display:flex; gap:12px; align-items:center; }
+.icon-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; transition:color 0.15s; }
+.icon-btn:hover { color:var(--text-strong); }
+.icon-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; }
+nav.main-nav { display:flex; flex-direction:column; gap:4px; }
+.nav-item { font-size:15px; color:var(--text); padding:6px 0; display:block; text-decoration:none; border:none; background:none; font-family:'DM Sans',sans-serif; text-align:left; width:100%; -webkit-text-fill-color:var(--text); transition:color 0.15s; cursor:pointer; }
+.nav-item:hover { color:var(--text-strong); -webkit-text-fill-color:var(--text-strong); }
+.nav-item.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.folder-tree { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border:1px solid var(--border); border-radius:8px; }
+.folder { font-size:13px; font-weight:400; color:var(--text); padding:3px 0; display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+.folder-arrow { font-size:10px; color:var(--text-muted); transition:transform 0.15s; display:inline-block; }
+.folder-arrow.closed { transform:rotate(-90deg); }
+.subfolder { padding-left:14px; display:flex; flex-direction:column; gap:2px; }
+.note-link { font-size:12px; color:var(--text-muted); padding:3px 0 3px 12px; line-height:1.4; display:block; text-decoration:none; transition:color 0.15s; -webkit-text-fill-color:var(--text-muted); }
+.note-link:hover { color:var(--text); -webkit-text-fill-color:var(--text); }
+.note-link.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.content { flex:1; padding:36px 64px 80px; max-width:800px; }
+.breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
+.breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
+.breadcrumbs a:hover { color:var(--text-strong); }
+.breadcrumbs span,.bc-current { color:var(--text-muted); }
+h1.article-title { font-size:26px; font-weight:500; line-height:1.3; color:var(--text-strong); margin-bottom:8px; }
+.meta { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+.tags { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:32px; }
+.tag { font-size:14px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; text-decoration:none; cursor:pointer; transition:opacity 0.15s; }
+.tag:hover { opacity:0.7; }
+.article-body .embed-figure { margin:24px 0; }
+.article-body .embed-figure img { max-width:100%; border-radius:8px; display:block; }
+.article-body .embed-figure video { max-width:100%; border-radius:8px; display:block; background:#000; }
+.article-body .embed-figure audio { width:100%; margin:8px 0; }
+.article-body img { max-width:100%; border-radius:8px; margin:16px 0; display:block; }
+.article-body .footnotes ol { padding-left:20px; }
+.article-body .footnotes li { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:6px; }
+.article-body .footnotes a { color:#9d8cff; }
+.article-body sup { font-size:11px; line-height:0; vertical-align:super; }
+.article-body sup a { color:#9d8cff; text-decoration:none; }
+.article-body sup a:hover { text-decoration:underline; }
+.article-body h2 { font-size:22px; font-weight:600; color:var(--text-strong); margin:36px 0 14px; }
+.article-body h3 { font-size:18px; font-weight:600; color:var(--text-strong); margin:24px 0 10px; }
+.article-body h4 { font-size:15px; font-weight:600; color:var(--text); margin:18px 0 8px; }
+.article-body p { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.article-body ul,.article-body ol { padding-left:20px; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
+.article-body li { font-size:16px; line-height:1.75; color:var(--text); }
+.article-body li strong { color:var(--text-strong); font-weight:500; }
+.article-body em { font-style:italic; }
+.article-body mark { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-text-fill-color:#111; color:#111; border-radius:4px; padding:1px 5px; font-weight:500; }
+.article-body a { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; transition:opacity 0.15s; }
+.article-body a::after { content:'↗'; font-size:0.75em; margin-left:2px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.article-body a:hover { opacity:0.7; }
+hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
+.last-modified { font-size:13px; color:var(--text-muted); }
+.home-intro { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.books-grid { display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+.book-card { padding:16px 20px; border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:border-color 0.15s; text-decoration:none; display:block; }
+.book-card:hover { border-color:#9d8cff; }
+.book-card h3 { font-size:15px; font-weight:500; color:var(--text-strong); margin-bottom:4px; }
+.book-card p { font-size:13px; color:var(--text-muted); }
+/* Graph */
+.graph-container { width:100%; height:400px; border:1px solid var(--border); border-radius:8px; margin-top:24px; position:relative; overflow:hidden; }
+canvas#graph { width:100%; height:100%; }
+.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
+.search-overlay.open { display:flex; }
+.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
+.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
+.search-input::placeholder { color:var(--text-muted); }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <a class="site-title" href="index.html">Sasha's Garden</a>
+    <div class="sidebar-icons">
+      <button class="icon-btn" onclick="toggleSearch()">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()">
+        <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a class="nav-item " href="research.html">Research Topics</a>
+    <a class="nav-item active" href="books.html">Book Reviews</a>
+    <a class="nav-item " href="blog.html">Blog Notes</a>
+    <a class="nav-item " href="seeds.html">Seeds</a>
+    <button class="nav-item" onclick="goRandom()">Random Note</button>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+  </nav>
+  
+</aside>
+
+<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
+  </div>
+</div>
+
+<main class="content">
+      <nav class="breadcrumbs"><a href="index.html">Home</a><span>›</span><span>Book Reviews</span><span>›</span><span class="bc-current">A Technique for Producing Ideas (1940)</span></nav>
+      <h1 class="article-title">A Technique for Producing Ideas (1940)</h1>
+      <p class="meta">1 хв читання</p>
+      <div class="tags"><a class="tag" href="tag-ideation.html" target="_blank">#ideation</a></div>
+      <article class="article-body"><p>Один з пергших рецепт створення ідей від маркетолога середини минулого століття Джеймс Вебб Янга. Той казав, що ідея – це нова комбінація старих елементів. І ключова задача в генерації ідей – це вміння знаходити нові звʼязки між цими елементами. </p>
+<p>Перший і найскладніший етап – це збір сирого матеріалу. Його варто збирати відразу на двох рівнях: конкретному та загальному. На конкретному рівні це може бути якась інформація про продукт і клієнта, якщо ми говоримо про сферу реклами. Наприклад, тут Янг цитує метод навчання письму Гі де Мопассана:</p>
+<blockquote>
+<p><em>«Йди на вулиці Парижа та злови таксі. Таксист буде здаватися тобі таким сами як і будь-який інший таксист. Але вивчай його допоки він не буде сприйматися в твоєму описі як окрема людина, яка зовсім не схожа на будь-якого іншого таксиста у світі».</em></p>
+</blockquote>
+<p>Під загальним рівнем збору матеріалу, Янг має на увазі інвестувати у природну цікавить до будь-якої можливої теми. Коли <em>«під сонцем не має жодної теми, якою людина не могла б легко зацікавитися — від, скажімо, єгипетських похоронних звичаїв до сучасного мистецтва. Кожна грань життя захоплює її».</em> </p>
+<p>Другий крок — переварити матеріал. Треба довго обмацувати зібраний матеріал, так б мовити, «щупальцями свого розуму». Дивитися на нього з різних боків і в різному освітленні. Брати два елементи і дивитися як вони виглядають разом. Намагатися скласти різні пазли. Потім, за його словами, треба відпочити і ідея сама несподівано прийде. </p>
+</article>
+      
+    </main>
+
+<script>
+// Theme persistence
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.dataset.theme = t;
+  if (t === 'light') {
+    const m = document.getElementById('icon-moon'), s = document.getElementById('icon-sun');
+    if (m) m.style.display = 'none';
+    if (s) s.style.display = '';
+  }
+})();
+function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
+function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
+function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
+function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
+const current=window.location.pathname.split('/').pop();
+document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
+const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","maленьк-початки.html","про-красу-та-мораль.html","список-фантаз-й-курс-в-р-чарда-сола-вурмана.html","як-допомогти-д-тям-культивувати-дивування-та-мницям-поради-з-sense-of-wonder-рейчал-карсон.html","a-technique-for-producing-ideas-1940-.html","curious-the-desire-to-know-and-why-your-future-depends-on-it.html","the-sense-of-wonder.html","wait-what-and-life-s-other-essential-questions.html","wonderstruck-how-wonder-awe-shape-the-way-we-think.html","чому-сну-св-т-екзистенц-йний-детектив.html","ideas-list.html","reading-list.html","в-део-про-глибокий-океан.html","таланти-та-методолог-я-gallup.html","цитата-з-figuring.html"];
+function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_NOTES[Math.floor(Math.random()*RANDOM_NOTES.length)];}
+</script>
+</body>
+</html>

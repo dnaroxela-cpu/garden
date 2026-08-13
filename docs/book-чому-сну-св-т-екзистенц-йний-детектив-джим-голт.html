@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book «Чому існує світ? Екзистенційний детектив» Джим Голт — Sasha's Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root[data-theme="dark"] { --bg:#000; --bg2:#111; --border:#222; --text-muted:#555; --text:#999; --text-strong:#fff; }
+:root[data-theme="light"] { --bg:#f5f5f0; --bg2:#e8e8e0; --border:#ddd; --text-muted:#aaa; --text:#555; --text-strong:#111; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; transition:background 0.2s; }
+.sidebar { width:260px; min-width:260px; padding:36px 28px; display:flex; flex-direction:column; gap:28px; background:var(--bg); position:sticky; top:0; height:100vh; overflow-y:auto; }
+.sidebar-top { display:flex; align-items:center; justify-content:space-between; }
+.site-title { font-size:18px; font-weight:500; text-decoration:none; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+@keyframes rainbow { 0%{background-position:0%} 100%{background-position:200%} }
+.sidebar-icons { display:flex; gap:12px; align-items:center; }
+.icon-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; transition:color 0.15s; }
+.icon-btn:hover { color:var(--text-strong); }
+.icon-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; }
+nav.main-nav { display:flex; flex-direction:column; gap:4px; }
+.nav-item { font-size:15px; color:var(--text); padding:6px 0; display:block; text-decoration:none; border:none; background:none; font-family:'DM Sans',sans-serif; text-align:left; width:100%; -webkit-text-fill-color:var(--text); transition:color 0.15s; cursor:pointer; }
+.nav-item:hover { color:var(--text-strong); -webkit-text-fill-color:var(--text-strong); }
+.nav-item.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.folder-tree { display:flex; flex-direction:column; gap:2px; padding:12px 14px; border:1px solid var(--border); border-radius:8px; }
+.folder { font-size:13px; font-weight:400; color:var(--text); padding:3px 0; display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+.folder-arrow { font-size:10px; color:var(--text-muted); transition:transform 0.15s; display:inline-block; }
+.folder-arrow.closed { transform:rotate(-90deg); }
+.subfolder { padding-left:14px; display:flex; flex-direction:column; gap:2px; }
+.note-link { font-size:12px; color:var(--text-muted); padding:3px 0 3px 12px; line-height:1.4; display:block; text-decoration:none; transition:color 0.15s; -webkit-text-fill-color:var(--text-muted); }
+.note-link:hover { color:var(--text); -webkit-text-fill-color:var(--text); }
+.note-link.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.content { flex:1; padding:36px 64px 80px; max-width:800px; }
+.breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
+.breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
+.breadcrumbs a:hover { color:var(--text-strong); }
+.breadcrumbs span,.bc-current { color:var(--text-muted); }
+h1.article-title { font-size:26px; font-weight:500; line-height:1.3; color:var(--text-strong); margin-bottom:8px; }
+.meta { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+.tags { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:32px; }
+.tag { font-size:14px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; text-decoration:none; cursor:pointer; transition:opacity 0.15s; }
+.tag:hover { opacity:0.7; }
+.article-body .embed-figure { margin:24px 0; }
+.article-body .embed-figure img { max-width:100%; border-radius:8px; display:block; }
+.article-body .embed-figure video { max-width:100%; border-radius:8px; display:block; background:#000; }
+.article-body .embed-figure audio { width:100%; margin:8px 0; }
+.article-body img { max-width:100%; border-radius:8px; margin:16px 0; display:block; }
+.article-body .footnotes ol { padding-left:20px; }
+.article-body .footnotes li { font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:6px; }
+.article-body .footnotes a { color:#9d8cff; }
+.article-body sup { font-size:11px; line-height:0; vertical-align:super; }
+.article-body sup a { color:#9d8cff; text-decoration:none; }
+.article-body sup a:hover { text-decoration:underline; }
+.article-body h2 { font-size:18px; font-weight:500; color:var(--text-strong); margin:32px 0 12px; }
+.article-body h3 { font-size:15px; font-weight:500; color:var(--text); margin:20px 0 8px; }
+.article-body h4 { font-size:14px; font-weight:500; color:var(--text-muted); margin:16px 0 6px; }
+.article-body p { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.article-body ul,.article-body ol { padding-left:20px; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
+.article-body li { font-size:16px; line-height:1.75; color:var(--text); }
+.article-body li strong { color:var(--text-strong); font-weight:500; }
+.article-body em { font-style:italic; }
+.article-body mark { background:rgba(157,140,255,0.2); color:var(--text-strong); border-radius:3px; padding:0 2px; }
+.article-body a { color:#9d8cff; }
+hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
+.last-modified { font-size:13px; color:var(--text-muted); }
+.home-intro { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.books-grid { display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+.book-card { padding:16px 20px; border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:border-color 0.15s; text-decoration:none; display:block; }
+.book-card:hover { border-color:#9d8cff; }
+.book-card h3 { font-size:15px; font-weight:500; color:var(--text-strong); margin-bottom:4px; }
+.book-card p { font-size:13px; color:var(--text-muted); }
+/* Graph */
+.graph-container { width:100%; height:400px; border:1px solid var(--border); border-radius:8px; margin-top:24px; position:relative; overflow:hidden; }
+canvas#graph { width:100%; height:100%; }
+.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
+.search-overlay.open { display:flex; }
+.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
+.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
+.search-input::placeholder { color:var(--text-muted); }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <a class="site-title" href="index.html">Sasha's Garden</a>
+    <div class="sidebar-icons">
+      <button class="icon-btn" onclick="toggleSearch()">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()">
+        <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a class="nav-item " href="research.html">Research Topics</a>
+    <a class="nav-item " href="books.html">Book Reviews</a>
+    <a class="nav-item " href="blog.html">Blog Notes</a>
+    <button class="nav-item" onclick="goRandom()">Random Note</button>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+  </nav>
+  
+</aside>
+
+<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
+  </div>
+</div>
+
+<main class="content">
+      <nav class="breadcrumbs"><a href="index.html">Home</a><span>›</span><span>Book Reviews</span><span>›</span><span class="bc-current">Book «Чому існує світ? Екзистенційний детектив» Джим Голт</span></nav>
+      <h1 class="article-title">Book «Чому існує світ? Екзистенційний детектив» Джим Голт</h1>
+      <p class="meta">30 червня 2026 р. · 6 хв читання</p>
+      <div class="tags"><a class="tag" href="tag-book.html" target="_blank">#book</a><a class="tag" href="tag-philosophy.html" target="_blank">#philosophy</a></div>
+      <article class="article-body"><figure class="embed-figure"><img src="9c1046d5-e768-439b-adc6-57f74aabddbb_1400x1027.webp" alt="9c1046d5-e768-439b-adc6-57f74aabddbb_1400x1027.webp" loading="lazy"></figure><p>Питання «Чому існує світ?» може захопити будь-кого — як маленьку дитину, так й Нобелівського лауреата. Це одна з найцікавіших таємниць з усіх можливих, масштабна та водночас тривожно інтимна. Ніби як на початку анекдоту, в її дослідженні найчастіше зустрічаються філософи, фізики та священники. Деякі відкидають її як безглузду, в той час як інші дивуються їй все життя.  </p>
+<p>Джим Голт, письменник та популяризатор науки, віддав цій таємниці цілу книгу. В 2025 році її переклали українською, тому я вирішила її прочитати. Голт описує історію постановки людством питання про те «чому існує щось, а не ніщо?», розповідає про різні сучасні думки навколо нього, а також про свої власні емоційні стани під час цих досліджень.  </p>
+<p>Він переказує свої розмови про причини існування світу з різними людьми, серед яких — математик Роджер Пенроуз, письменник Джон Апдайк (культовий роман якого теж щойно переклали українською), фізик та батько квантового обчислення Девід Дойч та філософ Дерек Парфіт.  </p>
+<p>Бувають моменти, коли розпочате дослідження здається Голту позбавленим сенсу, а також коли воно дивує до глибини души. В будь-якому разі, він приходить до висновку, що воно не може бути відокремленим від людини, яка його здійснює, разом з її характером та настроями. Іноді це питання співзвучно питанню «Чому існую я?», але все-таки не тотожне йому.  </p>
+<p>Письменниця та лауреатка Пулітцерівської премії <a href="https://www.vulture.com/2012/07/kathryn-schulz-on-jim-holt-why-does-the-world-exist.html">Катрін Шульц писала в одній з найкрасивіших рецензій,</a> яку я читала в житті: <em>«Задоволення від цієї книги полягає у спостереженні за матчем: приголомшливо винахідливий людський розум вигадує свої фантастичні припущення, Всесвіт холоднокровно повертає кожну подачу»</em>.  </p>
+<p>Можливо, ми ніколи не дізнаємось результати цього матчу між нашою цікавістю та найбільшою таємницею Всесвіту. Шульц закінчує рецензію так: <em>«[книга «Чому існує світ?»] робить те, що має робити справжнє наукове письмо: вона допомагає нам відчути всю повноту проблеми. Це книга, яка закінчується, буквально і переносно, непрозорістю. Голт перетинає міст, вночі, курить сигарету — цей крихітний артефакт людської винахідливості, що викликає залежність і сяє. В акті громадянської безвідповідальності, але інтелектуальної бравади, він нахиляється і дозволяє їй упасти в темряву. Вона падає, як останнє питання: скільки ми освітимо, перш ніж згаснемо?»</em>  </p>
+<p>Я не бачила кращих спроб описати це питання популярною мовою, з гумором та особистим життєвим контексом. Хоча місцями воно все таки відчувалось задроцьким, навіть за мірками мого філософсько-бакалаварського мозку, книга все одно прекрасна: 8,5/10.</p>
+<hr>
+<h3>Конспект історії постановки питання по Голту</h3>
+<ul>
+<li>Космогонія у народних міфах завжди починалась з <em>чогось</em>. Наприклад, у грецьких філософів, світ був побудований первинним матеріалом, який існував вічно. У різних філософів були різні кандидати на такий матеріал — вода, вогонь або більш абстрактний “апейрон”. Ідея того, що <em>ніщо</em> передувало цьому матеріалу, а тому світ мав мати момент створення або причину, була немислима. </li>
+<li>Десь у 2-3 століття н.е. отці церкви запропонували нову радикальну космогонію. Світ почав своє існування виключно завдяки творчому слову бога, якому не потрібен був жодний матеріал. Цей хід дав можливість помисли <em>ніщо</em> як реальну онтологічну можливість. І це дало можливість поставити питання чому існує світ, а не <em>цілковите ніщо</em>?</li>
+<li>Це питання вперше поставив Ляйбніц у 1714 році, колу йому було 68 років. Ляйбніц запропонував «принцип достатньої підстави»,згідно з яким існує пояснення для кожного факту, отже факт існування світу має мати пояснення. </li>
+<li>Г’юм та Кант не погодились з Ляйбніцом — існування обʼєктів не може бути гарантовано лише частою логікою, а пояснення існування світу веде лише до хиби та непослідовності. З ними погоджувались деякі відомі філософи згодом. Але були також і ті, хто все одно дивувався цим питанням, наприклад Анрі Бергсон («я хочу знати чому існує світ») та Людвіг Вітґенштайн («містика полягає в тому не <em>який</em> світ, а в тому, що він є»). </li>
+<li>Тим часом, більшість науковців були переконані, що світ вічний, у нього не було початку. Серед них Коперник, Галілей та Ньютон. Навіть Ейнштайн був переконаний, що світ вічний і незмінний. Хоча саме з його теорії відносності у 1927 році Жорж Леметер та Едвін Габбл вивели та довели розширення Всесвіту, та прийшли висновків, що світ мусив мати раптовий початок.</li>
+<li>Церковники тішилися відкриттю, в той час як багато науковців бідкалися. У 1950-х космолог Фред Гойл сказав, що «вибух — недостатньо гідний спосіб появи світу, ніби дівчина вистрибує з торта на вечірці». Він ж придумав термін «великий вибух», який згодом прижився. </li>
+<li>Через відкриття «великого вибуху» питання «Чому є щось, а не ніщо?» стало складніше ігнорувати. Метафізика знову стала популярна, а один з філософів яких вона найбільше цікавила Роберт Нозік написав, що: «людина яка пропонує не дивну відповідь на це питання, демонструє, що вона не зрозуміла питання».</li>
+</ul>
+<hr>
+<h3>Цитати з книги, які хочу зберегти</h3>
+<h4>Про таємницю</h4>
+<ul>
+<li>«Добро, краса, математичні обʼєкти, логічні закони – це не щось тією ж мірою, якою чимось є ментальні та матеріальні явища. (…) Чи можуть вони відігравати певну роль у поясненні того чому є щось, а не ніщо?»</li>
+<li>«Нам часто кажуть, що ясне світло науки скасувало таємницю, залишили лише логіку та раціональність, – писав Гакслі. – Але це зовсім не так. Наука скинула темну завісу таємниці з багатьох явищ, принісши людству значну користь, але вона зіштовхує нас із головною та універсальною таємницею – таємницею існування… Чому світ існує? Чому наповнення світу є таким, яким є? Чому воно має ментальні, субʼєктивні аспекти і водночас – матеріальні, об’єктивні? Ми не знаємо… Але ми повинні навчитися це приймати, а також приймати його й наше існування як одну фундаментальну таємницю» (цитата з Julian Huxley, Essays of a Humanist, 1969, р. 107-108)</li>
+</ul>
+<h4>Про закони фізики та що вони <em>пояснюють</em></h4>
+<ul>
+<li>«[закони фізики] не ширяють над світом і в жодній формі йому не передують. Натомість вони є лише найзагальнішим можливим результатом патернів подій у світі. Якщо так, то планети обертаються навколо Сонця не тому, що “підпорядковуються” законові тяжіння; натомість закон тяжіння резюмує загальний патерн в природі»</li>
+<li>«Тоді як ці закони можуть щось <em>пояснити</em>? Можливо, вони й не можуть. Так думав Вітґенштайн. “Весь сучасний світогляд грунтується на хибному уявленні, що так звані закони природи є поясненнями її явищ. Тож сучасні люди дивляться на закони природи як на щось непорушне, як стародавні – на Бога та долю”» (Голт цитує Вітґенштайна з Логіко-філософського трактату, 1921)</li>
+</ul>
+<h4>Про особисту ідентичність</h4>
+<ul>
+<li>«Самість, використовуючи аналогію Г’юма, – наче нація; або використовуючи аналогію Парфіта, наче клуб. Ми можемо простежити її ідентичність між певними моментами. Але питання чи залишається вона тією ж самою довго або після великих фізіологічних та психологічних перерв, є невизначеним і навіть порожнім» / «Постійна самість є чимось вигаданим, тінню, яку відкидає займенник “Я”»</li>
+<li>«Відчуття того, що реальність залежить від мого існування, є соліпсичною ілюзією, і я це знаю. Та навіть якщо її визначити такою, воно міцно мене тримає в лабетах. Як я можу послабити її пута? Можливо, твердо дотримуючись думки, що світ щасливо існував багато тисячоліть перед тим малоймовірним моментом, коли я раптово постав із ночі несвідомості, і він і далі буде існувати після неуникненної миті, коли я повернуся в ту ніч знову»</li>
+</ul>
+<p><em>Картинка: <a href="https://medium.com/design-bridges/design-management-3-d77f48e4c41e">Мем з блогу Design Bridges</a> про важливість онбордінгу. Мені він подобається також в контексті роздумів про причин існування світу.</em></p>
+</article>
+      <hr class="divider">
+      <p class="last-modified">Оновлено: 30 червня 2026 р.</p>
+    </main>
+
+<script>
+// Theme persistence
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.dataset.theme = t;
+  if (t === 'light') {
+    const m = document.getElementById('icon-moon'), s = document.getElementById('icon-sun');
+    if (m) m.style.display = 'none';
+    if (s) s.style.display = '';
+  }
+})();
+function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
+function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
+function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
+function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
+const current=window.location.pathname.split('/').pop();
+document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
+const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","maленьк-початки.html","в-део-про-глибокий-океан.html","про-красу-та-мораль.html","список-фантаз-й-курс-в-р-чарда-сола-вурмана.html","цитата-з-figuring.html","як-допомогти-д-тям-культивувати-дивування-та-мницям-поради-з-sense-of-wonder-рейчал-карсон.html","book-curious-the-desire-to-know-and-why-your-future-depends-on-it-ian-leslie-2014-.html","book-the-sense-of-wonder-рейчал-карсон.html","book-wait-what-and-life-s-other-essential-questions-james-ryan-2017-.html","book-wonderstruck-how-wonder-awe-shape-the-way-we-think-helen-de-cruz-2024-.html","book-чому-сну-св-т-екзистенц-йний-детектив-джим-голт.html","ideas-list.html","reading-list.html"];
+function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_NOTES[Math.floor(Math.random()*RANDOM_NOTES.length)];}
+</script>
+</body>
+</html>

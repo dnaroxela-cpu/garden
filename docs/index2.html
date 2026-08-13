@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sasha's Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'DM Sans',system-ui,sans-serif}
+#w{position:relative;width:100vw;height:100vh;overflow:hidden;background:#1a2a1a}
+#bg-day{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transition:opacity 1.2s ease;opacity:1}
+#bg-night{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transition:opacity 1.2s ease;opacity:0}
+#overlay{position:absolute;inset:0;z-index:1;transition:background 1.2s ease;background:rgba(0,0,0,0.2)}
+#desktop{position:absolute;inset:0;z-index:5}
+#toggle{position:fixed;bottom:24px;right:24px;z-index:20;width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;background:rgba(0,0,0,0.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;transition:background .3s}
+#toggle:hover{background:rgba(0,0,0,0.5)}
+#toggle svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+#icon-sun{display:none}
+.folder{position:absolute;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;user-select:none}
+.folder-icon{width:52px;height:44px}
+.folder-icon svg{width:100%;height:100%;filter:drop-shadow(0 2px 8px rgba(0,0,0,.45))}
+.folder-label{font-size:11px;color:#fff;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.9);max-width:80px;line-height:1.3;word-break:break-word}
+.folder-count{font-size:10px;color:rgba(255,255,255,.55);text-shadow:0 1px 4px rgba(0,0,0,.8)}
+#tt{position:fixed;background:rgba(10,10,10,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid rgba(255,255,255,.15);border-radius:8px;padding:7px 12px;font-size:12px;color:#fff;pointer-events:none;opacity:0;transition:opacity .12s;z-index:30;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="w">
+  <img id="bg-day" alt="">
+  <img id="bg-night" alt="">
+  <div id="overlay"></div>
+  <div id="desktop"></div>
+  <button id="toggle" onclick="toggleNight()">
+    <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+    <svg id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+  </button>
+  <div id="tt"></div>
+</div>
+
+<script>
+// Set image sources after page loads to avoid caching issues
+window.addEventListener('DOMContentLoaded', () => {
+  const day = document.getElementById('bg-day');
+  const night = document.getElementById('bg-night');
+  day.src = '000009060023.jpg?' + Date.now();
+  night.src = 'Gemini_Generated_Image_cbf6b5cbf6b5cbf6.png?' + Date.now();
+  day.onerror = () => console.log('Day photo failed to load');
+  night.onerror = () => console.log('Night photo failed to load');
+});
+
+let isNight = false;
+function toggleNight(){
+  isNight = !isNight;
+  document.getElementById('bg-night').style.opacity = isNight ? '1' : '0';
+  document.getElementById('bg-day').style.opacity = isNight ? '0' : '1';
+  document.getElementById('overlay').style.background = isNight ? 'rgba(0,0,10,0.35)' : 'rgba(0,0,0,0.2)';
+  document.getElementById('icon-moon').style.display = isNight ? 'none' : 'block';
+  document.getElementById('icon-sun').style.display = isNight ? 'block' : 'none';
+}
+
+const TAG_DATA=[
+  {tag:'curiosity',count:5},{tag:'wonder',count:4},{tag:'science',count:3},
+  {tag:'education',count:2},{tag:'awe',count:4},{tag:'magic',count:2},
+  {tag:'mind',count:3},{tag:'writing',count:3},{tag:'web',count:2},
+  {tag:'philosophy',count:2},{tag:'seacreatures',count:1},{tag:'films',count:1},
+  {tag:'questions',count:2},{tag:'morality',count:1},{tag:'graduation',count:1},
+  {tag:'book',count:4},{tag:'ml',count:2},{tag:'ethics',count:2},
+  {tag:'ai',count:3},{tag:'cog',count:2},
+];
+
+const COLORS=['#5B9BF8','#F8A05B','#A05BF8','#5BF8A0','#F85B9B','#F8D45B','#5BF8F8','#F85B5B','#9BF85B','#5B6BF8','#F8C05B','#C05BF8','#5BCBF8','#F86B5B','#6BF8A0','#F8B05B','#B0F85B','#5B8BF8','#F88B5B','#8BF85B'];
+
+function folderSVG(c){
+  return`<svg viewBox="0 0 56 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 10 Q2 6 6 6 L20 6 Q23 6 25 9 L27 12 L52 12 Q54 12 54 14 L54 40 Q54 42 52 42 L4 42 Q2 42 2 40 Z" fill="${c}" opacity="0.85"/>
+    <path d="M2 14 Q2 12 4 12 L52 12 Q54 12 54 14 L54 40 Q54 42 52 42 L4 42 Q2 42 2 40 Z" fill="${c}"/>
+    <path d="M4 12 L52 12 L52 16 Q28 18 4 16 Z" fill="rgba(255,255,255,0.2)"/>
+  </svg>`;
+}
+
+function placeRandom(ex, W, H){
+  let x, y, t=0;
+  do {
+    x = 0.04 + Math.random()*0.90;
+    y = 0.05 + Math.random()*0.87;
+    t++;
+  } while(t<400 && ex.some(p=>{
+    const dx=(x-p.x)*W, dy=(y-p.y)*H;
+    return Math.sqrt(dx*dx+dy*dy)<92;
+  }));
+  return {x, y};
+}
+
+const desktop = document.getElementById('desktop');
+const tip = document.getElementById('tt');
+const placed = [];
+const W = window.innerWidth, H = window.innerHeight;
+
+TAG_DATA.forEach((d, i) => {
+  const pos = placeRandom(placed, W, H);
+  placed.push(pos);
+  const rot = (Math.random()-.5)*7;
+
+  const el = document.createElement('div');
+  el.className = 'folder';
+  el.style.left = Math.round(pos.x*W) + 'px';
+  el.style.top  = Math.round(pos.y*H) + 'px';
+  el.style.transform = `translate(-50%,-50%) rotate(${rot}deg)`;
+  el.style.transition = 'transform .15s ease';
+  el.innerHTML = `
+    <div class="folder-icon">${folderSVG(COLORS[i%COLORS.length])}</div>
+    <div class="folder-label">${d.tag}</div>
+    <div class="folder-count">${d.count} нотаток</div>
+  `;
+
+  el.addEventListener('mouseenter', () => {
+    el.style.transform = `translate(-50%,-50%) rotate(${rot}deg) scale(1.1)`;
+    tip.style.opacity = '1';
+    tip.textContent = `#${d.tag} · ${d.count} нотаток`;
+  });
+  el.addEventListener('mousemove', e => {
+    tip.style.left = (e.clientX+14)+'px';
+    tip.style.top  = (e.clientY-38)+'px';
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.transform = `translate(-50%,-50%) rotate(${rot}deg)`;
+    tip.style.opacity = '0';
+  });
+
+  let dragging=false, ox=0, oy=0, sx=0, sy=0;
+  el.addEventListener('mousedown', e => {
+    dragging=true; sx=e.clientX; sy=e.clientY;
+    ox = e.clientX - parseInt(el.style.left);
+    oy = e.clientY - parseInt(el.style.top);
+    el.style.zIndex = 100;
+    el.style.transition = 'none';
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    el.style.left = (e.clientX-ox)+'px';
+    el.style.top  = (e.clientY-oy)+'px';
+  });
+  window.addEventListener('mouseup', e => {
+    if(!dragging) return;
+    dragging=false;
+    el.style.zIndex = 5;
+    el.style.transition = 'transform .15s ease';
+    if(Math.hypot(e.clientX-sx, e.clientY-sy) < 5){
+      window.location.href = 'tag-'+d.tag+'.html';
+    }
+  });
+
+  desktop.appendChild(el);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You and Your Research — Sasha's Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root[data-theme="dark"] { --bg:#0e0e0e; --bg2:#181818; --border:#262626; --text-muted:#555; --text:#999; --text-strong:#fff; }
+:root[data-theme="light"] { --bg:#f5f5f0; --bg2:#e8e8e0; --border:#ddd; --text-muted:#aaa; --text:#555; --text-strong:#111; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; transition:background 0.2s; }
+.sidebar { width:260px; min-width:260px; padding:36px 28px; display:flex; flex-direction:column; gap:28px; background:var(--bg); position:sticky; top:0; height:100vh; overflow-y:auto; }
+.sidebar-top { display:flex; align-items:center; justify-content:space-between; }
+.site-title { font-size:18px; font-weight:500; text-decoration:none; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+@keyframes rainbow { 0%{background-position:0%} 100%{background-position:200%} }
+.sidebar-icons { display:flex; gap:12px; align-items:center; }
+.icon-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; transition:color 0.15s; }
+.icon-btn:hover { color:var(--text-strong); }
+.icon-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; }
+nav.main-nav { display:flex; flex-direction:column; gap:4px; }
+.nav-item { font-size:15px; color:var(--text); padding:6px 0; display:block; text-decoration:none; border:none; background:none; font-family:'DM Sans',sans-serif; text-align:left; width:100%; -webkit-text-fill-color:var(--text); transition:color 0.15s; cursor:pointer; }
+.nav-item:hover { color:var(--text-strong); -webkit-text-fill-color:var(--text-strong); }
+.nav-item.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.content { flex:1; padding:36px 64px 80px; max-width:800px; }
+.breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
+.breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
+.breadcrumbs a:hover { color:var(--text-strong); text-decoration:underline; }
+.breadcrumbs span,.bc-current { color:var(--text-muted); }
+h1.article-title { font-size:26px; font-weight:500; line-height:1.3; color:var(--text-strong); margin-bottom:8px; }
+.meta { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+.tags { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:32px; }
+.tag { font-size:14px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; text-decoration:none; cursor:pointer; transition:opacity 0.15s; }
+.tag:hover { opacity:0.7; }
+.article-body .embed-figure { margin:24px 0; }
+.article-body .embed-figure img { max-width:100%; border-radius:8px; display:block; }
+.article-body .embed-figure video { max-width:100%; border-radius:8px; display:block; background:#000; }
+.article-body .embed-figure audio { width:100%; margin:8px 0; }
+.article-body img { max-width:100%; border-radius:8px; margin:16px 0; display:block; }
+/* Plain blockquote (no [!type]) — just a rainbow line on the left, no box */
+.article-body blockquote { position:relative; margin:24px 0; padding:2px 0 2px 18px; }
+.article-body blockquote::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:linear-gradient(180deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:100% 300%; animation:rainbow-v 4s linear infinite; border-radius:2px; }
+.article-body blockquote p { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:8px; }
+.article-body blockquote p:last-child { margin-bottom:0; }
+/* Callouts */
+.callout { display:flex; gap:0; margin:24px 0; border-radius:0 8px 8px 0; overflow:hidden; }
+.callout-stripe { width:2px; flex-shrink:0; background:linear-gradient(180deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:100% 300%; animation:rainbow-v 4s linear infinite; }
+@keyframes rainbow-v { 0%{background-position:0% 0%} 100%{background-position:0% 200%} }
+.callout-inner { flex:1; background:var(--bg2); border:0.5px solid var(--border); border-left:none; border-radius:0 8px 8px 0; padding:14px 16px; }
+.callout-title { display:flex; align-items:center; gap:7px; margin-bottom:8px; }
+.callout-type { font-size:13px; font-weight:500; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:300%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
+.callout-body p { font-size:14px; line-height:1.6; color:var(--text); margin:0; }
+.callout-body p+p { margin-top:8px; }
+.callout-body ul,.callout-body ol { padding-left:18px; display:flex; flex-direction:column; gap:6px; }
+.callout-body li { font-size:14px; line-height:1.6; color:var(--text); }
+/* Footnotes */
+.article-body .footnotes { margin-top:40px; padding-top:20px; border-top:0.5px solid var(--border); }
+.article-body .footnotes ol { list-style:none; padding-left:0; display:flex; flex-direction:column; gap:8px; counter-reset:fn; }
+.article-body .footnotes li { display:flex; gap:10px; font-size:13px; color:var(--text-muted); line-height:1.5; counter-increment:fn; }
+.article-body .footnotes li::before { content:counter(fn); font-size:12px; font-weight:500; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; flex-shrink:0; min-width:16px; }
+.article-body .footnotes li p { margin:0; font-size:13px; color:var(--text-muted); display:inline; }
+.article-body .footnotes li a { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
+.article-body .footnotes li a::after { display:none !important; }
+.article-body sup { font-size:11px; line-height:0; vertical-align:super; }
+.article-body sup a { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; text-decoration:none; }
+.article-body sup a::after { display:none !important; }
+/* FIX 2: Headings — black/white bold, size hierarchy */
+.article-body h1 { font-size:28px; font-weight:700; color:var(--text-strong); margin:40px 0 16px; line-height:1.25; }
+.article-body h2 { font-size:22px; font-weight:700; color:var(--text-strong); margin:36px 0 14px; line-height:1.3; }
+.article-body h3 { font-size:18px; font-weight:700; color:var(--text-strong); margin:28px 0 10px; line-height:1.35; }
+.article-body h4 { font-size:15px; font-weight:700; color:var(--text-strong); margin:20px 0 8px; }
+.article-body h5 { font-size:14px; font-weight:700; color:var(--text-strong); margin:16px 0 6px; }
+.article-body h6 { font-size:13px; font-weight:700; color:var(--text); margin:14px 0 6px; }
+.article-body p { font-size:16px; line-height:1.75; color:var(--text); margin-bottom:14px; }
+.article-body ul,.article-body ol { padding-left:20px; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
+.article-body li { font-size:16px; line-height:1.75; color:var(--text); }
+.article-body li strong { color:var(--text-strong); font-weight:500; }
+.article-body em { font-style:italic; }
+.article-body mark { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-text-fill-color:#111; color:#111; border-radius:4px; padding:1px 5px; font-weight:500; }
+.article-body a { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; transition:opacity 0.15s; }
+.article-body a::after { content:'↗'; font-size:0.75em; margin-left:2px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.article-body a:hover { opacity:0.7; }
+hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
+.last-modified { font-size:13px; color:var(--text-muted); }
+/* Homepage quote (random pick from "Цитати" note) */
+.quote-hero { display:flex; flex-direction:column; justify-content:flex-start; align-items:flex-start; text-align:left; max-width:520px; margin:0; }
+.quote-text { font-family:'DM Sans',sans-serif; font-size:clamp(.7rem,1.3vw,1.05rem); font-weight:500; line-height:1.32; color:var(--text-strong); margin-bottom:.6rem; transition:opacity .25s ease; }
+.quote-text.fade { opacity:0; }
+.quote-row { display:flex; align-items:center; justify-content:flex-start; gap:14px; flex-wrap:wrap; }
+.quote-source { font-size:.88rem; color:var(--text-muted); }
+.quote-refresh { background:none; border:1px solid var(--border); border-radius:20px; padding:5px 14px; color:var(--text); cursor:pointer; font-size:.78rem; font-family:'DM Sans',sans-serif; display:inline-flex; align-items:center; gap:6px; transition:opacity .2s ease, border-color .2s ease, color .2s ease; }
+.quote-refresh:hover { color:var(--text-strong); border-color:var(--text-muted); }
+.quote-refresh svg { width:12px; height:12px; transition:transform .4s ease; }
+.quote-refresh.spin svg { transform:rotate(360deg); }
+.books-grid { display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+.book-card { padding:16px 20px; border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:border-color 0.15s; text-decoration:none; display:block; }
+.book-card:hover { border-color:#9d8cff; }
+.book-card h3 { font-size:15px; font-weight:500; color:var(--text-strong); margin-bottom:4px; }
+.book-card p { font-size:13px; color:var(--text-muted); }
+.covers-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:20px; }
+.cover-card { border:1px solid var(--border); border-radius:10px; overflow:hidden; cursor:pointer; transition:border-color 0.15s,transform 0.15s; text-decoration:none; display:flex; flex-direction:column; }
+.cover-card:hover { border-color:#7b6cf0; transform:translateY(-2px); }
+.book-cover { width:100%; aspect-ratio:2/3; background:var(--bg2); overflow:hidden; position:relative; flex-shrink:0; }
+.book-cover img { width:100%; height:100%; object-fit:cover; display:block; }
+.book-cover-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:16px; text-align:center; font-size:13px; font-weight:500; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.book-info { padding:12px 14px; flex:1; display:flex; flex-direction:column; gap:4px; }
+.cover-card h3 { font-size:13px; font-weight:500; color:var(--text-strong); line-height:1.4; margin:0; }
+.cover-card p { font-size:12px; color:var(--text-muted); margin:0; }
+/* Filter bar — shared for blog/seeds/books */
+.filter-bar { display:flex; flex-wrap:wrap; gap:6px; margin:20px 0 4px; align-items:center; }
+.filter-btn { background:none; border:1px solid var(--border); border-radius:20px; padding:4px 12px; font-size:13px; color:var(--text-muted); cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+.filter-btn:hover { color:var(--text); border-color:var(--text-muted); }
+.filter-btn.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; border-color:transparent; color:#fff; -webkit-text-fill-color:#fff; animation:rainbow 4s linear infinite; }
+.book-card[hidden],.cover-card[hidden] { display:none !important; }
+.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
+.search-overlay.open { display:flex; }
+.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
+.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
+.search-input::placeholder { color:var(--text-muted); }
+/* Graph */
+.graph-wrap { position:relative; width:100%; height:560px; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-top:24px; }
+#graph { width:100%; height:100%; display:block; }
+.graph-tooltip { position:absolute; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--text); pointer-events:none; opacity:0; transition:opacity .15s; max-width:220px; line-height:1.6; font-family:'DM Sans',sans-serif; }
+.graph-tooltip .rb { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:300%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 3s linear infinite; font-weight:500; }
+.graph-ctrls { position:absolute; top:12px; right:12px; display:flex; gap:6px; align-items:center; }
+.graph-btn { background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:5px 10px; font-size:13px; color:var(--text); cursor:pointer; font-family:'DM Sans',sans-serif; line-height:1; }
+.graph-btn:hover { color:var(--text-strong); border-color:var(--text-muted); }
+.graph-sep { width:1px; height:18px; background:var(--border); }
+.graph-legend { position:absolute; bottom:14px; left:14px; display:flex; flex-direction:column; gap:5px; }
+.graph-legend-item { display:flex; align-items:center; gap:7px; font-size:11px; font-family:'DM Sans',sans-serif; color:var(--text-muted); }
+.graph-legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+/* Internal note link popup (Obsidian/Quartz-style) */
+.note-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:200; display:flex; align-items:flex-start; justify-content:center; padding:8vh 20px 40px; overflow-y:auto; }
+.note-modal { position:relative; background:var(--bg2); border:1px solid var(--border); border-radius:14px; max-width:640px; width:100%; padding:32px 36px 36px; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+.note-modal-close { position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer; line-height:1; padding:6px; border-radius:6px; transition:color 0.15s, background 0.15s; }
+.note-modal-close:hover { color:var(--text-strong); background:var(--bg); }
+.note-modal-open { display:inline-block; margin-top:24px; font-size:13px; background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
+.note-modal .article-title { font-size:22px; }
+.note-modal .article-body { margin-top:4px; }
+
+</style>
+</head>
+<body class="">
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <a class="site-title" href="index.html">Sasha's Garden</a>
+    <div class="sidebar-icons">
+      <button class="icon-btn" onclick="toggleSearch()">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()">
+        <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a class="nav-item " href="research.html">Map of Inquiry</a>
+    <a class="nav-item " href="books.html">Book Reviews</a>
+    <a class="nav-item " href="blog.html">Blog Notes</a>
+    <a class="nav-item " href="seeds.html">Seeds</a>
+    <button class="nav-item" onclick="goRandom()">Random Note</button>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+  </nav>
+</aside>
+
+<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
+  </div>
+</div>
+
+<main class="content">
+      <nav class="breadcrumbs"><a href="index.html">Home</a><span>›</span><span>Notes</span><span>›</span><span class="bc-current">You and Your Research</span></nav>
+      <h1 class="article-title">You and Your Research</h1>
+      <p class="meta">14 лип. 2026 р. · 4 хв читання</p>
+      
+      <article class="article-body"><ul>
+<li>What Bode was saying was this: ``Knowledge and productivity are like compound interest.&#39;&#39; Given two people of approximately the same ability and one person who works ten percent more than the other, the latter will more than twice outproduce the former. The more you know, the more you learn; the more you learn, the more you can do; the more you can do, the more the opportunity - it is very much like compound interest. I don&#39;t want to give you a rate, but it is a very high rate. Given two people with exactly the same ability, the one person who manages day in and day out to get in one more hour of thinking will be tremendously more productive over a lifetime. I took Bode&#39;s remark to heart; I spent a good deal more of my time for some years trying to work a bit harder and I found, in fact, I could get more work done. I don&#39;t like to say it in front of my wife, but I did sort of neglect her sometimes; I needed to study. You have to neglect things if you intend to get what you want done. There&#39;s no question about this.</li>
+<li>On this matter of drive Edison says, ``Genius is 99% perspiration and 1% inspiration.&#39;&#39; He may have been exaggerating, but the idea is that solid work, steadily applied, gets you surprisingly far. The steady application of effort with a little bit more work, <em>intelligently applied</em> is what does it. That&#39;s the trouble; drive, misapplied, doesn&#39;t get you anywhere. I&#39;ve often wondered why so many of my good friends at Bell Labs who worked as hard or harder than I did, didn&#39;t have so much to show for it. The misapplication of effort is a very serious matter. Just hard work is not enough - it must be applied sensibly.</li>
+<li>Great scientists tolerate ambiguity very well. They believe the theory enough to go ahead; they doubt it enough to notice the errors and faults so they can step forward and create the new replacement theory. If you believe too much you&#39;ll never notice the flaws; if you doubt too much you won&#39;t get started. It requires a lovely balance. But most great scientists are well aware of why their theories are true and they are also well aware of some slight misfits which don&#39;t quite fit and they don&#39;t forget it.</li>
+<li>Along those lines at some urging from John Tukey and others, I finally adopted what I called <code>Great Thoughts Time.&#39;&#39; When I went to lunch Friday noon, I would only discuss great thoughts after that. By great thoughts I mean ones like: </code>What will be the role of computers in all of AT&amp;T?&#39;&#39;, <code>How will computers change science?&#39;&#39; For example, I came up with the observation at that time that nine out of ten experiments were done in the lab and one in ten on the computer. I made a remark to the vice presidents one time, that it would be reversed, i.e. nine out of ten experiments would be done on the computer and one in ten in the lab. They knew I was a crazy mathematician and had no sense of reality. I knew they were wrong and they&#39;ve been proved wrong while I have been proved right. They built laboratories when they didn&#39;t need them. I saw that computers were transforming science because I spent a lot of time asking </code>What will be the impact of computers on science and how can I change it?&#39;&#39; I asked myself, ``How is it going to change Bell Labs?&#39;&#39; I remarked one time, in the same address, that more than one-half of the people at Bell Labs will be interacting closely with computing machines before I leave. Well, you all have terminals now. I thought hard about where was my field going, where were the opportunities, and what were the important things to do. Let me go there so there is a chance I can do important things.</li>
+<li>Most great scientists know many important problems. They have something between 10 and 20 important problems for which they are looking for an attack. And when they see a new idea come up, one hears them say <code>Well that bears on this problem.&#39;&#39; They drop all the other things and get after it. Now I can tell you a horror story that was told to me but I can&#39;t vouch for the truth of it. I was sitting in an airport talking to a friend of mine from Los Alamos about how it was lucky that the fission experiment occurred over in Europe when it did because that got us working on the atomic bomb here in the US. He said </code>No; at Berkeley we had gathered a bunch of data; we didn&#39;t get around to reducing it because we were building some more equipment, but if we had reduced that data we would have found fission.&#39;&#39; They had it in their hands and they didn&#39;t pursue it. They came in second!</li>
+</ul>
+</article>
+      <hr class="divider"><p class="last-modified">Оновлено: 14 липня 2026 р.</p>
+    </main>
+
+<script>
+(function(){
+  const t = localStorage.getItem('theme') || 'dark';
+  document.documentElement.dataset.theme = t;
+  if (t === 'light') {
+    const m = document.getElementById('icon-moon'), s = document.getElementById('icon-sun');
+    if (m) m.style.display = 'none';
+    if (s) s.style.display = '';
+  }
+})();
+function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
+function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
+function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
+function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
+const current=window.location.pathname.split('/').pop();
+document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
+const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","про-красу-та-мораль.html","список-фантаз-й-курс-в-р-чарда-сола-вурмана.html","як-допомогти-д-тям-культивувати-дивування-та-мницям-поради-з-sense-of-wonder-рейчал-карсон.html","a-technique-for-producing-ideas.html","after-finitude-an-essay-on-the-necessity-of-contingency.html","curious-the-desire-to-know-and-why-your-future-depends-on-it.html","science-as-a-vocation.html","the-sense-of-wonder.html","the-sublime-and-the-good.html","the-toaster-project-or-a-heroic-attempt-to-build-a-simple-electric-appliance-from-scratch.html","wait-what-and-life-s-other-essential-questions.html","wonderstruck-how-wonder-awe-shape-the-way-we-think.html","чому-сну-св-т-екзистенц-йний-детектив.html","-нженер-я.html","you-and-your-research.html","вища-осв-та-та-ун-верситет-думки-навколо-читацько-групи.html","задач-для-покращення-саду.html","ideas-list.html","maленьк-початки.html","reading-list.html","глибокий-океан.html","таланти-та-методолог-я-gallup.html","цитати.html","цифровий-сад.html"];
+function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_NOTES[Math.floor(Math.random()*RANDOM_NOTES.length)];}
+
+// ---------- internal note link popup ----------
+const NOTE_SLUGS = new Set(RANDOM_NOTES);
+function closeTopModal(){
+  const modals = document.querySelectorAll('.note-modal-overlay');
+  if (modals.length) modals[modals.length-1].remove();
+}
+function openNoteModal(href){
+  fetch(href).then(r => r.text()).then(html => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const titleHtml = doc.querySelector('.article-title')?.outerHTML || '';
+    const metaHtml = doc.querySelector('.meta')?.outerHTML || '';
+    const tagsHtml = doc.querySelector('.tags')?.outerHTML || '';
+    const bodyHtml = doc.querySelector('.article-body')?.innerHTML || '';
+    const overlay = document.createElement('div');
+    overlay.className = 'note-modal-overlay';
+    overlay.innerHTML = '<div class="note-modal"><button class="note-modal-close" aria-label="Закрити">✕</button>'
+      + titleHtml + metaHtml + tagsHtml
+      + '<article class="article-body">' + bodyHtml + '</article>'
+      + '<a class="note-modal-open" href="' + href + '">Відкрити повністю ↗</a></div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('.note-modal-close').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  }).catch(() => { window.location.href = href; });
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('.article-body a, .note-modal a');
+  if (!a) return;
+  if (a.classList.contains('note-modal-open')) return;
+  const href = a.getAttribute('href');
+  if (a.target === '_blank' || !href || !NOTE_SLUGS.has(href)) return;
+  e.preventDefault();
+  openNoteModal(href);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTopModal(); });
+</script>
+</body>
+</html>
