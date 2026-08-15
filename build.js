@@ -215,12 +215,13 @@ html[data-theme="light"] body.hero-page::before { content:''; position:fixed; in
 html[data-theme="dark"] body.hero-page::before { content:''; position:fixed; inset:0; z-index:-2; background-image:url('${heroImgDark || heroImg}'); background-size:cover; background-position:center; }
 body.hero-page::after { content:''; position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,.12) 40%, rgba(0,0,0,.4) 100%); }
 body.hero-page .sidebar { background:transparent; }
+body.hero-page .mobile-topbar { background:transparent; border-bottom:1px solid rgba(255,255,255,.12); }
 body.hero-page .content, body.hero-page .content h1.article-title, body.hero-page .content .meta,
 body.hero-page .article-body, body.hero-page .article-body p, body.hero-page .article-body li,
 body.hero-page .article-body h1, body.hero-page .article-body h2, body.hero-page .article-body h3,
 body.hero-page .article-body h4, body.hero-page .article-body h5, body.hero-page .article-body h6,
-body.hero-page .nav-item:not(.active), body.hero-page .icon-btn, body.hero-page .breadcrumbs, body.hero-page .breadcrumbs span { color:#fff; -webkit-text-fill-color:#fff; }
-body.hero-page .icon-btn svg { stroke:#fff; }
+body.hero-page .nav-item:not(.active), body.hero-page .icon-btn, body.hero-page .breadcrumbs, body.hero-page .breadcrumbs span, body.hero-page .menu-toggle { color:#fff; -webkit-text-fill-color:#fff; }
+body.hero-page .icon-btn svg, body.hero-page .menu-toggle svg { stroke:#fff; }
 body.hero-page .breadcrumbs a { color:rgba(255,255,255,.75); -webkit-text-fill-color:rgba(255,255,255,.75); }
 body.hero-page .article-body a { color:#fff; -webkit-text-fill-color:#fff; background:none; text-decoration:underline; }
 body.hero-page .article-body a::after { display:none; }
@@ -257,6 +258,48 @@ nav.main-nav { display:flex; flex-direction:column; gap:4px; }
 .nav-item.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
 .content { flex:1; padding:36px 64px 80px; max-width:800px; }
 body.has-notes .content { max-width:1180px; }
+.mobile-topbar { display:none; }
+.sidebar-scrim { display:none; }
+.footnotes-mobile { display:none; }
+
+@media (max-width: 760px){
+  body { display:block; }
+  .mobile-topbar {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px; position:sticky; top:0; z-index:60;
+    background:var(--bg); border-bottom:0.5px solid var(--border);
+  }
+  .mobile-topbar .site-title { font-size:17px; }
+  .mobile-topbar-icons { display:flex; align-items:center; gap:14px; }
+  .mobile-topbar-icons .icon-btn svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.4; stroke-linecap:round; }
+  .menu-toggle {
+    background:none; border:none; color:var(--text-strong); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:4px;
+  }
+  .menu-toggle svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; }
+  .sidebar {
+    position:fixed; top:0; left:0; height:100vh; z-index:80;
+    transform:translateX(-100%); transition:transform .25s ease;
+    box-shadow:20px 0 40px rgba(0,0,0,.3);
+    width:82vw; max-width:300px;
+  }
+  body.menu-open .sidebar { transform:translateX(0); }
+  body.menu-open .sidebar-scrim {
+    display:block; position:fixed; inset:0; z-index:70;
+    background:rgba(0,0,0,.45);
+  }
+  .sidebar-top { display:none; }
+  .content { padding:24px 20px 60px; max-width:none !important; }
+  .article-grid { grid-template-columns: 1fr !important; column-gap:0; }
+  .note-col { display:none; }
+  .footnotes-mobile { margin-top:32px; padding-top:20px; border-top:0.5px solid var(--border); display:flex; flex-direction:column; gap:14px; }
+  .fn-mobile-item { font-size:14px; line-height:1.6; color:var(--text-muted); }
+  .fn-mobile-item p { font-size:14px; line-height:1.6; color:var(--text-muted); margin-bottom:6px; }
+  .fn-mobile-num { color:var(--text-muted); font-weight:500; margin-right:6px; }
+  .covers-grid { grid-template-columns: repeat(2, 1fr) !important; gap:14px !important; }
+  .graph-ctrls { flex-wrap:wrap; max-width:calc(100vw - 32px); }
+  .menu-window { width:min(72vw, 230px); }
+}
 .breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
 .breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
 .breadcrumbs a:hover { color:var(--text-strong); text-decoration:underline; }
@@ -383,6 +426,22 @@ ${heroCss}
 </style>
 </head>
 <body class="${heroClass.trim()}${hasFootnotes ? ' has-notes' : ''}">
+<div class="mobile-topbar">
+  <a class="site-title grad" href="index.html">Sasha's Garden</a>
+  <div class="mobile-topbar-icons">
+    <button class="icon-btn" onclick="toggleSearch()" aria-label="Пошук">
+      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+    </button>
+    <button class="icon-btn" onclick="toggleTheme()" aria-label="Тема">
+      <svg id="icon-moon-mobile" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+      <svg id="icon-sun-mobile" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Меню">
+      <svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</div>
+<div class="sidebar-scrim" onclick="toggleMobileMenu()"></div>
 <aside class="sidebar">
   <div class="sidebar-top">
     <a class="site-title" href="index.html">Sasha's Garden</a>
@@ -421,12 +480,22 @@ ${heroCss}
   const t = localStorage.getItem('theme') || 'dark';
   document.documentElement.dataset.theme = t;
   if (t === 'light') {
-    const m = document.getElementById('icon-moon'), s = document.getElementById('icon-sun');
-    if (m) m.style.display = 'none';
-    if (s) s.style.display = '';
+    ['icon-moon','icon-sun','icon-moon-mobile','icon-sun-mobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = id.indexOf('moon') !== -1 ? 'none' : '';
+    });
   }
 })();
-function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
+function toggleTheme(){
+  const h = document.documentElement;
+  const dark = h.dataset.theme === 'dark';
+  h.dataset.theme = dark ? 'light' : 'dark';
+  localStorage.setItem('theme', dark ? 'light' : 'dark');
+  ['icon-moon','icon-moon-mobile'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = dark ? 'none' : ''; });
+  ['icon-sun','icon-sun-mobile'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = dark ? '' : 'none'; });
+}
+function toggleMobileMenu(){document.body.classList.toggle("menu-open");}
 function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
 function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
 function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
@@ -546,6 +615,9 @@ function isInternalNoteLink(a){
       }).catch(() => {});
     }, 300);
   }
+
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!canHover) return; // touch devices: let links navigate normally, no hover preview
 
   document.addEventListener('mouseover', e => {
     const a = e.target.closest('.article-body a');
@@ -936,6 +1008,16 @@ body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
 .search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
 .search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
 .search-input::placeholder { color:var(--text-muted); }
+
+@media (max-width: 760px){
+  .menu-window{ width:min(70vw, 220px); top:14px; left:14px; padding:16px 18px; }
+  .menu-window nav{ gap:10px; }
+  .graph-ctrls{ top:auto; bottom:14px; right:14px; flex-wrap:wrap; max-width:min(50vw, 190px); gap:4px; padding:6px; justify-content:flex-end; }
+  .graph-ctrls #graph-evolve{ font-size:11px; padding:4px 8px; }
+  .graph-btn{ padding:4px 7px; font-size:12px; }
+  .graph-legend{ bottom:14px; left:14px; padding:10px 12px; max-width:44vw; }
+  .graph-legend-item{ font-size:10px; }
+}
 </style>
 </head>
 <body>
@@ -1127,9 +1209,12 @@ async function build() {
     const footnoteStore = hasFootnotes
       ? '<div class="fn-store" style="display:none">' + footnotes.map(f => `<div id="${f.id}">${f.html}</div>`).join('') + '</div>'
       : '';
+    const footnotesMobile = hasFootnotes
+      ? '<div class="footnotes-mobile">' + footnotes.map((f, i) => `<div class="fn-mobile-item"><span class="fn-mobile-num">(${i+1})</span>${f.html}</div>`).join('') + '</div>'
+      : '';
     const isBook = file.folder && file.folder.startsWith('Book Reviews');
     const articleHtml = hasFootnotes
-      ? `<div class="article-grid"><div class="main-col"><article class="article-body">${bodyHtml}</article>${footnoteStore}</div><div class="note-col" id="noteCol"></div></div>`
+      ? `<div class="article-grid"><div class="main-col"><article class="article-body">${bodyHtml}</article>${footnoteStore}${footnotesMobile}</div><div class="note-col" id="noteCol"></div></div>`
       : `<article class="article-body">${bodyHtml}</article>`;
     const content = `
       ${renderBreadcrumbs(file)}

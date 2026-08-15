@@ -24,6 +24,48 @@ nav.main-nav { display:flex; flex-direction:column; gap:4px; }
 .nav-item.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
 .content { flex:1; padding:36px 64px 80px; max-width:800px; }
 body.has-notes .content { max-width:1180px; }
+.mobile-topbar { display:none; }
+.sidebar-scrim { display:none; }
+.footnotes-mobile { display:none; }
+
+@media (max-width: 760px){
+  body { display:block; }
+  .mobile-topbar {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px; position:sticky; top:0; z-index:60;
+    background:var(--bg); border-bottom:0.5px solid var(--border);
+  }
+  .mobile-topbar .site-title { font-size:17px; }
+  .mobile-topbar-icons { display:flex; align-items:center; gap:14px; }
+  .mobile-topbar-icons .icon-btn svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.4; stroke-linecap:round; }
+  .menu-toggle {
+    background:none; border:none; color:var(--text-strong); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:4px;
+  }
+  .menu-toggle svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; }
+  .sidebar {
+    position:fixed; top:0; left:0; height:100vh; z-index:80;
+    transform:translateX(-100%); transition:transform .25s ease;
+    box-shadow:20px 0 40px rgba(0,0,0,.3);
+    width:82vw; max-width:300px;
+  }
+  body.menu-open .sidebar { transform:translateX(0); }
+  body.menu-open .sidebar-scrim {
+    display:block; position:fixed; inset:0; z-index:70;
+    background:rgba(0,0,0,.45);
+  }
+  .sidebar-top { display:none; }
+  .content { padding:24px 20px 60px; max-width:none !important; }
+  .article-grid { grid-template-columns: 1fr !important; column-gap:0; }
+  .note-col { display:none; }
+  .footnotes-mobile { margin-top:32px; padding-top:20px; border-top:0.5px solid var(--border); display:flex; flex-direction:column; gap:14px; }
+  .fn-mobile-item { font-size:14px; line-height:1.6; color:var(--text-muted); }
+  .fn-mobile-item p { font-size:14px; line-height:1.6; color:var(--text-muted); margin-bottom:6px; }
+  .fn-mobile-num { color:var(--text-muted); font-weight:500; margin-right:6px; }
+  .covers-grid { grid-template-columns: repeat(2, 1fr) !important; gap:14px !important; }
+  .graph-ctrls { flex-wrap:wrap; max-width:calc(100vw - 32px); }
+  .menu-window { width:min(72vw, 230px); }
+}
 .breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
 .breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
 .breadcrumbs a:hover { color:var(--text-strong); text-decoration:underline; }
@@ -150,6 +192,22 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
 </style>
 </head>
 <body class="">
+<div class="mobile-topbar">
+  <a class="site-title grad" href="index.html">Sasha's Garden</a>
+  <div class="mobile-topbar-icons">
+    <button class="icon-btn" onclick="toggleSearch()" aria-label="Пошук">
+      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+    </button>
+    <button class="icon-btn" onclick="toggleTheme()" aria-label="Тема">
+      <svg id="icon-moon-mobile" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
+      <svg id="icon-sun-mobile" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Меню">
+      <svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</div>
+<div class="sidebar-scrim" onclick="toggleMobileMenu()"></div>
 <aside class="sidebar">
   <div class="sidebar-top">
     <a class="site-title" href="index.html">Sasha's Garden</a>
@@ -214,19 +272,29 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
   const t = localStorage.getItem('theme') || 'dark';
   document.documentElement.dataset.theme = t;
   if (t === 'light') {
-    const m = document.getElementById('icon-moon'), s = document.getElementById('icon-sun');
-    if (m) m.style.display = 'none';
-    if (s) s.style.display = '';
+    ['icon-moon','icon-sun','icon-moon-mobile','icon-sun-mobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = id.indexOf('moon') !== -1 ? 'none' : '';
+    });
   }
 })();
-function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
+function toggleTheme(){
+  const h = document.documentElement;
+  const dark = h.dataset.theme === 'dark';
+  h.dataset.theme = dark ? 'light' : 'dark';
+  localStorage.setItem('theme', dark ? 'light' : 'dark');
+  ['icon-moon','icon-moon-mobile'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = dark ? 'none' : ''; });
+  ['icon-sun','icon-sun-mobile'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = dark ? '' : 'none'; });
+}
+function toggleMobileMenu(){document.body.classList.toggle("menu-open");}
 function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
 function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
 function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
 const current=window.location.pathname.split('/').pop();
 document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
-const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","про-красу-та-мораль.html","список-фантаз-й-курс-в-р-чарда-сола-вурмана.html","як-допомогти-д-тям-культивувати-дивування-та-мницям-поради-з-sense-of-wonder-рейчал-карсон.html","a-technique-for-producing-ideas.html","after-finitude-an-essay-on-the-necessity-of-contingency.html","curious-the-desire-to-know-and-why-your-future-depends-on-it.html","infection-environmental-humanities.html","science-as-a-vocation.html","the-sense-of-wonder.html","the-sublime-and-the-good.html","the-toaster-project-or-a-heroic-attempt-to-build-a-simple-electric-appliance-from-scratch.html","the-university-in-ruins.html","thumbelina-the-culture-and-technology-of-millennials.html","wait-what-and-life-s-other-essential-questions.html","where-are-the-missing-masses-sociology-of-a-few-mundane-artefacts.html","wonderstruck-how-wonder-awe-shape-the-way-we-think.html","учитель-незнайко.html","чому-сну-св-т-екзистенц-йний-детектив.html","ideas-list.html","maленьк-початки.html","reading-list.html","-де-занять.html","антропоцентризм.html","ан-м-зм.html","вища-осв-та-та-ун-верситет-нотатки-з-читацько-групи-локусу.html","глибокий-океан.html","задач-для-покращення-саду.html","про-кт-perfume-area.html","розум-та-мислення.html","таланти-та-методолог-я-gallup.html","цитати.html","цифровий-сад.html"];
+const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","про-красу-та-мораль.html","список-фантаз-й-курс-в-р-чарда-сола-вурмана.html","цифровий-сад.html","як-допомогти-д-тям-культивувати-дивування-та-мницям-поради-з-sense-of-wonder-рейчал-карсон.html","a-technique-for-producing-ideas.html","after-finitude-an-essay-on-the-necessity-of-contingency.html","curious-the-desire-to-know-and-why-your-future-depends-on-it.html","reassembling-of-the-social.html","science-as-a-vocation.html","social-construction-of-what-.html","the-ignorant-schoolmaster-five-lessons-in-intellectual-emancipation.html","the-sense-of-wonder.html","the-sublime-and-the-good.html","the-toaster-project-or-a-heroic-attempt-to-build-a-simple-electric-appliance-from-scratch.html","the-university-in-ruins.html","the-year-of-magical-thinking.html","thumbelina-the-culture-and-technology-of-millennials.html","wait-what-and-life-s-other-essential-questions.html","where-are-the-missing-masses-sociology-of-a-few-mundane-artefacts.html","wonderstruck-how-wonder-awe-shape-the-way-we-think.html","чому-сну-св-т-екзистенц-йний-детектив.html","ideas-list.html","maленьк-початки.html","reading-list.html","science-syllabus-ideas.html","-де-занять.html","антропоцентризм-та-навколо-.html","вища-осв-та-та-ун-верситет-нотатки-з-читацько-групи-локусу.html","глибокий-океан.html","задач-для-покращення-саду.html","про-кт-perfume-area.html","розум-та-мислення.html","таланти-та-методолог-я-gallup.html","цитати.html","ц-кав-сть-для-новачк-в-в-д-curiosity-maps-до-особистих-досл-джень.html"];
 function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_NOTES[Math.floor(Math.random()*RANDOM_NOTES.length)];}
 
 // ---------- footnotes: position each margin note against its in-text marker ----------
@@ -339,6 +407,9 @@ function isInternalNoteLink(a){
       }).catch(() => {});
     }, 300);
   }
+
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!canHover) return; // touch devices: let links navigate normally, no hover preview
 
   document.addEventListener('mouseover', e => {
     const a = e.target.closest('.article-body a');
