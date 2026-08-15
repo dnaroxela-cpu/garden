@@ -127,7 +127,7 @@ function renderTags(tags) {
 }
 
 const SECTION_PAGES = {
-  'Research Topics': 'research.html',
+  'Research Topics': 'index.html',
   'Book Reviews': 'books.html',
   'Blog Notes': 'blog.html',
   'Seeds': 'seeds.html',
@@ -295,10 +295,10 @@ body.has-notes .content { max-width:1180px; }
   .footnotes-mobile { margin-top:32px; padding-top:20px; border-top:0.5px solid var(--border); display:flex; flex-direction:column; gap:14px; }
   .fn-mobile-item { font-size:14px; line-height:1.6; color:var(--text-muted); }
   .fn-mobile-item p { font-size:14px; line-height:1.6; color:var(--text-muted); margin-bottom:6px; }
-  .fn-mobile-num { color:var(--text-muted); font-weight:500; margin-right:6px; }
+  .fn-mobile-num { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; font-weight:500; margin-right:6px; text-decoration:none; cursor:pointer; }
   .covers-grid { grid-template-columns: repeat(2, 1fr) !important; gap:14px !important; }
-  .graph-ctrls { flex-wrap:wrap; max-width:calc(100vw - 32px); }
-  .menu-window { width:min(72vw, 230px); }
+  .article-body a::after { display:none; }
+  .work-arrow { display:none; }
 }
 .breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
 .breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
@@ -396,11 +396,7 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
 .filter-btn:hover { color:var(--text); border-color:var(--text-muted); }
 .filter-btn.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; border-color:transparent; color:#fff; -webkit-text-fill-color:#fff; animation:rainbow 4s linear infinite; }
 .book-card[hidden],.cover-card[hidden] { display:none !important; }
-.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
-.search-overlay.open { display:flex; }
-.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
-.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
-.search-input::placeholder { color:var(--text-muted); }
+
 /* Graph */
 .graph-wrap { position:relative; width:100%; height:560px; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-top:24px; }
 #graph { width:100%; height:100%; display:block; }
@@ -429,9 +425,6 @@ ${heroCss}
 <div class="mobile-topbar">
   <a class="site-title grad" href="index.html">Sasha's Garden</a>
   <div class="mobile-topbar-icons">
-    <button class="icon-btn" onclick="toggleSearch()" aria-label="Пошук">
-      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-    </button>
     <button class="icon-btn" onclick="toggleTheme()" aria-label="Тема">
       <svg id="icon-moon-mobile" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
       <svg id="icon-sun-mobile" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
@@ -446,9 +439,6 @@ ${heroCss}
   <div class="sidebar-top">
     <a class="site-title" href="index.html">Sasha's Garden</a>
     <div class="sidebar-icons">
-      <button class="icon-btn" onclick="toggleSearch()">
-        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-      </button>
       <button class="icon-btn" onclick="toggleTheme()">
         <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
         <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
@@ -456,22 +446,15 @@ ${heroCss}
     </div>
   </div>
   <nav class="main-nav">
-    <a class="nav-item ${isActive('research')}" href="research.html">Map of Inquiry</a>
+    <a class="nav-item ${isActive('research')}" href="index.html">Map of Inquiry</a>
     <a class="nav-item ${isActive('books')}" href="books.html">Book Reviews</a>
     <a class="nav-item ${isActive('blog')}" href="blog.html">Blog Notes</a>
     <a class="nav-item ${isActive('seeds')}" href="seeds.html">Seeds</a>
     <button class="nav-item" onclick="goRandom()">Random Note</button>
-    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work <span class="work-arrow">↗</span></a>
   </nav>
   ${sidebarExtra || ''}
 </aside>
-
-<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
-  <div class="search-box">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
-  </div>
-</div>
 
 <main class="content">${content}</main>
 
@@ -496,10 +479,7 @@ function toggleTheme(){
   ['icon-sun','icon-sun-mobile'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = dark ? '' : 'none'; });
 }
 function toggleMobileMenu(){document.body.classList.toggle("menu-open");}
-function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
-function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
 function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
 const current=window.location.pathname.split('/').pop();
 document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
 const RANDOM_NOTES = ${JSON.stringify(allFiles ? allFiles.filter(f => f.title !== 'index').map(f => path.basename(f.slug) + '.html') : [])};
@@ -540,7 +520,7 @@ function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_N
 })();
 
 // ---------- internal note link hover preview ----------
-const EXCLUDE_FROM_PREVIEW = new Set(['index.html', 'research.html', 'books.html', 'blog.html', 'seeds.html']);
+const EXCLUDE_FROM_PREVIEW = new Set(['index.html', 'books.html', 'blog.html', 'seeds.html']);
 function isInternalNoteLink(a){
   if (a.target === '_blank') return false;
   const href = a.getAttribute('href');
@@ -689,7 +669,7 @@ function extractFootnotes(raw, fileKey) {
     n++;
     const id = 'fn-' + fileKey + '-' + n;
     footnotes.push({ id, html: marked(defs[label]) });
-    return `<span class="fn-ref" data-fn="${id}">${n}</span>`;
+    return `<span class="fn-ref" id="fnref-${id}" data-fn="${id}">${n}</span>`;
   });
   return { raw, footnotes };
 }
@@ -946,6 +926,51 @@ const GRAPH_SCRIPT = `
   canvas.addEventListener('mouseleave', () => { hovered=null; tooltip.style.opacity='0'; drag=null; running=true; });
   canvas.addEventListener('click', e => { if (lastDragMoved) { lastDragMoved=false; drag=null; return; } drag = null; const n = nodeAt(e.clientX,e.clientY); if (!n) return; if (n.isTagNode) { window.location.href = 'tag-'+n.tag+'.html'; return; } if (!n.isHub) window.location.href = n.id+'.html'; });
   canvas.addEventListener('wheel', e => { e.preventDefault(); window.graphZoom(e.deltaY<0?1.08:0.93); },{passive:false});
+
+  // ---- touch: one finger pans/drags a node, two fingers pinch-zoom ----
+  let pinch = null, touchMoved = false;
+  function touchDist(t0, t1){ return Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY); }
+  function touchMid(t0, t1){ return { x:(t0.clientX+t1.clientX)/2, y:(t0.clientY+t1.clientY)/2 }; }
+  canvas.addEventListener('touchstart', e => {
+    touchMoved = false;
+    if (e.touches.length === 2) {
+      drag = null;
+      pinch = { dist: touchDist(e.touches[0], e.touches[1]), mid: touchMid(e.touches[0], e.touches[1]) };
+    } else if (e.touches.length === 1) {
+      const t = e.touches[0];
+      const n = nodeAt(t.clientX, t.clientY);
+      if (n) { n.dragTargetX = n.x; n.dragTargetY = n.y; running = false; }
+      drag = n ? {type:'node',node:n,moved:false} : {type:'pan',lx:t.clientX,ly:t.clientY};
+    }
+  }, { passive:true });
+  canvas.addEventListener('touchmove', e => {
+    touchMoved = true;
+    if (e.touches.length === 2 && pinch) {
+      e.preventDefault();
+      const newDist = touchDist(e.touches[0], e.touches[1]);
+      const factor = newDist / (pinch.dist || newDist);
+      window.graphZoom(factor);
+      pinch.dist = newDist;
+    } else if (e.touches.length === 1 && drag) {
+      e.preventDefault();
+      const t = e.touches[0];
+      if (drag.type === 'pan') { transform.x += t.clientX-drag.lx; transform.y += t.clientY-drag.ly; drag.lx = t.clientX; drag.ly = t.clientY; }
+      else if (drag.type === 'node') { const p = worldXY(t.clientX, t.clientY); drag.node.dragTargetX = p.x; drag.node.dragTargetY = p.y; drag.moved = true; }
+    }
+  }, { passive:false });
+  canvas.addEventListener('touchend', e => {
+    if (e.touches.length < 2) pinch = null;
+    if (e.touches.length === 0) {
+      if (drag?.type === 'node') running = true;
+      if (!touchMoved && drag?.type !== 'node') {
+        // treat as a tap: reuse last known single-touch point via changedTouches
+        const t = e.changedTouches[0];
+        if (t) { const n = nodeAt(t.clientX, t.clientY); if (n) { if (n.isTagNode) { window.location.href = 'tag-'+n.tag+'.html'; } else if (!n.isHub) { window.location.href = n.id+'.html'; } } }
+      }
+      drag = null;
+    }
+  }, { passive:true });
+
   resize(); initNodes(); edges = getEdges(); loop();
 })();
 `;
@@ -973,8 +998,8 @@ body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
 @keyframes rainbow{ 0%{background-position:0%} 100%{background-position:200%} }
 .grad{ background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; }
 
-.graph-wrap-full{ position:fixed; inset:0; }
-#graph{ width:100%; height:100%; display:block; }
+.graph-wrap-full{ position:fixed; inset:0; touch-action:none; }
+#graph{ width:100%; height:100%; display:block; touch-action:none; }
 .graph-tooltip{ position:absolute; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--text); pointer-events:none; opacity:0; transition:opacity .15s; max-width:220px; line-height:1.6; font-family:'DM Sans',sans-serif; z-index:20; }
 .graph-tooltip .rb{ background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:300%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 3s linear infinite; font-weight:500; }
 
@@ -1003,20 +1028,32 @@ body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
 .graph-legend-item{ display:flex; align-items:center; gap:7px; font-size:11px; font-family:'DM Sans',sans-serif; color:var(--text-muted); }
 .graph-legend-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
 
-.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
-.search-overlay.open { display:flex; }
-.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
-.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
-.search-input::placeholder { color:var(--text-muted); }
+.graph-menu-toggle{ display:none; }
+.graph-scrim{ display:none; }
 
 @media (max-width: 760px){
-  .menu-window{ width:min(70vw, 220px); top:14px; left:14px; padding:16px 18px; }
+  .menu-window{
+    width:min(74vw, 240px); top:14px; left:14px; padding:16px 18px;
+    max-height:80vh; overflow-y:auto;
+    transform:translateX(-120%); transition:transform .25s ease; z-index:36;
+  }
+  body.menu-open .menu-window{ transform:translateX(0); }
   .menu-window nav{ gap:10px; }
+  .graph-menu-toggle{
+    display:flex; position:fixed; top:14px; left:14px; z-index:35;
+    width:40px; height:40px; align-items:center; justify-content:center;
+    background:rgba(24,24,24,0.55); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:var(--text-strong); cursor:pointer;
+  }
+  :root[data-theme="light"] .graph-menu-toggle{ background:rgba(245,245,240,0.65); border:1px solid rgba(0,0,0,0.06); }
+  .graph-menu-toggle svg{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; }
+  body.menu-open .graph-scrim{ display:block; position:fixed; inset:0; z-index:29; background:rgba(0,0,0,.4); }
   .graph-ctrls{ top:auto; bottom:14px; right:14px; flex-wrap:wrap; max-width:min(50vw, 190px); gap:4px; padding:6px; justify-content:flex-end; }
   .graph-ctrls #graph-evolve{ font-size:11px; padding:4px 8px; }
   .graph-btn{ padding:4px 7px; font-size:12px; }
   .graph-legend{ bottom:14px; left:14px; padding:10px 12px; max-width:44vw; }
   .graph-legend-item{ font-size:10px; }
+  .work-arrow{ display:none; }
 }
 </style>
 </head>
@@ -1027,13 +1064,15 @@ body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
   <div class="graph-tooltip" id="graph-tooltip"></div>
 </div>
 
+<button class="graph-menu-toggle" onclick="toggleGraphMenu()" aria-label="Меню">
+  <svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+</button>
+<div class="graph-scrim" onclick="toggleGraphMenu()"></div>
+
 <div class="menu-window">
   <div class="menu-window-top">
     <a class="site-title grad" href="index.html">Sasha's Garden</a>
     <div class="menu-window-icons">
-      <button class="icon-btn" onclick="toggleSearch()">
-        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-      </button>
       <button class="icon-btn" onclick="toggleTheme()">
         <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
         <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
@@ -1041,12 +1080,12 @@ body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
     </div>
   </div>
   <nav>
-    <a class="nav-item active" href="research.html">Map of Inquiry</a>
+    <a class="nav-item active" href="index.html">Map of Inquiry</a>
     <a class="nav-item" href="books.html">Book Reviews</a>
     <a class="nav-item" href="blog.html">Blog Notes</a>
     <a class="nav-item" href="seeds.html">Seeds</a>
     <button class="nav-item" onclick="goRandom()">Random Note</button>
-    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work <span class="work-arrow">↗</span></a>
   </nav>
 </div>
 
@@ -1061,13 +1100,6 @@ body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
 
 <div class="graph-legend" id="graph-legend"></div>
 
-<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
-  <div class="search-box">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
-  </div>
-</div>
-
 <script>
 (function(){
   const t = localStorage.getItem('theme') || 'dark';
@@ -1079,9 +1111,7 @@ body{ font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
   }
 })();
 function toggleTheme(){const h=document.documentElement,m=document.getElementById('icon-moon'),s=document.getElementById('icon-sun');if(h.dataset.theme==='dark'){h.dataset.theme='light';localStorage.setItem('theme','light');m.style.display='none';s.style.display='';}else{h.dataset.theme='dark';localStorage.setItem('theme','dark');m.style.display='';s.style.display='none';}}
-function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
-function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
+function toggleGraphMenu(){document.body.classList.toggle('menu-open');}
 const RANDOM_NOTES = ${randomNotes};
 function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_NOTES[Math.floor(Math.random()*RANDOM_NOTES.length)];}
 </script>
@@ -1100,46 +1130,9 @@ async function build() {
   const bookFiles = files.filter(f => f.folder && f.folder.startsWith('Book Reviews'));
   const coversCache = await resolveCovers(bookFiles);
 
-  // Index page — standard template, but the first embedded image in index.md
-  // becomes a full-screen background photo (light theme), the second one
-  // (if present) becomes the dark-theme background — swapped live on theme toggle.
-  // The main content is a random quote from the "Цитати" note (bullets: "Текст — Автор"),
-  // with a client-side "інша цитата" button to reshuffle without reloading.
-  const indexFile = files.find(f => f.title === 'index');
-  let indexTitle = 'Мій Digital Garden';
-  let indexHeroImg = null;
-  let indexHeroImgDark = null;
-  if (indexFile) {
-    const h1Match = indexFile.raw.match(/^#\s+(.+)$/m);
-    if (h1Match) indexTitle = h1Match[1].trim();
-    let rawIdx = indexFile.body.replace(/^#\s+.+$/m, '');
+  // Homepage — Map of Inquiry (full-viewport graph, floating blurred menu) is now the site's index.html
+  fs.writeFileSync(path.join(OUT, 'index.html'), renderResearchPage(files, graphData));
 
-    // pull out the first two embedded images: 1st = light theme bg, 2nd = dark theme bg
-    const embedMatches = [...rawIdx.matchAll(/!\[\[([^\]]+)\]\]/g)].slice(0, 2);
-    const heroSlots = [];
-    for (const m of embedMatches) {
-      const filename = m[1];
-      const ext = filename.split('.').pop().toLowerCase();
-      if (!['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) continue;
-      const mediaSrc = findMediaSrc(filename, indexFile);
-      if (!mediaSrc) continue;
-      fs.copyFileSync(mediaSrc, path.join(OUT, filename));
-      heroSlots.push(filename);
-    }
-    indexHeroImg = heroSlots[0] || null;
-    indexHeroImgDark = heroSlots[1] || null;
-  }
-
-  fs.writeFileSync(path.join(OUT, 'index.html'), template({
-    title: indexTitle,
-    content: '',
-    sidebarExtra: '',
-    isIndex: true, isResearch: false, file: null, treeHtml, allFiles: files,
-    heroImg: indexHeroImg, heroImgDark: indexHeroImgDark
-  }));
-
-  // Research — full-viewport graph, floating blurred menu
-  fs.writeFileSync(path.join(OUT, 'research.html'), renderResearchPage(files, graphData));
 
   // Blog Notes — tag filter + date
   const blogFiles = files.filter(f => f.folder && f.folder.startsWith('Blog Notes'));
@@ -1210,7 +1203,7 @@ async function build() {
       ? '<div class="fn-store" style="display:none">' + footnotes.map(f => `<div id="${f.id}">${f.html}</div>`).join('') + '</div>'
       : '';
     const footnotesMobile = hasFootnotes
-      ? '<div class="footnotes-mobile">' + footnotes.map((f, i) => `<div class="fn-mobile-item"><span class="fn-mobile-num">(${i+1})</span>${f.html}</div>`).join('') + '</div>'
+      ? '<div class="footnotes-mobile">' + footnotes.map((f, i) => `<div class="fn-mobile-item"><a class="fn-mobile-num" href="#fnref-${f.id}">(${i+1})</a>${f.html}</div>`).join('') + '</div>'
       : '';
     const isBook = file.folder && file.folder.startsWith('Book Reviews');
     const articleHtml = hasFootnotes

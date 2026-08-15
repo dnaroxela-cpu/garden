@@ -61,10 +61,10 @@ body.has-notes .content { max-width:1180px; }
   .footnotes-mobile { margin-top:32px; padding-top:20px; border-top:0.5px solid var(--border); display:flex; flex-direction:column; gap:14px; }
   .fn-mobile-item { font-size:14px; line-height:1.6; color:var(--text-muted); }
   .fn-mobile-item p { font-size:14px; line-height:1.6; color:var(--text-muted); margin-bottom:6px; }
-  .fn-mobile-num { color:var(--text-muted); font-weight:500; margin-right:6px; }
+  .fn-mobile-num { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:rainbow 4s linear infinite; font-weight:500; margin-right:6px; text-decoration:none; cursor:pointer; }
   .covers-grid { grid-template-columns: repeat(2, 1fr) !important; gap:14px !important; }
-  .graph-ctrls { flex-wrap:wrap; max-width:calc(100vw - 32px); }
-  .menu-window { width:min(72vw, 230px); }
+  .article-body a::after { display:none; }
+  .work-arrow { display:none; }
 }
 .breadcrumbs { font-size:13px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; }
 .breadcrumbs a { color:var(--text-muted); text-decoration:none; transition:color 0.15s; }
@@ -162,11 +162,7 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
 .filter-btn:hover { color:var(--text); border-color:var(--text-muted); }
 .filter-btn.active { background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe000,#40e0d0,#7b6cf0,#ff0080); background-size:200%; border-color:transparent; color:#fff; -webkit-text-fill-color:#fff; animation:rainbow 4s linear infinite; }
 .book-card[hidden],.cover-card[hidden] { display:none !important; }
-.search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:flex-start; justify-content:center; padding-top:120px; }
-.search-overlay.open { display:flex; }
-.search-box { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; width:480px; display:flex; align-items:center; gap:10px; }
-.search-input { background:none; border:none; outline:none; font-size:16px; color:var(--text-strong); width:100%; font-family:'DM Sans',sans-serif; }
-.search-input::placeholder { color:var(--text-muted); }
+
 /* Graph */
 .graph-wrap { position:relative; width:100%; height:560px; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-top:24px; }
 #graph { width:100%; height:100%; display:block; }
@@ -195,9 +191,6 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
 <div class="mobile-topbar">
   <a class="site-title grad" href="index.html">Sasha's Garden</a>
   <div class="mobile-topbar-icons">
-    <button class="icon-btn" onclick="toggleSearch()" aria-label="Пошук">
-      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-    </button>
     <button class="icon-btn" onclick="toggleTheme()" aria-label="Тема">
       <svg id="icon-moon-mobile" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
       <svg id="icon-sun-mobile" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
@@ -212,9 +205,6 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
   <div class="sidebar-top">
     <a class="site-title" href="index.html">Sasha's Garden</a>
     <div class="sidebar-icons">
-      <button class="icon-btn" onclick="toggleSearch()">
-        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-      </button>
       <button class="icon-btn" onclick="toggleTheme()">
         <svg id="icon-moon" viewBox="0 0 24 24"><path d="M20 13.5a8.5 8.5 0 1 1-9-9 6 6 0 0 0 9 9z"/></svg>
         <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
@@ -222,22 +212,15 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
     </div>
   </div>
   <nav class="main-nav">
-    <a class="nav-item " href="research.html">Map of Inquiry</a>
+    <a class="nav-item " href="index.html">Map of Inquiry</a>
     <a class="nav-item active" href="books.html">Book Reviews</a>
     <a class="nav-item " href="blog.html">Blog Notes</a>
     <a class="nav-item " href="seeds.html">Seeds</a>
     <button class="nav-item" onclick="goRandom()">Random Note</button>
-    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work ↗</a>
+    <a class="nav-item" href="https://dnaroxela.xyz" target="_blank">Work <span class="work-arrow">↗</span></a>
   </nav>
   
 </aside>
-
-<div class="search-overlay" id="search-overlay" onclick="closeSearch(event)">
-  <div class="search-box">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
-    <input class="search-input" type="text" placeholder="Пошук по нотаткам..." id="search-input">
-  </div>
-</div>
 
 <main class="content">
       <nav class="breadcrumbs"><a href="index.html">Home</a><span>›</span><a href="books.html">Book Reviews</a><span>›</span><span class="bc-current">Wonderstruck. How Wonder & Awe Shape the Way We Think</span></nav>
@@ -281,20 +264,20 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
 <ul>
 <li>Магія – це колективний термін для практик людей, який окреслює сприйняття або  створення див</li>
 <li>Створити світ в фентезі – означає створити світ з альтернативними законами природи</li>
-<li>Магія не ірраціональна, вона слідує за глибокими cтруктурами людського мислення, які також лежать в основі науки та причинно–наслідкового мислення<span class="fn-ref" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-1">1</span></li>
+<li>Магія не ірраціональна, вона слідує за глибокими cтруктурами людського мислення, які також лежать в основі науки та причинно–наслідкового мислення<span class="fn-ref" id="fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-1" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-1">1</span></li>
 <li>Наприклад, магічні ритуали зазвичай причнно-наслідково туманні — ми не знаємо яким чином магічні закляття мають працювати — але теж саме справедливо відноситься до того, як звичайні люди користуються технологіями. Більшість людей використовує GPS, вакцинацію та комп&#39;ютерну пам&#39;ять без розуміння як вони працюють.</li>
-<li>Магія включає подвійний аспект активної сили (хардова магія) та пасивного здивування (софтова магія)<span class="fn-ref" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-2">2</span>. Щось схожк робить наука, коли допомагає контролювати наше середовище.</li>
+<li>Магія включає подвійний аспект активної сили (хардова магія) та пасивного здивування (софтова магія)<span class="fn-ref" id="fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-2" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-2">2</span>. Щось схожк робить наука, коли допомагає контролювати наше середовище.</li>
 <li>Фрезер вважав, що в основі магії, релігії та науки лежить віра в порядок природи. Маг вірить, що одні і ті самі причини (одне закляття) призведуть до одних і тих самих результатів (результатів закляття). Маг, як і науковець, втручається в порядок речей, використовуючи повторюваності, які він спостерігає в світі. Про витоки науки в магії писали Marcel Mauss та Otto Neurath.</li>
-<li>«Yates thesis»: нова модерна наука з&#39;явилася з магії, герміневтики та окультизму Ренісансу. В книзі про Джордано Бруно вона стверджує, що той прийняв геліоцентризм і був страчений за це, не стільки з міркувань астрономічних доказів та підрахунків, скільки з відчуття здивування перед безкінечним космосом, джерелом яких були його читання герменевтичних текстів. <span class="fn-ref" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-3">3</span> </li>
-<li>Маги, напротивагу природнім філософам, напряму маніпулювали природними матеріалами та спостерігали ефекти цих маніпуляцій – так описував науковців Джодано Бруно<span class="fn-ref" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-4">4</span>. Магніти, приливи і інші аномалії не вели себе нормально, тобто так як люди звикли на той час спостерігати явища і тому такі аномальні явища класифікувалися як &quot;натуральна магія&quot; в часи Ренесансу. Десь два століття потому, наука зайняла місце натуральної магії. </li>
+<li>«Yates thesis»: нова модерна наука з&#39;явилася з магії, герміневтики та окультизму Ренісансу. В книзі про Джордано Бруно вона стверджує, що той прийняв геліоцентризм і був страчений за це, не стільки з міркувань астрономічних доказів та підрахунків, скільки з відчуття здивування перед безкінечним космосом, джерелом яких були його читання герменевтичних текстів. <span class="fn-ref" id="fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-3" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-3">3</span> </li>
+<li>Маги, напротивагу природнім філософам, напряму маніпулювали природними матеріалами та спостерігали ефекти цих маніпуляцій – так описував науковців Джодано Бруно<span class="fn-ref" id="fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-4" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-4">4</span>. Магніти, приливи і інші аномалії не вели себе нормально, тобто так як люди звикли на той час спостерігати явища і тому такі аномальні явища класифікувалися як &quot;натуральна магія&quot; в часи Ренесансу. Десь два століття потому, наука зайняла місце натуральної магії. </li>
 <li>Когнітивна основа магії – це подив разом з бажанням контролю.</li>
 </ul>
 <h3>Бачення з першістю: релігія як технологія подиву</h3>
 <ul>
 <li>Так само як ми використовуємо калькулятори та інші інструменти, щоб вирішувати математичні проблеми, релігія допомагає нам вирішити екзестенційні проблеми. </li>
-<li>Ритауал збагачує наш розум, доглядаючи за нашими емоціними та когнітивними потребами<span class="fn-ref" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-5">5</span>. </li>
+<li>Ритауал збагачує наш розум, доглядаючи за нашими емоціними та когнітивними потребами<span class="fn-ref" id="fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-5" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-5">5</span>. </li>
 <li>Одна з таких потреб — це потреба в awe та wonder. Вони не тільки дають нам почуватися краще, але й челенджать наше мислення. </li>
-<li>Релігії — сильні шейпери звичок. Ми часто покладаємося на звички в нашій взаємодії з навколишнім світом. З часом, ми культивуємо звички через практику, і таким чином вони стають автоматичними. Звички чимось схожі на навички. Вони «поларизують світ, створюючи купу знаків, які направляють наші дії»<span class="fn-ref" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-6">6</span> </li>
+<li>Релігії — сильні шейпери звичок. Ми часто покладаємося на звички в нашій взаємодії з навколишнім світом. З часом, ми культивуємо звички через практику, і таким чином вони стають автоматичними. Звички чимось схожі на навички. Вони «поларизують світ, створюючи купу знаків, які направляють наші дії»<span class="fn-ref" id="fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-6" data-fn="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-6">6</span> </li>
 <li>Тому створення нових звичок потребує багато сил, але також допомагає делегувати багато прийняття рішень. Див: Romdenh-Romluc «Habit and attention»</li>
 <li>Створення звички дає певну свободу, див: Rietveld, «Affordances and unreflective freedom»</li>
 <li>Погляд Мерло-Понті на навички та звички дає новий спосіб мислення про релігію. В кінці кінців, релігія це не лише віра, але й система практик та ритуалів, таких як літургія, молитва, фестивалі та голодування.</li>
@@ -314,12 +297,12 @@ hr.divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
 </div><div id="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-4"><p>Вперше термін науковець вжив William Whewell в рецензії на книгу Mary Somerville&#39;s On the Connexion of the Physical Sciencies (1834)</p>
 </div><div id="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-5"><p>Xunzi, Discourse on Ritual (475—221 BCE)</p>
 </div><div id="fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-6"><p>Merleau-Ponty&#39;s Phenomenology of Perception, 129</p>
-</div></div><div class="footnotes-mobile"><div class="fn-mobile-item"><span class="fn-mobile-num">(1)</span><p>Searching for Control by Legare, Souza</p>
-</div><div class="fn-mobile-item"><span class="fn-mobile-num">(2)</span><p>Це розрізнення запропонував Brendon Sanderson</p>
-</div><div class="fn-mobile-item"><span class="fn-mobile-num">(3)</span><p>Frances Yates, Giordano Bruno and the Hermetic Tradition (1964). Про вплив магії та алхімії на перших науковців, наприклад хіміка Роберта Бойля див: The Roots of the Silver Tree: Boyle, Alchemy, and Teleology by Jennifer L. Whyte</p>
-</div><div class="fn-mobile-item"><span class="fn-mobile-num">(4)</span><p>Вперше термін науковець вжив William Whewell в рецензії на книгу Mary Somerville&#39;s On the Connexion of the Physical Sciencies (1834)</p>
-</div><div class="fn-mobile-item"><span class="fn-mobile-num">(5)</span><p>Xunzi, Discourse on Ritual (475—221 BCE)</p>
-</div><div class="fn-mobile-item"><span class="fn-mobile-num">(6)</span><p>Merleau-Ponty&#39;s Phenomenology of Perception, 129</p>
+</div></div><div class="footnotes-mobile"><div class="fn-mobile-item"><a class="fn-mobile-num" href="#fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-1">(1)</a><p>Searching for Control by Legare, Souza</p>
+</div><div class="fn-mobile-item"><a class="fn-mobile-num" href="#fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-2">(2)</a><p>Це розрізнення запропонував Brendon Sanderson</p>
+</div><div class="fn-mobile-item"><a class="fn-mobile-num" href="#fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-3">(3)</a><p>Frances Yates, Giordano Bruno and the Hermetic Tradition (1964). Про вплив магії та алхімії на перших науковців, наприклад хіміка Роберта Бойля див: The Roots of the Silver Tree: Boyle, Alchemy, and Teleology by Jennifer L. Whyte</p>
+</div><div class="fn-mobile-item"><a class="fn-mobile-num" href="#fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-4">(4)</a><p>Вперше термін науковець вжив William Whewell в рецензії на книгу Mary Somerville&#39;s On the Connexion of the Physical Sciencies (1834)</p>
+</div><div class="fn-mobile-item"><a class="fn-mobile-num" href="#fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-5">(5)</a><p>Xunzi, Discourse on Ritual (475—221 BCE)</p>
+</div><div class="fn-mobile-item"><a class="fn-mobile-num" href="#fnref-fn-wonderstruck-how-wonder-awe-shape-the-way-we-think-6">(6)</a><p>Merleau-Ponty&#39;s Phenomenology of Perception, 129</p>
 </div></div></div><div class="note-col" id="noteCol"></div></div>
       
     </main>
@@ -345,10 +328,7 @@ function toggleTheme(){
   ['icon-sun','icon-sun-mobile'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = dark ? '' : 'none'; });
 }
 function toggleMobileMenu(){document.body.classList.toggle("menu-open");}
-function toggleSearch(){const o=document.getElementById('search-overlay');o.classList.toggle('open');if(o.classList.contains('open'))setTimeout(()=>document.getElementById('search-input').focus(),50);}
-function closeSearch(e){if(e.target===document.getElementById('search-overlay'))document.getElementById('search-overlay').classList.remove('open');}
 function toggleFolder(id){const el=document.getElementById(id),arr=document.getElementById('arr-'+id);if(!el)return;if(el.style.display==='none'){el.style.display='';arr&&arr.classList.remove('closed');}else{el.style.display='none';arr&&arr.classList.add('closed');}}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').classList.remove('open');});
 const current=window.location.pathname.split('/').pop();
 document.querySelectorAll('.note-link').forEach(l=>{if(l.getAttribute('href')===current)l.classList.add('active');});
 const RANDOM_NOTES = ["7-порад-як-б-льше-ц-кавитися-св-том.html","про-красу-та-мораль.html","список-фантаз-й-курс-в-р-чарда-сола-вурмана.html","цифровий-сад.html","як-допомогти-д-тям-культивувати-дивування-та-мницям-поради-з-sense-of-wonder-рейчал-карсон.html","a-technique-for-producing-ideas.html","after-finitude-an-essay-on-the-necessity-of-contingency.html","curious-the-desire-to-know-and-why-your-future-depends-on-it.html","reassembling-of-the-social.html","science-as-a-vocation.html","social-construction-of-what-.html","the-ignorant-schoolmaster-five-lessons-in-intellectual-emancipation.html","the-sense-of-wonder.html","the-sublime-and-the-good.html","the-toaster-project-or-a-heroic-attempt-to-build-a-simple-electric-appliance-from-scratch.html","the-university-in-ruins.html","the-year-of-magical-thinking.html","thumbelina-the-culture-and-technology-of-millennials.html","wait-what-and-life-s-other-essential-questions.html","where-are-the-missing-masses-sociology-of-a-few-mundane-artefacts.html","wonderstruck-how-wonder-awe-shape-the-way-we-think.html","чому-сну-св-т-екзистенц-йний-детектив.html","ideas-list.html","maленьк-початки.html","reading-list.html","science-syllabus-ideas.html","-де-занять.html","антропоцентризм-та-навколо-.html","вища-осв-та-та-ун-верситет-нотатки-з-читацько-групи-локусу.html","глибокий-океан.html","задач-для-покращення-саду.html","про-кт-perfume-area.html","розум-та-мислення.html","таланти-та-методолог-я-gallup.html","цитати.html","ц-кав-сть-для-новачк-в-в-д-curiosity-maps-до-особистих-досл-джень.html"];
@@ -389,7 +369,7 @@ function goRandom(){if(!RANDOM_NOTES.length)return;window.location.href=RANDOM_N
 })();
 
 // ---------- internal note link hover preview ----------
-const EXCLUDE_FROM_PREVIEW = new Set(['index.html', 'research.html', 'books.html', 'blog.html', 'seeds.html']);
+const EXCLUDE_FROM_PREVIEW = new Set(['index.html', 'books.html', 'blog.html', 'seeds.html']);
 function isInternalNoteLink(a){
   if (a.target === '_blank') return false;
   const href = a.getAttribute('href');
