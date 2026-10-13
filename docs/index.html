@@ -334,7 +334,7 @@ html,body{overflow-x:clip}
 .home-map canvas{width:100%;height:100%;touch-action:none}
 @keyframes floatin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .list.compact .row{padding-block:7px;grid-template-columns:auto minmax(0,1fr) auto}.list.compact .row .lead{display:none}.list.compact li:last-child .row{border-bottom:0}.list.compact .row .t{font-size:15px}
-.hovercard{position:absolute;width:280px;pointer-events:none;padding:12px 14px;background:var(--surface);border:1px solid var(--rule);border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.12);display:flex;flex-direction:column;gap:6px;animation:floatin .2s ease-out both}
+.hovercard{position:absolute;z-index:5;width:min(280px,calc(100% - 16px));pointer-events:none;padding:12px 14px;background:var(--surface);border:1px solid var(--rule);border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.12);display:flex;flex-direction:column;gap:6px;animation:floatin .2s ease-out both}
 .hovercard b{font-family:var(--f-display);font-weight:500;font-size:17px;line-height:1.25}
 .hovercard p{margin:0;font-size:14px;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .hovercard small{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
@@ -407,6 +407,7 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 @keyframes coverin{from{opacity:0;transform:translateY(8px) rotate(-2deg)}to{opacity:1;transform:none}}
 /* home keeps only the play button of the timeline; the map page shows the full scrubber, legend and buttons */
 .home-map .tl-track,.home-map .mapctl{display:none}
+@media (hover:none){.home-map .mapctl{display:flex;flex:none}.home-map .mlegend,.home-map #m-motion{display:none}}
 .home-map .timeline-ctl{padding:6px 14px 6px 6px;border-radius:99px}
 .home-map .maptools{justify-content:flex-start;padding:0 24px 20px}
 .stage{position:absolute;inset:0}
@@ -425,7 +426,7 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 .home-quote .ghost{margin:0}
 .intro b{font-weight:600}
 .hint-touch{display:none}
-@media (hover:none){.hint-mouse{display:none}.hint-touch{display:inline}}
+@media (hover:none){.hint-mouse{display:none}.hint-touch{display:inline}.hovercard{pointer-events:auto}.hovercard .hc-open{align-self:flex-start;padding:6px 0 2px;font-family:var(--f-mono);font-size:13px}}
 .walk{margin-top:4px;align-self:flex-start;font:inherit;background:none;border:0;padding:6px 0;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:12px}
 .trail{width:84px;height:12px;flex:none;overflow:visible}
 .trail-path{stroke:var(--muted);stroke-width:1;stroke-dasharray:1 4;stroke-linecap:round}
@@ -439,7 +440,10 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 .walk-l::after{content:"→";display:inline-block;margin-left:.5em;transition:transform .2s}
 .walk:hover .walk-l::after{transform:translateX(4px)}
 @media (prefers-reduced-motion:reduce){.walk:hover .trail-path{animation:none}}
-.mapbtns{display:flex;gap:8px}.mapbtns .ghost{margin:0;background:var(--bg)}
+.mapbtns{display:flex;gap:8px}.rs-s{display:none}
+.mapbtns .ghost{white-space:nowrap}
+@media (max-width:600px){.rs-l{display:none}.rs-s{display:inline}#m-reset{width:32px;padding:4px 0}}
+.mapbtns .zbtn{width:32px;padding:4px 0;text-align:center}.mapbtns .ghost{margin:0;background:var(--bg)}
 @media (max-width:900px){
   .home-split{display:block;height:auto;min-height:0;margin-top:0}
   .home-split .home-map{margin:0 var(--g);border-left:0}
@@ -451,8 +455,9 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
   .fontpick{left:12px;bottom:12px}
   .home-map{height:64vh;height:64dvh;border-top:1px solid var(--rule)}
   .stage canvas{touch-action:pan-y}
+  .map-holder .stage canvas{touch-action:none}
   .map-hint{left:0;right:0;top:12px}
-  .home-map .maptools{padding:0 12px 12px}
+  .home-map .maptools{padding:0 12px 12px;flex-direction:row;align-items:center;justify-content:space-between}
   .map-holder{height:72vh;height:72dvh;min-height:0}
   .maptools{flex-direction:column;align-items:stretch;padding:10px 12px;gap:8px}
   .map-holder .maptools{top:0;bottom:auto}
@@ -622,13 +627,13 @@ body.on-home footer.site-foot{margin-top:0}
         </figcaption>
       </figure>
       <div class="home-map">
-        <p class="map-hint mono"><span class="hint-mouse">Кожна точка — нотатка. Наведи, щоб прочитати, натисни, щоб відкрити.</span><span class="hint-touch">Кожна точка — нотатка. Торкнись, щоб прочитати, і ще раз, щоб відкрити.</span></p>
+        <p class="map-hint mono"><span class="hint-mouse">Кожна точка — нотатка. Наведи, щоб прочитати, натисни, щоб відкрити.</span><span class="hint-touch">Торкнись точки, щоб прочитати. Два пальці — масштаб.</span></p>
       <div class="stage" id="stage">
       <canvas id="homeMap" aria-label="Жива мапа всіх нотаток"></canvas>
       <div class="hovercard" id="hovercard" hidden></div>
       <div class="maptools">
         <div class="timeline-ctl"><button class="tplay" id="t-play" aria-label="Програти, як ріс сад"><svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path id="t-icon" d="M2 1l7 4-7 4z" fill="currentColor"/></svg></button><div class="tl-track"><div class="tl-ticks" id="tl-ticks" aria-hidden="true"></div><div class="tl-fill" id="tl-fill" aria-hidden="true"></div><input type="range" id="t-range" min="0" max="1000" value="1000" aria-label="Сад у часі"></div><span class="tlabel mono" id="t-label"></span></div>
-        <div class="mapctl"><div class="mlegend" id="m-legend" role="group" aria-label="Підсвітити тему"></div><div class="mapbtns"><button class="ghost" id="m-motion">рух</button><button class="ghost" id="m-reset">показати все</button></div></div>
+        <div class="mapctl"><div class="mlegend" id="m-legend" role="group" aria-label="Підсвітити тему"></div><div class="mapbtns"><button class="ghost zbtn" id="m-zout" aria-label="Віддалити">−</button><button class="ghost zbtn" id="m-zin" aria-label="Наблизити">+</button><button class="ghost" id="m-motion">рух</button><button class="ghost" id="m-reset" aria-label="Показати все"><span class="rs-l">показати все</span><span class="rs-s" aria-hidden="true">⤢</span></button></div></div>
       </div>
       </div>
       </div>
@@ -646,7 +651,7 @@ body.on-home footer.site-foot{margin-top:0}
   <section class="view" id="v-map" hidden>
     <div class="head">
       <h1>Мапа</h1>
-      <p>Усі нотатки, теги й посилання між ними. Колір — тема, розмір — довжина нотатки. <span class="hint-mouse">Тягни точки, гортай і масштабуй мапу, програй, як ріс сад.</span><span class="hint-touch">Торкнись точки, щоб прочитати, і ще раз, щоб відкрити. Кнопка ▶ покаже, як ріс сад.</span></p>
+      <p>Усі нотатки, теги й посилання між ними. Колір — тема, розмір — довжина нотатки. <span class="hint-mouse">Тягни точки, гортай і масштабуй мапу, програй, як ріс сад.</span><span class="hint-touch">Торкнись точки, щоб прочитати, або тегу, щоб відфільтрувати сад. Тягни мапу пальцем, масштабуй двома пальцями чи кнопками − і +. Кнопка ▶ покаже, як ріс сад.</span></p>
     </div>
     <div class="map-holder" id="map-holder"></div>
   </section>
@@ -1070,22 +1075,45 @@ function makeSim(canvas,{focus=null,mini=false,shift=null,mark=null,onOpen=null}
     c.restore();c.globalAlpha=1;
   }
   const pt=e=>{const r=canvas.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
-  const pick=(x,y)=>{const[wx,wy]=toW(x,y);let best=null,bd=14/S.view.s;for(const n of nodes){if(!vis(n))continue;const d=Math.hypot(n.x-wx,n.y-wy);if(d<Math.max(bd,n.r)){best=n;bd=d}}return best};
+  const pick=(x,y,r=14)=>{const[wx,wy]=toW(x,y);let best=null,bd=r/S.view.s;for(const n of nodes){if(!vis(n))continue;const d=Math.hypot(n.x-wx,n.y-wy);if(d<Math.max(bd,n.r)){best=n;bd=d}}return best};
   let down=null;
-  // touch: taps only. A finger that moves is the page scrolling, so it must not pan the map, drag dots or push them away.
+  // touch: one finger taps (and pans where the canvas owns the gesture, i.e. touch-action:none), two fingers pinch-zoom.
   const touchy=e=>e.pointerType!=="mouse";
-  canvas.addEventListener("pointercancel",()=>{down=null;S.drag=null;S.mouse=null;S.energy=1});
+  const ownsTouch=()=>getComputedStyle(canvas).touchAction==="none";
+  const pts=new Map();let pinch=null;
+  const zoomAt=(x,y,s)=>{s=Math.min(8,Math.max(.3,s));const[wx,wy]=toW(x,y);S.view.s=s;S.view.x=x-wx*s;S.view.y=y-wy*s;S.user=true};
+  const two=()=>{const[p,q]=[...pts.values()];return{d:Math.hypot(p[0]-q[0],p[1]-q[1])||1,x:(p[0]+q[0])/2,y:(p[1]+q[1])/2}};
+  const lift=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null};
+  canvas.addEventListener("pointercancel",e=>{lift(e);down=null;S.drag=null;S.mouse=null;S.energy=1});
   canvas.addEventListener("pointermove",e=>{const[x,y]=pt(e);
-    if(touchy(e)){if(down&&Math.hypot(x-down.x0,y-down.y0)>8)down.moved=true;return}
+    if(touchy(e)){if(!pts.has(e.pointerId))return;pts.set(e.pointerId,[x,y]);
+      if(pinch&&pts.size>=2&&!mini){const g=two();const[wx,wy]=pinch.w;const s=Math.min(8,Math.max(.3,pinch.s*g.d/pinch.d));S.view.s=s;S.view.x=g.x-wx*s;S.view.y=g.y-wy*s;S.user=true;return}
+      if(!down)return;
+      if(Math.hypot(x-down.x0,y-down.y0)>10)down.moved=true;
+      if(down.moved&&!mini&&ownsTouch()){S.view.x+=x-down.x;S.view.y+=y-down.y;S.user=true;S.tapped=null;S.hover=null}
+      down.x=x;down.y=y;return}
     S.mouse=toW(x,y);
     if(down&&!S.drag&&!mini&&down.n==null){S.view.x+=x-down.x;S.view.y+=y-down.y;down.x=x;down.y=y;down.moved=true;S.user=true;return}
     if(down&&down.n){if(Math.hypot(x-down.x0,y-down.y0)>4){S.drag=down.n;down.moved=true}}
-    S.hover=pick(x,y);canvas.style.cursor=S.hover?(S.hover.kind==="note"?"pointer":"pointer"):(mini?"default":"grab")});
+    S.hover=pick(x,y);canvas.style.cursor=S.hover?"pointer":(mini?"default":"grab")});
   canvas.addEventListener("pointerleave",e=>{S.mouse=null;if(e.pointerType==="mouse")S.hover=null});
-  canvas.addEventListener("pointerdown",e=>{const[x,y]=pt(e);const n=pick(x,y);down={x,y,x0:x,y0:y,n,moved:false};if(!touchy(e)){canvas.setPointerCapture(e.pointerId);S.mouse=toW(x,y)}});
-  canvas.addEventListener("pointerup",e=>{if(touchy(e)){S.mouse=null;if(down&&!down.moved&&!down.n){S.tapped=null;S.hover=null}}if(down&&!down.moved&&down.n){const n=down.n;if(e.pointerType!=="mouse"&&S.tapped!==n){S.tapped=n;S.hover=n;down=null;return}S.tapped=null;if(n.kind==="note")(onOpen?onOpen(n.id):openNote(n.id));else{tagF=n.id.slice(1);statusF=null;renderGarden();go("garden")}}
+  canvas.addEventListener("pointerdown",e=>{const[x,y]=pt(e);
+    if(touchy(e)){pts.set(e.pointerId,[x,y]);if(ownsTouch())try{canvas.setPointerCapture(e.pointerId)}catch(_){}
+      if(pts.size>=2){down=null;if(!mini){const g=two();pinch={d:g.d,s:S.view.s,w:toW(g.x,g.y)}}return}
+      down={x,y,x0:x,y0:y,n:pick(x,y,26),moved:false};return}
+    down={x,y,x0:x,y0:y,n:pick(x,y),moved:false};canvas.setPointerCapture(e.pointerId);S.mouse=toW(x,y)});
+  canvas.addEventListener("pointerup",e=>{
+    if(touchy(e)){lift(e);S.mouse=null;const d=down;down=null;if(!d||d.moved)return;
+      const n=d.n;if(!n){S.tapped=null;S.hover=null;return}
+      if(n.kind==="note"&&S.tapped!==n){S.tapped=n;S.hover=n;return}
+      S.tapped=null;S.hover=null;ghost=true;S.open(n);return}
+    if(down&&!down.moved&&down.n)S.open(down.n);
     if(S.drag){S.drag.vx=S.drag.vy=0}S.drag=null;down=null;S.energy=1});
-  if(!mini)canvas.addEventListener("wheel",e=>{e.preventDefault();const[x,y]=pt(e),f=Math.exp(-e.deltaY*.0015);const s=Math.min(8,Math.max(.3,S.view.s*f));const[wx,wy]=toW(x,y);S.view.s=s;S.view.x=x-wx*s;S.view.y=y-wy*s;S.user=true},{passive:false});
+  // the view changes under the finger on a tap, so swallow the click the browser synthesises afterwards
+  let ghost=false;canvas.addEventListener("touchend",e=>{if(ghost){ghost=false;e.preventDefault()}},{passive:false});
+  S.open=n=>{if(n.kind==="note")(onOpen?onOpen(n.id):openNote(n.id));else{tagF=n.id.slice(1);statusF=null;renderGarden();go("garden")}};
+  S.zoom=f=>zoomAt(S.w/2,S.h/2,S.view.s*f);
+  if(!mini)canvas.addEventListener("wheel",e=>{e.preventDefault();const[x,y]=pt(e);zoomAt(x,y,S.view.s*Math.exp(-e.deltaY*.0015))},{passive:false});
   S.size=size;S.step=step;S.draw=draw;S.reset=()=>{S.user=false;fit()};
   for(let i=0;i<220;i++)step(0);
   return S;
@@ -1106,8 +1134,12 @@ function hovercard(){const hc=$("#hovercard");const n=bigSim&&bigSim.hover;
   if(!n){hc.hidden=true;return}
   const v=bigSim.view,x=n.x*v.s+v.x,y=n.y*v.s+v.y;
   if(n.kind==="tag"){const c=NOTES.filter(m=>m.tags.includes(n.id.slice(1))).length;hc.innerHTML=`<b>${esc(n.t)}</b><small>${c} нотаток · натисни, щоб відфільтрувати сад</small>`}
-  else{const m=BY[n.id];hc.innerHTML=`<span class="g">${glyph(m.status)}${STL[m.status]} · ${fmt(m.date)}</span><b>${esc(short(m.title))}</b><p>${esc(m.excerpt)}</p><small class="hint-touch">торкнись ще раз, щоб відкрити</small>`}
-  hc.hidden=false;const W=bigSim.w;hc.style.left=Math.min(Math.max(8,x+16),W-300)+"px";hc.style.top=Math.max(8,y-20)+"px";
+  else{const m=BY[n.id];hc.innerHTML=`<span class="g">${glyph(m.status)}${STL[m.status]} · ${fmt(m.date)}</span><b>${esc(short(m.title))}</b><p>${esc(m.excerpt)}</p><button class="linkbtn hint-touch hc-open">відкрити нотатку →</button>`}
+  hc.hidden=false;const W=bigSim.w,H=bigSim.h;hc.style.left=Math.max(8,Math.min(x+16,W-hc.offsetWidth-8))+"px";
+  // keep the card clear of the map tools at the bottom: below the dot if it fits, otherwise above it
+  const ch=hc.offsetHeight,tools=$("#stage .maptools"),top=tools&&tools.offsetTop<H/2;
+  const ceil=top?tools.offsetTop+tools.offsetHeight+8:8,floor=top||!tools?H-8:tools.offsetTop-8;
+  hc.style.top=Math.max(ceil,y-20+ch<=floor?y-20:Math.min(y-ch-16,floor-ch))+"px";
 }
 function loop(t){
   const s=bigSim;if(s&&s.canvas.offsetParent&&s.w){if(MOTION||s.energy>.02||s.drag){s.step(t)}s.draw(t);hovercard()}
@@ -1116,6 +1148,9 @@ function loop(t){
 }
 requestAnimationFrame(loop);
 $("#m-reset").onclick=()=>bigSim&&bigSim.reset();
+$("#m-zin").onclick=()=>bigSim&&bigSim.zoom(1.4);
+$("#m-zout").onclick=()=>bigSim&&bigSim.zoom(1/1.4);
+$("#hovercard").addEventListener("click",e=>{if(e.target.closest(".hc-open")&&bigSim&&bigSim.hover){const n=bigSim.hover;bigSim.hover=bigSim.tapped=null;bigSim.open(n)}});
 $("#m-motion").onclick=e=>{MOTION=!MOTION;e.currentTarget.setAttribute("aria-pressed",MOTION);e.currentTarget.textContent=MOTION?"рух увімкнено":"рух вимкнено";bigSim&&(bigSim.energy=1)};
 $("#m-motion").setAttribute("aria-pressed",MOTION);$("#m-motion").textContent=MOTION?"рух увімкнено":"рух вимкнено";
 function renderLegend(){const f=bigSim&&bigSim.focusTag;$("#m-legend").innerHTML=TAGS.filter(t=>t[1]>1).map(([t])=>`<button data-ft="${esc(t)}" aria-pressed="${f===t}"><i style="background:${rb(tagHue(t))}"></i>#${esc(t)}</button>`).join("")+(f?`<button data-ft="" class="ft-x">× усі теми</button>`:"")}
