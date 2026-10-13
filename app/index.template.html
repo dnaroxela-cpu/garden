@@ -646,7 +646,7 @@ body.on-home footer.site-foot{margin-top:0}
   <section class="view" id="v-map" hidden>
     <div class="head">
       <h1>Мапа</h1>
-      <p>Усі нотатки, теги й посилання між ними. Колір — тема, розмір — довжина нотатки. Тягни точки, гортай і масштабуй мапу, програй, як ріс сад.</p>
+      <p>Усі нотатки, теги й посилання між ними. Колір — тема, розмір — довжина нотатки. <span class="hint-mouse">Тягни точки, гортай і масштабуй мапу, програй, як ріс сад.</span><span class="hint-touch">Торкнись точки, щоб прочитати, і ще раз, щоб відкрити. Кнопка ▶ покаже, як ріс сад.</span></p>
     </div>
     <div class="map-holder" id="map-holder"></div>
   </section>
@@ -1072,13 +1072,18 @@ function makeSim(canvas,{focus=null,mini=false,shift=null,mark=null,onOpen=null}
   const pt=e=>{const r=canvas.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
   const pick=(x,y)=>{const[wx,wy]=toW(x,y);let best=null,bd=14/S.view.s;for(const n of nodes){if(!vis(n))continue;const d=Math.hypot(n.x-wx,n.y-wy);if(d<Math.max(bd,n.r)){best=n;bd=d}}return best};
   let down=null;
-  canvas.addEventListener("pointermove",e=>{const[x,y]=pt(e);S.mouse=toW(x,y);
+  // touch: taps only. A finger that moves is the page scrolling, so it must not pan the map, drag dots or push them away.
+  const touchy=e=>e.pointerType!=="mouse";
+  canvas.addEventListener("pointercancel",()=>{down=null;S.drag=null;S.mouse=null;S.energy=1});
+  canvas.addEventListener("pointermove",e=>{const[x,y]=pt(e);
+    if(touchy(e)){if(down&&Math.hypot(x-down.x0,y-down.y0)>8)down.moved=true;return}
+    S.mouse=toW(x,y);
     if(down&&!S.drag&&!mini&&down.n==null){S.view.x+=x-down.x;S.view.y+=y-down.y;down.x=x;down.y=y;down.moved=true;S.user=true;return}
     if(down&&down.n){if(Math.hypot(x-down.x0,y-down.y0)>4){S.drag=down.n;down.moved=true}}
     S.hover=pick(x,y);canvas.style.cursor=S.hover?(S.hover.kind==="note"?"pointer":"pointer"):(mini?"default":"grab")});
   canvas.addEventListener("pointerleave",e=>{S.mouse=null;if(e.pointerType==="mouse")S.hover=null});
-  canvas.addEventListener("pointerdown",e=>{const[x,y]=pt(e);const n=pick(x,y);down={x,y,x0:x,y0:y,n,moved:false};canvas.setPointerCapture(e.pointerId);S.mouse=toW(x,y)});
-  canvas.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse")S.mouse=null;if(down&&!down.moved&&down.n){const n=down.n;if(e.pointerType!=="mouse"&&S.tapped!==n){S.tapped=n;S.hover=n;down=null;return}S.tapped=null;if(n.kind==="note")(onOpen?onOpen(n.id):openNote(n.id));else{tagF=n.id.slice(1);statusF=null;renderGarden();go("garden")}}
+  canvas.addEventListener("pointerdown",e=>{const[x,y]=pt(e);const n=pick(x,y);down={x,y,x0:x,y0:y,n,moved:false};if(!touchy(e)){canvas.setPointerCapture(e.pointerId);S.mouse=toW(x,y)}});
+  canvas.addEventListener("pointerup",e=>{if(touchy(e)){S.mouse=null;if(down&&!down.moved&&!down.n){S.tapped=null;S.hover=null}}if(down&&!down.moved&&down.n){const n=down.n;if(e.pointerType!=="mouse"&&S.tapped!==n){S.tapped=n;S.hover=n;down=null;return}S.tapped=null;if(n.kind==="note")(onOpen?onOpen(n.id):openNote(n.id));else{tagF=n.id.slice(1);statusF=null;renderGarden();go("garden")}}
     if(S.drag){S.drag.vx=S.drag.vy=0}S.drag=null;down=null;S.energy=1});
   if(!mini)canvas.addEventListener("wheel",e=>{e.preventDefault();const[x,y]=pt(e),f=Math.exp(-e.deltaY*.0015);const s=Math.min(8,Math.max(.3,S.view.s*f));const[wx,wy]=toW(x,y);S.view.s=s;S.view.x=x-wx*s;S.view.y=y-wy*s;S.user=true},{passive:false});
   S.size=size;S.step=step;S.draw=draw;S.reset=()=>{S.user=false;fit()};
