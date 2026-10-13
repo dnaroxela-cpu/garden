@@ -33,8 +33,8 @@ marked.use({
 });
 
 // CONFIG
-const VAULT = '/Users/dnaroxela/Documents/Obsidian Vault';
-const OUT = path.join(__dirname, 'docs');
+const VAULT = process.env.VAULT || '/Users/dnaroxela/Documents/Obsidian Vault';
+const OUT = process.env.OUT || path.join(__dirname, 'docs');
 
 function readFiles(dir, base = dir) {
   const results = [];
@@ -1241,6 +1241,148 @@ async function build() {
     fs.writeFileSync(path.join(OUT, `tag-${tag}.html`), template({ title: '#' + tag, content: tagContent, isIndex: false, isResearch: false, file: null, treeHtml, allFiles: files }));
     console.log('🏷 tag:', tag);
   }
+  await buildApp(files, coversCache);
+}
+
+// ============================================================
+// New site (one-page app): docs/index.html + redirects for old URLs
+// ============================================================
+// The design lives in app/index.template.html. build.js fills it with:
+//   /*DATA*/     every note in a folder: html, tags, links, dates, book author/year, cover
+//   /*JOURNAL*/  docs/journal.json — what changed between builds (kept and extended on every run)
+//   /*TRAILS*/   routes through the garden from a note called «Стежки» (see parseTrails below)
+// Old per-note pages (note.html, books.html, tag-x.html…) become tiny redirects into the app,
+// so links that are already shared keep working. HTML files that no longer belong to any note are removed.
+const crypto = require('crypto');
+const APP_DIR = path.join(__dirname, 'app');
+
+function plainParas(html) {
+  return [...html.matchAll(/<(p|li|h[1-6]|blockquote)\b[^>]*>([\s\S]*?)<\/\1>/g)]
+    .map(m => m[2].replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/\s+/g, ' ').trim())
+    .filter(p => p.length > 2);
+}
+const hashText = t => crypto.createHash('md5').update(t).digest('hex').slice(0, 10);
+
+function noteExcerpt(raw) {
+  const clean = raw
+    .replace(/^---[\s\S]*?---/, '')
+    .replace(/!\[\[[^\]]+\]\]/g, '')
+    .replace(/^>\s*\[![^\]]*\].*$/gm, '')
+    .replace(/(^|\s)#[a-zA-Zа-яА-ЯіїєґІЇЄҐ][\wа-яА-ЯіїєґІЇЄҐ-]*/g, ' ')
+    .replace(/[#*`_\[\]>]/g, '')
+    .replace(/\s+/g, ' ').trim();
+  return (clean.split(/[.!?]\s+/)[0] || '').trim().slice(0, 160);
+}
+
+// «Стежки» note format (any folder or none):
+//   ## Про подив
+//   Від Рейчел Карсон до Гелен Де Круз.
+//   - [[The Sense of Wonder]]
+//   - [[Wonderstruck]]
+function parseTrails(files) {
+  const f = files.find(x => x.title.trim().toLowerCase() === 'стежки');
+  if (!f) return [];
+  return f.body.split(/^##\s+/m).slice(1).map(block => {
+    const lines = block.split('\n');
+    const name = lines[0].trim();
+    const desc = (lines.slice(1).find(l => l.trim() && !/^\s*[-*\d]/.test(l)) || '').trim();
+    const ids = [...block.matchAll(/\[\[([^\]|#]+)/g)].map(m => {
+      const t = m[1].trim().toLowerCase();
+      const hit = files.find(x => x.title.trim().toLowerCase() === t);
+      return hit ? path.basename(hit.slug) : null;
+    }).filter(Boolean);
+    return { name, desc, ids };
+  }).filter(t => t.name && t.ids.length > 1);
+}
+
+function redirectPage(target, title) {
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><title>${esc(title)} — Sasha's Garden</title>
+<meta http-equiv="refresh" content="0; url=${esc(target)}"><link rel="canonical" href="${esc(target)}">
+<script>location.replace(${JSON.stringify(target)})</script></head>
+<body><p><a href="${esc(target)}">${esc(title)}</a></p></body></html>`;
+}
+
+async function buildApp(files, coversCache) {
+  const notes = files.filter(f => f.folder && f.title.trim().toLowerCase() !== 'стежки');
+  const ids = new Set(notes.map(f => path.basename(f.slug)));
+  const data = notes.map(file => {
+    const id = path.basename(file.slug);
+    const withWikilinks = convertWikilinks(file.body, files);
+    const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
+    const rawClean = rawFixed.replace(/(?<![#\n]) *#([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_-]*)/g, '').replace(/^\s*#([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_-]*)(\s|$)/gm, '');
+    const { raw: withFn, footnotes } = extractFootnotes(rawClean, id);
+    let html = resolveMdLinks(marked(withFn), files);
+    if (footnotes.length) html += `<section class="footnotes"><ol>${footnotes.map(f => `<li id="${f.id}">${f.html}</li>`).join('')}</ol></section>`;
+    const links = new Set();
+    html = html.replace(/<a href="([^"#?]+)\.html"/g, (m, slug) => {
+      let s; try { s = decodeURIComponent(slug); } catch (e) { s = slug; }
+      if (ids.has(s) && s !== id) { links.add(s); return `<a href="#note" data-note="${s}"`; }
+      return m;
+    });
+    const isBook = file.folder.startsWith('Book Reviews');
+    return {
+      id, title: file.title, folder: file.folder.split(path.sep)[0], tags: file.tags,
+      excerpt: noteExcerpt(file.raw), date: file.dateMs, links: [...links],
+      book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
+      cover: isBook ? (coversCache[file.title] || null) : null,
+      html,
+    };
+  });
+
+  // journal: compare paragraphs with the previous build
+  const STATE = path.join(OUT, 'garden-state.json'), JOURNAL = path.join(OUT, 'journal.json');
+  let state = null, journal = [];
+  try { state = JSON.parse(fs.readFileSync(STATE, 'utf8')); } catch (e) {}
+  try { journal = JSON.parse(fs.readFileSync(JOURNAL, 'utf8')); } catch (e) {}
+  const now = new Date(), today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const nextState = {};
+  for (const n of data) {
+    const paras = plainParas(n.html), words = paras.reduce((s, p) => s + p.split(' ').length, 0);
+    const hashes = paras.map(hashText);
+    nextState[n.id] = { h: hashes, w: words };
+    if (!state) continue; // first run only records the starting point
+    const prev = state[n.id];
+    let e = null;
+    if (!prev) e = { date: today, id: n.id, kind: 'new', add: hashes.length, rem: 0, words };
+    else {
+      const ph = new Set(prev.h), ch = new Set(hashes);
+      const add = hashes.filter(h => !ph.has(h)).length, rem = prev.h.filter(h => !ch.has(h)).length;
+      if (add || rem) e = { date: today, id: n.id, kind: 'edit', add, rem, words: words - prev.w };
+    }
+    if (e) {
+      const same = journal.find(j => j.date === e.date && j.id === e.id && j.kind !== 'first');
+      if (same) { same.add += e.add; same.rem += e.rem; same.words += e.words; if (e.kind === 'new') same.kind = 'new'; }
+      else journal.push(e);
+    }
+  }
+  fs.writeFileSync(STATE, JSON.stringify(nextState));
+  fs.writeFileSync(JOURNAL, JSON.stringify(journal));
+
+  const json = v => JSON.stringify(v).replace(/<\//g, '<\\/');
+  const tpl = fs.readFileSync(path.join(APP_DIR, 'index.template.html'), 'utf8');
+  const page = tpl.replace('/*DATA*/', () => json(data)).replace('/*JOURNAL*/', () => json(journal)).replace('/*TRAILS*/', () => json(parseTrails(files)));
+  const written = new Set(['index.html']);
+  fs.writeFileSync(path.join(OUT, 'index.html'), page);
+  for (const asset of fs.readdirSync(APP_DIR)) {
+    if (asset.endsWith('.html')) continue;
+    fs.copyFileSync(path.join(APP_DIR, asset), path.join(OUT, asset));
+  }
+
+  // old URLs → the app
+  const put = (name, target, title) => { fs.writeFileSync(path.join(OUT, name), redirectPage(target, title)); written.add(name); };
+  for (const n of data) put(`${n.id}.html`, `index.html#n=${encodeURIComponent(n.id)}`, n.title);
+  put('blog.html', 'index.html#blog', 'Есеї');
+  put('books.html', 'index.html#shelf', 'Полиця');
+  put('seeds.html', 'index.html#garden', 'Сад');
+  put('research.html', 'index.html#map', 'Мапа');
+  for (const t of new Set(files.flatMap(f => f.tags))) put(`tag-${t}.html`, 'index.html#garden', '#' + t);
+
+  // remove pages of notes that no longer exist (keeps images and other files)
+  for (const name of fs.readdirSync(OUT)) {
+    if (name.endsWith('.html') && !written.has(name)) { fs.unlinkSync(path.join(OUT, name)); console.log('🧹 removed', name); }
+  }
+  console.log(`\n🌿 Новий сайт: ${data.length} нотаток, ${journal.length} записів у журналі`);
 }
 
 build().catch(console.error);
