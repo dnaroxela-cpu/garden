@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sasha's Garden</title>
 <meta name="description" content="Цифровий сад Саші: живі нотатки з Obsidian про цікавість, освіту, подив та дизайн.">
-<style>html{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>html{color-scheme:light;-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=Onest:wght@300;500;700&family=Spectral:ital,wght@0,300;0,500;1,300;1,400&family=Unbounded:wght@300;400;700&family=Geologica:wght@300;500&display=swap">
@@ -60,7 +60,18 @@ nav{position:relative}
 :root[data-nav="dock"] .bar nav button{position:relative;z-index:1;padding:8px 16px;border-radius:99px}
 :root[data-nav="dock"] .bar nav button[aria-current="page"]{color:#111}
 :root[data-nav="dock"] .nav-ind{top:6px;bottom:6px;height:auto;border-radius:99px}
-@media (max-width:600px){:root[data-nav="split"] .bar{padding-block:12px}:root[data-nav="split"] .bar .logo{font-size:12px}:root[data-nav="split"] .mode{grid-column:1;justify-self:end;margin-right:8px;width:28px;height:28px}:root[data-nav="split"] .bar nav{flex-wrap:nowrap;white-space:nowrap;gap:0 9px;padding-left:9px}:root[data-nav="split"] .bar nav button{font-size:12px;padding-inline:0}:root[data-nav="split"] .nav-ind{bottom:-13px}}
+@media (max-width:600px){
+  :root[data-nav="split"] .bar{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;padding-block:12px}
+  :root[data-nav="split"] .bar::after{display:none}
+  :root[data-nav="split"] .bar .logo{order:0;margin-right:auto;font-size:12px;white-space:nowrap;flex:none}
+  .bar.logo-off .logo{opacity:1;translate:0 0;pointer-events:auto}
+  :root[data-nav="split"] .bar nav{order:1;min-width:0;flex:0 1 auto;flex-wrap:nowrap;white-space:nowrap;gap:0 10px;padding-left:0;overflow-x:auto;scrollbar-width:none}
+  :root[data-nav="split"] .bar nav::-webkit-scrollbar{display:none}
+  :root[data-nav="split"] .bar nav button{font-size:12px;padding-inline:0;flex:none}
+  :root[data-nav="split"] .mode{order:2;margin:0;width:28px;height:28px;flex:none}
+  :root[data-nav="split"] .nav-ind{bottom:-1px}
+}
+@media (max-width:360px){:root[data-nav="split"] .bar .logo{font-size:11px}:root[data-nav="split"] .bar nav{gap:0 8px}:root[data-nav="split"] .bar nav button{font-size:11px}}
 @media (max-width:600px){:root[data-nav="dock"] .bar nav button{padding:8px 12px}:root[data-nav="line"] .bar nav button+button::before{margin:0 8px}:root[data-nav="split"] .bar nav{padding-left:12px}:root[data-nav="split"] .bar nav button{padding-inline:4px}}
 .navpick{position:fixed;left:var(--g);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:55;display:flex;gap:2px;align-items:center;padding:4px;border:1px dashed var(--rule);border-radius:8px;background:var(--bg);font-family:var(--f-mono);font-size:11px}
 .navpick span{padding:0 6px;color:var(--muted)}
@@ -436,11 +447,11 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
   .portrait{position:relative}
   .portrait img{position:static;display:block;width:100%;height:78vh;height:78svh;object-position:46% 12%}
   .hello{padding:20px 16px 56px}
-  .hello .intro{font-size:calc(var(--hello-size-m,24px))}
+  .hello .intro{font-size:clamp(20px,6.1vw,26px);max-width:none;overflow-wrap:break-word}
   .fontpick{left:12px;bottom:12px}
   .home-map{height:64vh;height:64dvh;border-top:1px solid var(--rule)}
   .stage canvas{touch-action:pan-y}
-  .map-hint{left:16px;right:16px;top:12px}
+  .map-hint{left:0;right:0;top:12px}
   .home-map .maptools{padding:0 12px 12px}
   .map-holder{height:72vh;height:72dvh;min-height:0}
   .maptools{flex-direction:column;align-items:stretch;padding:10px 12px;gap:8px}
