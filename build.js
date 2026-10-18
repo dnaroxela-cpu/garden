@@ -1251,6 +1251,7 @@ async function build() {
 //   /*DATA*/     every note in a folder: html, tags, links, dates, book author/year, cover
 //   /*JOURNAL*/  docs/journal.json — what changed between builds (kept and extended on every run)
 //   /*TRAILS*/   routes through the garden from a note called «Стежки» (see parseTrails below)
+//   /*SERIES*/   the «Серіали» tab of the shelf, from a note called «Серіали» (see parseSeries below)
 // Old per-note pages (note.html, books.html, tag-x.html…) become tiny redirects into the app,
 // so links that are already shared keep working. HTML files that no longer belong to any note are removed.
 const crypto = require('crypto');
@@ -1293,6 +1294,74 @@ function parseTrails(files) {
     }).filter(Boolean);
     return { name, desc, ids };
   }).filter(t => t.name && t.ids.length > 1);
+}
+
+// «Серіали» note format (any folder or none), one show per line, parts split by a dash:
+//   - Breaking Bad – драма, кримінал – 10/10
+//   - [[Fleabag]] — комедія — 9
+// ## headings are kept as groups. A last part that looks like a score (9, 8.5, 9/10, ★★★★) is the rating;
+// everything between the title and the rating is genres (comma-separated).
+// An image link on the line (![](url) or a bare https://….jpg) overrides the cover.
+const RATING_RE = /^(?:\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?|[★☆⭐]+)[^\p{L}\d]*$/u;
+function parseSeries(files) {
+  const f = files.find(x => x.title.trim().toLowerCase() === 'серіали');
+  if (!f) return [];
+  const out = [];
+  let group = null;
+  for (const line of f.body.split('\n')) {
+    const h = line.match(/^#{1,6}\s+(.+)/);
+    if (h) { group = h[1].trim(); continue; }
+    const m = line.match(/^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.+)/);
+    if (!m) continue;
+    let text = m[1];
+    const img = text.match(/!\[[^\]]*\]\((https?:[^)\s]+)\)|(https?:\/\/\S+\.(?:jpe?g|png|webp)(?:\?\S*)?)/i);
+    text = text.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/https?:\/\/\S+/g, '')
+      .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, '$2').replace(/\[\[([^\]]+)\]\]/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_`]/g, '').trim();
+    const parts = text.split(/\s+[–—-]+\s+|\s*[–—]\s*/).map(p => p.trim()).filter(Boolean);
+    if (!parts.length) continue;
+    const title = parts.shift();
+    let rating = null;
+    if (parts.length && RATING_RE.test(parts[parts.length - 1])) rating = parts.pop();
+    const genres = parts.join(', ').split(/\s*[,;/]\s*/).map(g => g.trim().toLowerCase()).filter(Boolean);
+    out.push({ title, genres, rating, group, cover: img ? (img[1] || img[2]) : null });
+  }
+  return out;
+}
+
+// series covers: TVmaze (no key needed), then the iTunes store; cached next to book covers as "tv:<title>".
+// Returns undefined when the network failed, so that title is tried again on the next build.
+async function fetchSeriesCover(title) {
+  let reached = false;
+  try {
+    const res = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(title)}`);
+    reached = true;
+    if (res.ok) {
+      const d = await res.json();
+      const u = d.image && (d.image.original || d.image.medium);
+      if (u) return u.replace(/^http:/, 'https:');
+    }
+  } catch {}
+  try {
+    const res = await fetch(`https://itunes.apple.com/search?media=tvShow&entity=tvSeason&limit=1&term=${encodeURIComponent(title)}`);
+    reached = true;
+    const d = await res.json();
+    const u = d.results && d.results[0] && d.results[0].artworkUrl100;
+    if (u) return u.replace(/100x100bb/, '600x600bb');
+  } catch {}
+  return reached ? null : undefined;
+}
+async function resolveSeriesCovers(series) {
+  const cache = loadCoversCache();
+  const toFetch = series.filter(s => !s.cover && !(('tv:' + s.title) in cache));
+  if (toFetch.length) {
+    console.log(`Завантажую ${toFetch.length} обкладинок серіалів...`);
+    const results = await Promise.all(toFetch.map(s => fetchSeriesCover(s.title)));
+    toFetch.forEach((s, i) => { if (results[i] !== undefined) cache['tv:' + s.title] = results[i]; });
+    saveCoversCache(cache);
+  }
+  for (const s of series) if (!s.cover) s.cover = cache['tv:' + s.title] || null;
+  return series;
 }
 
 function redirectPage(target, title) {
@@ -1361,7 +1430,9 @@ async function buildApp(files, coversCache) {
 
   const json = v => JSON.stringify(v).replace(/<\//g, '<\\/');
   const tpl = fs.readFileSync(path.join(APP_DIR, 'index.template.html'), 'utf8');
-  const page = tpl.replace('/*DATA*/', () => json(data)).replace('/*JOURNAL*/', () => json(journal)).replace('/*TRAILS*/', () => json(parseTrails(files)));
+  const series = await resolveSeriesCovers(parseSeries(files));
+  const page = tpl.replace('/*DATA*/', () => json(data)).replace('/*JOURNAL*/', () => json(journal)).replace('/*TRAILS*/', () => json(parseTrails(files)))
+    .replace('/*SERIES*/', () => json(series));
   const written = new Set(['index.html']);
   fs.writeFileSync(path.join(OUT, 'index.html'), page);
   for (const asset of fs.readdirSync(APP_DIR)) {
