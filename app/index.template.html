@@ -524,11 +524,12 @@ body.book-open .shelf-drawer{transform:none}
 @media (min-width:1100px){body.book-open #v-shelf{padding-right:min(680px,100vw)}body.book-open #v-shelf .head{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.shelf-drawer{transition:none}}
 
-/* series: a list from the «Серіали» note; cover pops up on hover */
-.series-bar{display:flex;flex-direction:column;gap:12px;padding-block:28px 8px}
+/* series and films: lists from the «Серіали» note and MUBI; poster pops up on hover */
+.series-count{padding-block:28px 8px;margin:0}.series-count a{color:inherit}
 .series{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--ink)}
 .series .grp-h{padding:28px 0 8px;border-bottom:1px solid var(--rule)}
 .srow{display:grid;grid-template-columns:minmax(0,auto) 1fr auto;align-items:baseline;gap:6px 16px;padding-block:12px;border-bottom:1px solid var(--rule);cursor:default;outline-offset:4px}
+#t-films .srow{cursor:pointer}
 .srow .tt{min-width:0}
 .srow .t{font-size:18px;transition:color .2s}
 .srow .st{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:10px;white-space:nowrap}
@@ -701,16 +702,18 @@ body.on-home footer.site-foot{margin-top:0}
   <section class="view" id="v-shelf" hidden>
     <div class="head">
       <h1>Полиця</h1>
-      <p>Книжки й тексти, які я законспектувала в Obsidian, серіали, цитати, що чіпляються, і закладки на чужі сади. Товщина корінця — це довжина конспекту. Розстав книжки як хочеш і натисни на корінець, щоб відкрити конспект поруч.</p>
+      <p>Книжки й тексти, які я законспектувала в Obsidian, фільми з MUBI, серіали, цитати, що чіпляються, і закладки на чужі сади. Товщина корінця — це довжина конспекту. Розстав книжки як хочеш і натисни на корінець, щоб відкрити конспект поруч.</p>
     </div>
     <div class="tabs">
       <button data-tab="books" aria-current="true">Книжки</button>
+      <button data-tab="films">Фільми</button>
       <button data-tab="series">Серіали</button>
       <button data-tab="quotes">Цитати</button>
       <button data-tab="links">Закладки</button>
     </div>
     <div id="t-books"></div>
     <aside class="shelf-drawer" aria-label="Відкрита книжка"><div class="panes in-drawer" id="shelf-panes"></div></aside>
+    <div id="t-films" hidden></div>
     <div id="t-series" hidden></div>
     <div id="t-quotes" hidden><div class="quotes" id="quotes" style="margin-top:32px"></div></div>
     <div id="t-links" hidden><ul class="list" id="links" style="margin-top:24px"></ul></div>
@@ -732,6 +735,7 @@ body.on-home footer.site-foot{margin-top:0}
 <script type="application/json" id="journal-data">/*JOURNAL*/</script>
 <script type="application/json" id="trails-data">/*TRAILS*/</script>
 <script type="application/json" id="series-data">/*SERIES*/</script>
+<script type="application/json" id="films-data">/*FILMS*/</script>
 <script>
 const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>b.date-a.date);
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
@@ -1013,51 +1017,46 @@ addEventListener("scroll",hideCover,{passive:true});
 function renderHomeShelf(){$("#home-shelf").innerHTML=[...BOOKS].sort((a,b)=>b.readSort-a.readSort).map(b=>`<button class="spine mini" data-hbook="${b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${Math.max(34,Math.round(b.w*1.05))}px;height:${Math.round(b.h*.98)}px" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`).join("")}
 renderHomeShelf();
 $("#home-shelf").addEventListener("click",e=>{const b=e.target.closest("[data-hbook]");if(!b)return;go("shelf");document.body.classList.add("book-open");shelfStack.set([b.dataset.hbook])});
-// series: from the «Серіали» note («Назва – жанри – оцінка»); cover is fetched only when you hover a row
-const SERIES=(()=>{try{const d=JSON.parse(document.getElementById("series-data").textContent);return Array.isArray(d)?d:[]}catch(e){return[]}})();
-SERIES.forEach((s,i)=>{s.i=i;const m=(s.rating||"").match(/^(\d+(?:[.,]\d+)?)(?:\s*\/\s*(\d+))?/);const stars=(s.rating||"").match(/[★⭐]/g);
-  s.score=m?(+m[1].replace(",","."))/(m[2]?+m[2]:10):stars?stars.length/5:-1;s.color=SPINES[hash(s.title)%SPINES.length]});
+// series (from the «Серіали» note) and films (from MUBI): plain lists grouped by year; the poster loads only when you hover a row
+const readJSON=id=>{try{const d=JSON.parse(document.getElementById(id).textContent);return Array.isArray(d)?d:[]}catch(e){return[]}};
 const SER_STATUS={watching:"дивлюсь зараз",rewatch:"передивляюсь",rewatching:"передивляюсь",rewatched:"передивилась","re-watched":"передивилась",dropped:"кинула",paused:"на паузі","on hold":"на паузі",finished:"подивилась"};
-const SER_SORT={note:"як у нотатці",score:"за оцінкою",title:"за назвою"};
-let serSort="note",serGenre=null;try{serSort=localStorage.getItem("seriesSort")||serSort}catch(e){}if(!SER_SORT[serSort])serSort="note";
-const SER_GENRES=(()=>{const c={};SERIES.forEach(s=>s.genres.forEach(g=>c[g]=(c[g]||0)+1));const all=Object.entries(c).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"uk"));const common=all.filter(x=>x[1]>1);return(common.length>1?common:all).map(x=>x[0])})(); // only genres that repeat, so the row stays short
-function renderSeries(){const box=$("#t-series");
-  if(!SERIES.length){box.innerHTML=`<p class="mono series-empty">Тут з'являться серіали з нотатки «Серіали» в Obsidian: один рядок — «Назва – жанри – оцінка».</p>`;return}
-  let list=SERIES.filter(s=>!serGenre||s.genres.includes(serGenre));
-  if(serSort==="score")list=[...list].sort((a,b)=>b.score-a.score||a.i-b.i);
-  if(serSort==="title")list=[...list].sort((a,b)=>a.title.localeCompare(b.title,"uk"));
-  const row=s=>`<li class="srow" tabindex="0" data-ser="${s.i}"><span class="tt"><span class="t">${esc(s.title)}</span>${s.status?`<span class="st">${esc(SER_STATUS[s.status]||s.status)}</span>`:""}</span><span class="gs">${esc(s.genres.join(", "))}</span><span class="r${s.rating?"":" none"}">${s.rating?esc(s.rating):"—"}</span></li>`;
-  let rows="";if(serSort==="note"&&list.some(s=>s.group)){let g;list.forEach(s=>{if(s.group!==g){g=s.group;rows+=`<li class="grp-h label">${esc(g||"")}</li>`}rows+=row(s)})}else rows=list.map(row).join("");
-  box.innerHTML=`<div class="series-bar"><div class="arr" role="group" aria-label="Порядок"><span class="label">Порядок</span>${Object.entries(SER_SORT).map(([k,v])=>`<button data-ssort="${k}" aria-pressed="${k===serSort}">${v}</button>`).join("")}</div>
-    ${SER_GENRES.length>1?`<div class="arr" role="group" aria-label="Жанр"><span class="label">Жанр</span><button data-sgenre="" aria-pressed="${!serGenre}">усі</button>${SER_GENRES.map(g=>`<button data-sgenre="${esc(g)}" aria-pressed="${g===serGenre}">${esc(g)}</button>`).join("")}</div>`:""}
-    <span class="mono">${list.length} ${plural(list.length,"серіал","серіали","серіалів")}</span></div><ul class="series">${rows}</ul>`}
-function showSeriesCover(row,px){const s=SERIES[+row.dataset.ser];if(!s)return;const pop=$("#coverpop");
-  const fallback=`<div class="cover cv-fallback" style="background:${s.color[0]};color:${s.color[1]}">${esc(s.title)}<small>${esc(s.genres.slice(0,2).join(", "))}</small></div>`;
+const SCREEN={
+  series:readJSON("series-data").map(s=>({...s,meta:s.genres.join(", "),tag:s.status?SER_STATUS[s.status]||s.status:""})),
+  films:readJSON("films-data").map(f=>({...f,group:f.date?f.date.slice(0,4):"",meta:[f.year,f.directors.join(", ")].filter(Boolean).join(" · "),rating:f.rating?f.rating+"/5":null,tag:""}))};
+SCREEN.films.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+const SCREEN_EMPTY={series:"Тут з'являться серіали з нотатки «Серіали» в Obsidian: один рядок — «Назва — 4/5 — Жанр, Жанр».",
+  films:"Тут з'являться фільми з MUBI, щойно сайт збереться на Mac з доступом до mubi.com."};
+function renderScreen(kind){const box=$("#t-"+kind),list=SCREEN[kind];
+  if(!list.length){box.innerHTML=`<p class="mono series-empty">${SCREEN_EMPTY[kind]}</p>`;return}
+  let rows="",g;list.forEach((s,i)=>{if(list.some(x=>x.group)&&s.group!==g){g=s.group;rows+=`<li class="grp-h label">${esc(g||"")}</li>`}
+    rows+=`<li class="srow" tabindex="0" data-scr="${kind}:${i}"><span class="tt"><span class="t">${esc(s.title)}</span>${s.tag?`<span class="st">${esc(s.tag)}</span>`:""}</span><span class="gs">${esc(s.meta)}</span><span class="r${s.rating?"":" none"}">${s.rating?esc(s.rating):"—"}</span></li>`});
+  const n=list.length;box.innerHTML=`<p class="mono series-count">${n} ${kind==="films"?plural(n,"фільм","фільми","фільмів"):plural(n,"серіал","серіали","серіалів")}${kind==="films"?` · <a href="https://mubi.com/en/users/6777405" target="_blank" rel="noopener">мій MUBI ↗</a>`:""}</p><ul class="series">${rows}</ul>`}
+function screenItem(row){const[k,i]=row.dataset.scr.split(":");return SCREEN[k][+i]}
+function showScreenCover(row,px){const s=screenItem(row);if(!s)return;const pop=$("#coverpop"),c=SPINES[hash(s.title)%SPINES.length];
+  const fallback=`<div class="cover cv-fallback" style="background:${c[0]};color:${c[1]}">${esc(s.title)}<small>${esc(s.meta.split(" · ").pop().split(",").slice(0,2).join(","))}</small></div>`;
   pop.innerHTML=s.cover?`<img src="${esc(s.cover)}" alt="Постер «${esc(s.title)}»" referrerpolicy="no-referrer">`+fallback:fallback;
   const img=pop.querySelector("img");if(img){pop.classList.add("loading");img.onload=()=>pop.classList.remove("loading");img.onerror=()=>{img.remove();pop.classList.remove("loading")}}
   pop.hidden=false;const r=row.getBoundingClientRect(),w=150,h=225;let x,y;
   if(px!=null){x=px+28;if(x+w>innerWidth-8)x=Math.max(8,px-w-28);y=Math.max(70,Math.min(innerHeight-h-8,r.top+r.height/2-h/2))}
   else{x=Math.max(8,Math.min(innerWidth-w-8,r.left+row.querySelector(".t").offsetWidth+28));y=r.top-h-10;if(y<70)y=r.bottom+10} // tap or keyboard: above the row, title stays visible
   pop.style.left=x+"px";pop.style.top=y+"px"}
-const serBox=$("#t-series");
-serBox.addEventListener("pointerover",e=>{const r=e.target.closest("[data-ser]");if(r&&e.pointerType==="mouse")showSeriesCover(r,e.clientX)});
-serBox.addEventListener("pointermove",e=>{const r=e.target.closest("[data-ser]");if(r&&e.pointerType==="mouse"&&!$("#coverpop").hidden){const pop=$("#coverpop");let x=e.clientX+28;if(x+150>innerWidth-8)x=e.clientX-178;pop.style.left=Math.max(8,x)+"px"}});
-serBox.addEventListener("pointerout",e=>{const r=e.target.closest("[data-ser]");if(r&&!r.contains(e.relatedTarget))hideCover()});
-serBox.addEventListener("focusin",e=>{const r=e.target.closest("[data-ser]");if(r)showSeriesCover(r)});
-serBox.addEventListener("focusout",hideCover);
-serBox.addEventListener("click",e=>{
-  const so=e.target.closest("[data-ssort]");if(so){serSort=so.dataset.ssort;try{localStorage.setItem("seriesSort",serSort)}catch(err){}renderSeries();return}
-  const g=e.target.closest("[data-sgenre]");if(g){serGenre=g.dataset.sgenre||null;renderSeries();return}
-  const r=e.target.closest("[data-ser]");if(!r)return; // touch: tap a row to see the poster, tap again to hide it
-  const was=r.classList.contains("on");serBox.querySelectorAll(".srow.on").forEach(x=>x.classList.remove("on"));
-  if(e.pointerType==="mouse")return;if(was){hideCover();return}r.classList.add("on");showSeriesCover(r)});
-renderSeries();
+["series","films"].forEach(kind=>{const box=$("#t-"+kind);
+  box.addEventListener("pointerover",e=>{const r=e.target.closest("[data-scr]");if(r&&e.pointerType==="mouse")showScreenCover(r,e.clientX)});
+  box.addEventListener("pointermove",e=>{const r=e.target.closest("[data-scr]");if(r&&e.pointerType==="mouse"&&!$("#coverpop").hidden){let x=e.clientX+28;if(x+150>innerWidth-8)x=e.clientX-178;$("#coverpop").style.left=Math.max(8,x)+"px"}});
+  box.addEventListener("pointerout",e=>{const r=e.target.closest("[data-scr]");if(r&&!r.contains(e.relatedTarget))hideCover()});
+  box.addEventListener("focusin",e=>{const r=e.target.closest("[data-scr]");if(r)showScreenCover(r)});
+  box.addEventListener("focusout",hideCover);
+  box.addEventListener("click",e=>{const r=e.target.closest("[data-scr]");if(!r)return;
+    if(e.pointerType==="mouse"){const s=screenItem(r);if(s.url)open(s.url,"_blank","noopener");return} // mouse: a film opens on MUBI
+    const was=r.classList.contains("on");box.querySelectorAll(".srow.on").forEach(x=>x.classList.remove("on")); // touch: tap shows the poster, tap again hides it
+    if(was){hideCover();return}r.classList.add("on");showScreenCover(r)});
+  renderScreen(kind)});
 $("#quotes").innerHTML=QUOTES.map(q=>`<figure><blockquote>«${esc(q[0])}»</blockquote>${q[1]?`<figcaption>ᔥ ${esc(q[1])}</figcaption>`:""}</figure>`).join("");
 const LINKS=[["Andy's working notes","notes.andymatuschak.org","https://notes.andymatuschak.org/About_these_notes"],["The Garden of Maggie Appleton","maggieappleton.com","https://maggieappleton.com/garden"],["Tom Critchlow","tomcritchlow.com","https://tomcritchlow.com/"],["Worrydream quotes","Bret Victor","https://worrydream.com/quotes/"],["Jessica Smith","jayeless.net","https://www.jayeless.net/"],["Joel Hooks","joelhooks.com","https://joelhooks.com/"],["Christoph Locher","christophlocher.com","https://christophlocher.com"],["are.na","бібліотеки знань","https://www.are.na"],["The Garden and the Stream","Mike Caulfield, 2015","https://hapgood.us/2015/10/17/the-garden-and-the-stream-a-technopastoral/"]];
 $("#links").innerHTML=LINKS.map(l=>`<li><a class="row" href="${l[2]}"><span class="g">↗</span><span class="t">${esc(l[0])}</span><span class="lead"></span><span class="d">${esc(l[1])}</span></a></li>`).join("");
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-current",x===b));
-  hideCover();["books","series","quotes","links"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
+  hideCover();["books","films","series","quotes","links"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
 
 
 // living map: a continuous gentle force simulation; colour = theme on the rainbow, size = note length, pulses travel along [[links]]
