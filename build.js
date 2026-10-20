@@ -1304,7 +1304,7 @@ function parseTrails(files) {
 // a status word (watching, rewatched, dropped…) is the status; everything else is genres (comma-separated).
 // An image link on the line (![](url) or a bare https://….jpg) overrides the cover.
 const RATING_RE = /^(?:\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?|[★☆⭐]+)[^\p{L}\d]*$/u;
-const STATUS_RE = /^(watching|rewatch(ed|ing)?|re-?watched|dropped|paused|on hold|finished|дивлюсь|дивлюся|передивилась|переглянула|кинула|на паузі|подивилась)$/i;
+const STATUS_RE = /^(watching|rewatch(ed|ing)?|re-?watched|dropped|paused|on hold|finished|(want|plan) to (re-?)?watch|to (re-?)?watch|дивлюсь|дивлюся|передивилась|переглянула|кинула|на паузі|подивилась|хочу (пере)?подивитис[ья])$/i;
 function parseSeries(files) {
   const f = files.find(x => x.title.trim().toLowerCase() === 'серіали');
   if (!f) return [];
@@ -1377,12 +1377,12 @@ async function resolveSeriesCovers(series) {
     }
     saveCoversCache(cache);
   }
-  for (const s of series) if (!s.genres.length) s.genres = cache['wd:' + s.title] || [];
+  for (const s of series) if (!s.genres.length) s.genres = tidyGenres(cache['wd:' + s.title]);
   return series;
 }
 
 const { resolveFilms, visibleFilms } = require('./films');
-const { wikiLookup } = require('./wiki');
+const { wikiLookup, tidyGenres } = require('./wiki');
 
 function redirectPage(target, title) {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

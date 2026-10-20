@@ -5,10 +5,22 @@ const UA = { 'User-Agent': 'SashasGarden/1.0 (https://dnaroxela-cpu.github.io/ga
 const FILM = new Set(['Q11424', 'Q24869', 'Q29168811', 'Q202866', 'Q93204', 'Q24862', 'Q506240', 'Q226730', 'Q17517379', 'Q1054574']);
 const SERIES = new Set(['Q5398426', 'Q1259759', 'Q15416', 'Q581714', 'Q526877', 'Q3464665', 'Q21191270', 'Q1366112', 'Q117467246', 'Q63952888', 'Q7725310']);
 
+// Wikimedia answers 429 when asked too often: requests go one at a time, at most ~5 a second, and a 429/5xx is retried after a pause
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let last = 0;
 async function getJSON(url) {
-  const res = await fetch(url, { headers: UA, signal: AbortSignal.timeout(15000) });
-  if (!res.ok) throw new Error(`${res.status} ${url}`);
-  return res.json();
+  for (let attempt = 0; ; attempt++) {
+    const wait = last + 200 - Date.now();
+    last = Date.now() + Math.max(0, wait);
+    if (wait > 0) await sleep(wait);
+    const res = await fetch(url, { headers: UA, signal: AbortSignal.timeout(15000) });
+    if (res.ok) return res.json();
+    if (attempt < 4 && (res.status === 429 || res.status >= 500)) {
+      await sleep((+res.headers.get('retry-after') || 2 ** attempt * 2) * 1000);
+      continue;
+    }
+    throw new Error(`${res.status} ${url}`);
+  }
 }
 const ids = (claims, p) => ((claims && claims[p]) || []).map(c => c.mainsnak && c.mainsnak.datavalue && c.mainsnak.datavalue.value)
   .filter(Boolean).map(v => v.id || v.time).filter(Boolean);
@@ -16,7 +28,9 @@ const kindOf = claims => {
   const p31 = ids(claims, 'P31');
   return p31.some(id => SERIES.has(id)) ? 'series' : p31.some(id => FILM.has(id)) ? 'film' : null;
 };
-const cleanGenre = g => g.toLowerCase().replace(/\s+(film|movie|television series|television program|tv series|series)$/, '').trim();
+const cleanGenre = g => g.toLowerCase()
+  .replace(/\s+(film|movie|television series|television program|television|tv series|series|fiction)$/, '').trim();
+const SKIP_GENRE = new Set(['fiction', 'independent', 'lgbt-related', 'lgbtq-related', 'drama television', 'film', 'television']);
 
 // Returns { kind: 'film'|'series'|null, genres: [...] }, or null when Wikipedia has no matching article.
 // Throws when Wikipedia can't be reached, so the caller can try again on the next build.
@@ -44,7 +58,7 @@ async function wikiLookup(title, year, want) {
   let genres = [];
   if (gids.length) {
     const l = await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=labels&languages=en&ids=${gids.join('|')}`);
-    genres = [...new Set(gids.map(g => l.entities[g] && l.entities[g].labels.en && cleanGenre(l.entities[g].labels.en.value)).filter(Boolean))];
+    genres = [...new Set(gids.map(g => l.entities[g] && l.entities[g].labels.en && cleanGenre(l.entities[g].labels.en.value)).filter(g => g && !SKIP_GENRE.has(g)))];
   }
   return { kind: best.kind, genres };
 }
@@ -55,4 +69,7 @@ async function pool(items, n, fn) {
   await Promise.all(Array.from({ length: n }, async () => { while (i < items.length) { const k = i++; await fn(items[k], k); } }));
 }
 
-module.exports = { wikiLookup, pool };
+// tidy genres already stored (older builds kept labels like "horror fiction" or "independent")
+const tidyGenres = gs => [...new Set((gs || []).map(cleanGenre).filter(g => g && !SKIP_GENRE.has(g)))];
+
+module.exports = { wikiLookup, pool, tidyGenres };

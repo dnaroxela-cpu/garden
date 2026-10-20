@@ -1019,7 +1019,7 @@ renderHomeShelf();
 $("#home-shelf").addEventListener("click",e=>{const b=e.target.closest("[data-hbook]");if(!b)return;go("shelf");document.body.classList.add("book-open");shelfStack.set([b.dataset.hbook])});
 // series (from the «Серіали» note) and films (from MUBI): plain lists grouped by year; the poster loads only when you hover a row
 const readJSON=id=>{try{const d=JSON.parse(document.getElementById(id).textContent);return Array.isArray(d)?d:[]}catch(e){return[]}};
-const SER_STATUS={watching:"дивлюсь зараз",rewatch:"передивляюсь",rewatching:"передивляюсь",rewatched:"передивилась","re-watched":"передивилась",dropped:"кинула",paused:"на паузі","on hold":"на паузі",finished:"подивилась"};
+const SER_STATUS={watching:"дивлюсь зараз",rewatch:"передивляюсь",rewatching:"передивляюсь",rewatched:"передивилась","re-watched":"передивилась",dropped:"кинула",paused:"на паузі","on hold":"на паузі",finished:"подивилась","want to watch":"хочу подивитись","plan to watch":"хочу подивитись","to watch":"хочу подивитись","want to rewatch":"хочу передивитись","want to re-watch":"хочу передивитись","to rewatch":"хочу передивитись"};
 const SCREEN={
   series:readJSON("series-data").map(s=>({...s,meta:s.genres.join(", "),tag:s.status?SER_STATUS[s.status]||s.status:""})),
   films:readJSON("films-data").map(f=>({...f,group:f.date?f.date.slice(0,4):"",meta:[f.year,f.directors.join(", "),(f.genres||[]).join(", ")].filter(Boolean).join(" · "),rating:f.rating?f.rating+"/5":null,tag:""}))};

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { wikiLookup, pool } = require('./wiki');
+const { wikiLookup, pool, tidyGenres } = require('./wiki');
 
 // Films for the «Фільми» tab of the shelf: ratings from MUBI (https://mubi.com/en/users/<id>), fetched on every build and kept in docs/films.json,
 // so if MUBI can't be reached the last list stays on the site.
@@ -60,20 +60,20 @@ async function resolveFilms(OUT) {
   }
   const todo = films.filter(f => !f.wiki);
   if (todo.length) console.log(`🎬 шукаю жанри у Вікіпедії для ${todo.length} фільмів...`);
-  let failed = 0;
-  await pool(todo, 4, async f => {
+  let failed = 0, firstError = null;
+  await pool(todo, 2, async f => {
     try {
       const w = await wikiLookup(f.title, f.year, 'film');
       if (w) { f.genres = w.genres; if (w.kind === 'series') f.series = true; }
       f.wiki = true; // found or not, don't ask again; a network error leaves it for the next build
-    } catch { failed++; }
+    } catch (e) { failed++; firstError = firstError || e.message; }
   });
-  if (failed) console.log(`🎬 Вікіпедія не відповіла для ${failed} фільмів, спробую наступного разу`);
+  if (failed) console.log(`🎬 Вікіпедія не відповіла для ${failed} фільмів, спробую наступного разу (${firstError})`);
   fs.writeFileSync(FILE, JSON.stringify(films));
   console.log(`🎬 фільмів з MUBI: ${films.length}`);
   return films;
 }
 
-const visibleFilms = films => films.filter(f => !f.series);
+const visibleFilms = films => films.filter(f => !f.series).map(f => ({ ...f, genres: tidyGenres(f.genres) }));
 
 module.exports = { resolveFilms, visibleFilms };
