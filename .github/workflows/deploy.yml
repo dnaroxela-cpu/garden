@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "17 6 * * 1" # Mondays: refresh films from MUBI
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,6 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Refresh films from MUBI
+        run: node update-films.js
+        continue-on-error: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
