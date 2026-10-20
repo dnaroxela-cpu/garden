@@ -31,7 +31,7 @@ jobs:
       - name: Refresh films from MUBI
         run: node update-films.js
         continue-on-error: true
-        timeout-minutes: 5
+        timeout-minutes: 15
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs

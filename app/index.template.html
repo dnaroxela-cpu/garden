@@ -703,7 +703,6 @@ body.on-home footer.site-foot{margin-top:0}
   <section class="view" id="v-shelf" hidden>
     <div class="head">
       <h1>Полиця</h1>
-      <p>Книжки й тексти, які я законспектувала в Obsidian, фільми з MUBI, серіали, цитати, що чіпляються, і закладки на чужі сади. Товщина корінця — це довжина конспекту. Розстав книжки як хочеш і натисни на корінець, щоб відкрити конспект поруч.</p>
     </div>
     <div class="tabs">
       <button data-tab="books" aria-current="true">Книжки</button>
@@ -1023,7 +1022,7 @@ const readJSON=id=>{try{const d=JSON.parse(document.getElementById(id).textConte
 const SER_STATUS={watching:"дивлюсь зараз",rewatch:"передивляюсь",rewatching:"передивляюсь",rewatched:"передивилась","re-watched":"передивилась",dropped:"кинула",paused:"на паузі","on hold":"на паузі",finished:"подивилась"};
 const SCREEN={
   series:readJSON("series-data").map(s=>({...s,meta:s.genres.join(", "),tag:s.status?SER_STATUS[s.status]||s.status:""})),
-  films:readJSON("films-data").map(f=>({...f,group:f.date?f.date.slice(0,4):"",meta:[f.year,f.directors.join(", ")].filter(Boolean).join(" · "),rating:f.rating?f.rating+"/5":null,tag:""}))};
+  films:readJSON("films-data").map(f=>({...f,group:f.date?f.date.slice(0,4):"",meta:[f.year,f.directors.join(", "),(f.genres||[]).join(", ")].filter(Boolean).join(" · "),rating:f.rating?f.rating+"/5":null,tag:""}))};
 SCREEN.films.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
 const SCREEN_EMPTY={series:"Тут з'являться серіали з нотатки «Серіали» в Obsidian: один рядок — «Назва — 4/5 — Жанр, Жанр».",
   films:"Тут з'являться фільми з MUBI, щойно сайт збереться на Mac з доступом до mubi.com."};

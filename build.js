@@ -1367,10 +1367,22 @@ async function resolveSeriesCovers(series) {
     saveCoversCache(cache);
   }
   for (const s of series) if (!s.cover) s.cover = cache['tv:' + s.title] || null;
+  // genres written in the note win; for the rest ask Wikipedia (cached as "wd:<title>")
+  const noGenres = series.filter(s => !s.genres.length && !(('wd:' + s.title) in cache));
+  if (noGenres.length) {
+    console.log(`Шукаю жанри ${noGenres.length} серіалів у Вікіпедії...`);
+    for (const s of noGenres) {
+      try { const w = await wikiLookup(s.title, null, 'series'); cache['wd:' + s.title] = w ? w.genres : []; }
+      catch { /* offline: try again next build */ }
+    }
+    saveCoversCache(cache);
+  }
+  for (const s of series) if (!s.genres.length) s.genres = cache['wd:' + s.title] || [];
   return series;
 }
 
-const { resolveFilms } = require('./films');
+const { resolveFilms, visibleFilms } = require('./films');
+const { wikiLookup } = require('./wiki');
 
 function redirectPage(target, title) {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1441,7 +1453,7 @@ async function buildApp(files, coversCache) {
   const series = await resolveSeriesCovers(parseSeries(files));
   const films = await resolveFilms(OUT);
   const page = tpl.replace('/*DATA*/', () => json(data)).replace('/*JOURNAL*/', () => json(journal)).replace('/*TRAILS*/', () => json(parseTrails(files)))
-    .replace('/*SERIES*/', () => json(series)).replace('/*FILMS*/', () => json(films));
+    .replace('/*SERIES*/', () => json(series)).replace('/*FILMS*/', () => json(visibleFilms(films)));
   const written = new Set(['index.html']);
   fs.writeFileSync(path.join(OUT, 'index.html'), page);
   for (const asset of fs.readdirSync(APP_DIR)) {

@@ -1,9 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const { wikiLookup, pool } = require('./wiki');
 
 // Films for the «Фільми» tab of the shelf: ratings from MUBI (https://mubi.com/en/users/<id>), fetched on every build and kept in docs/films.json,
 // so if MUBI can't be reached the last list stays on the site.
 // Used by build.js and by update-films.js (the weekly GitHub Action). Poster: MUBI's vertical artwork, else the iTunes store, else a still.
+// Genres come from Wikipedia/Wikidata, which also tells films from TV series: series rated on MUBI stay in films.json
+// (so they aren't looked up again) but are left out of the site, see visibleFilms.
 const MUBI_USER = process.env.MUBI_USER || '6777405';
 async function mubiRatings(user) {
   const headers = { CLIENT: 'web', CLIENT_COUNTRY: process.env.MUBI_COUNTRY || 'US', Accept: 'application/json' };
@@ -51,11 +54,26 @@ async function resolveFilms(OUT) {
       directors: (f.directors || []).map(x => x.name).filter(Boolean),
       rating: r.overall || null, date: (r.updated_at || r.created_at || '').slice(0, 10) || null,
       url: f.web_url || null, cover,
+      series: !!(f.series || f.episode || f.is_series) || (old ? !!old.series : false),
+      genres: old && old.genres || [], wiki: !!(old && old.wiki),
     });
   }
+  const todo = films.filter(f => !f.wiki);
+  if (todo.length) console.log(`🎬 шукаю жанри у Вікіпедії для ${todo.length} фільмів...`);
+  let failed = 0;
+  await pool(todo, 4, async f => {
+    try {
+      const w = await wikiLookup(f.title, f.year, 'film');
+      if (w) { f.genres = w.genres; if (w.kind === 'series') f.series = true; }
+      f.wiki = true; // found or not, don't ask again; a network error leaves it for the next build
+    } catch { failed++; }
+  });
+  if (failed) console.log(`🎬 Вікіпедія не відповіла для ${failed} фільмів, спробую наступного разу`);
   fs.writeFileSync(FILE, JSON.stringify(films));
   console.log(`🎬 фільмів з MUBI: ${films.length}`);
   return films;
 }
 
-module.exports = { resolveFilms };
+const visibleFilms = films => films.filter(f => !f.series);
+
+module.exports = { resolveFilms, visibleFilms };
