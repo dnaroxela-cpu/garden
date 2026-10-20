@@ -11,7 +11,7 @@ async function mubiRatings(user) {
   let cursor = null;
   for (let i = 0; i < 50; i++) {
     const url = `https://api.mubi.com/v4/users/${user}/ratings?per_page=100${cursor ? `&before=${cursor}` : ''}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
     if (!res.ok) throw new Error(`MUBI ${res.status}`);
     const d = await res.json();
     const page = d.ratings || [];
@@ -23,7 +23,7 @@ async function mubiRatings(user) {
 }
 async function itunesPoster(title, year) {
   try {
-    const res = await fetch(`https://itunes.apple.com/search?media=movie&entity=movie&limit=5&term=${encodeURIComponent(title)}`);
+    const res = await fetch(`https://itunes.apple.com/search?media=movie&entity=movie&limit=5&term=${encodeURIComponent(title)}`, { signal: AbortSignal.timeout(10000) });
     const d = await res.json();
     const hit = (d.results || []).find(r => !year || String(r.releaseDate || '').startsWith(String(year))) || (d.results || [])[0];
     return hit && hit.artworkUrl100 ? hit.artworkUrl100.replace(/100x100bb/, '600x600bb') : null;
