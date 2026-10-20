@@ -60,8 +60,9 @@ async function resolveFilms(OUT) {
   }
   const todo = films.filter(f => !f.wiki);
   if (todo.length) console.log(`🎬 шукаю жанри у Вікіпедії для ${todo.length} фільмів...`);
-  let failed = 0, firstError = null;
+  let failed = 0, firstError = null, done = 0;
   await pool(todo, 2, async f => {
+    if (++done % 50 === 0) console.log(`   …${done} з ${todo.length}`);
     try {
       const w = await wikiLookup(f.title, f.year, 'film');
       if (w) { f.genres = w.genres; if (w.kind === 'series') f.series = true; }
