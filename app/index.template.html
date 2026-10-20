@@ -529,7 +529,9 @@ body.book-open .shelf-drawer{transform:none}
 .series{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--ink)}
 .series .grp-h{padding:28px 0 8px;border-bottom:1px solid var(--rule)}
 .srow{display:grid;grid-template-columns:minmax(0,auto) 1fr auto;align-items:baseline;gap:6px 16px;padding-block:12px;border-bottom:1px solid var(--rule);cursor:default;outline-offset:4px}
-.srow .t{font-size:18px;min-width:0;transition:color .2s}
+.srow .tt{min-width:0}
+.srow .t{font-size:18px;transition:color .2s}
+.srow .st{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:10px;white-space:nowrap}
 .srow:hover .t,.srow:focus-visible .t,.srow.on .t{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 .srow .gs{font-family:var(--f-mono);font-size:12px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .srow .gs::before{content:"";display:inline-block;width:24px;margin-right:10px;border-bottom:1px dotted var(--rule);transform:translateY(-4px)}
@@ -1015,15 +1017,16 @@ $("#home-shelf").addEventListener("click",e=>{const b=e.target.closest("[data-hb
 const SERIES=(()=>{try{const d=JSON.parse(document.getElementById("series-data").textContent);return Array.isArray(d)?d:[]}catch(e){return[]}})();
 SERIES.forEach((s,i)=>{s.i=i;const m=(s.rating||"").match(/^(\d+(?:[.,]\d+)?)(?:\s*\/\s*(\d+))?/);const stars=(s.rating||"").match(/[★⭐]/g);
   s.score=m?(+m[1].replace(",","."))/(m[2]?+m[2]:10):stars?stars.length/5:-1;s.color=SPINES[hash(s.title)%SPINES.length]});
+const SER_STATUS={watching:"дивлюсь зараз",rewatch:"передивляюсь",rewatching:"передивляюсь",rewatched:"передивилась","re-watched":"передивилась",dropped:"кинула",paused:"на паузі","on hold":"на паузі",finished:"подивилась"};
 const SER_SORT={note:"як у нотатці",score:"за оцінкою",title:"за назвою"};
 let serSort="note",serGenre=null;try{serSort=localStorage.getItem("seriesSort")||serSort}catch(e){}if(!SER_SORT[serSort])serSort="note";
-const SER_GENRES=(()=>{const c={};SERIES.forEach(s=>s.genres.forEach(g=>c[g]=(c[g]||0)+1));return Object.entries(c).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"uk")).map(x=>x[0])})();
+const SER_GENRES=(()=>{const c={};SERIES.forEach(s=>s.genres.forEach(g=>c[g]=(c[g]||0)+1));const all=Object.entries(c).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"uk"));const common=all.filter(x=>x[1]>1);return(common.length>1?common:all).map(x=>x[0])})(); // only genres that repeat, so the row stays short
 function renderSeries(){const box=$("#t-series");
   if(!SERIES.length){box.innerHTML=`<p class="mono series-empty">Тут з'являться серіали з нотатки «Серіали» в Obsidian: один рядок — «Назва – жанри – оцінка».</p>`;return}
   let list=SERIES.filter(s=>!serGenre||s.genres.includes(serGenre));
   if(serSort==="score")list=[...list].sort((a,b)=>b.score-a.score||a.i-b.i);
   if(serSort==="title")list=[...list].sort((a,b)=>a.title.localeCompare(b.title,"uk"));
-  const row=s=>`<li class="srow" tabindex="0" data-ser="${s.i}"><span class="t">${esc(s.title)}</span><span class="gs">${esc(s.genres.join(", "))}</span><span class="r${s.rating?"":" none"}">${s.rating?esc(s.rating):"—"}</span></li>`;
+  const row=s=>`<li class="srow" tabindex="0" data-ser="${s.i}"><span class="tt"><span class="t">${esc(s.title)}</span>${s.status?`<span class="st">${esc(SER_STATUS[s.status]||s.status)}</span>`:""}</span><span class="gs">${esc(s.genres.join(", "))}</span><span class="r${s.rating?"":" none"}">${s.rating?esc(s.rating):"—"}</span></li>`;
   let rows="";if(serSort==="note"&&list.some(s=>s.group)){let g;list.forEach(s=>{if(s.group!==g){g=s.group;rows+=`<li class="grp-h label">${esc(g||"")}</li>`}rows+=row(s)})}else rows=list.map(row).join("");
   box.innerHTML=`<div class="series-bar"><div class="arr" role="group" aria-label="Порядок"><span class="label">Порядок</span>${Object.entries(SER_SORT).map(([k,v])=>`<button data-ssort="${k}" aria-pressed="${k===serSort}">${v}</button>`).join("")}</div>
     ${SER_GENRES.length>1?`<div class="arr" role="group" aria-label="Жанр"><span class="label">Жанр</span><button data-sgenre="" aria-pressed="${!serGenre}">усі</button>${SER_GENRES.map(g=>`<button data-sgenre="${esc(g)}" aria-pressed="${g===serGenre}">${esc(g)}</button>`).join("")}</div>`:""}

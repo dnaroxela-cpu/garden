@@ -1296,13 +1296,14 @@ function parseTrails(files) {
   }).filter(t => t.name && t.ids.length > 1);
 }
 
-// «Серіали» note format (any folder or none), one show per line, parts split by a dash:
-//   - Breaking Bad – драма, кримінал – 10/10
-//   - [[Fleabag]] — комедія — 9
-// ## headings are kept as groups. A last part that looks like a score (9, 8.5, 9/10, ★★★★) is the rating;
-// everything between the title and the rating is genres (comma-separated).
+// «Серіали» note format (any folder or none), one show per line, parts split by a dash, in any order after the title:
+//   - Homeland — 5/5 — rewatched — Drama, Espionage, thriller
+//   - Nobody Wants This — watching
+// ## headings are kept as groups. A part that looks like a score (4/5, 9, 8.5, ★★★★) is the rating;
+// a status word (watching, rewatched, dropped…) is the status; everything else is genres (comma-separated).
 // An image link on the line (![](url) or a bare https://….jpg) overrides the cover.
 const RATING_RE = /^(?:\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?|[★☆⭐]+)[^\p{L}\d]*$/u;
+const STATUS_RE = /^(watching|rewatch(ed|ing)?|re-?watched|dropped|paused|on hold|finished|дивлюсь|дивлюся|передивилась|переглянула|кинула|на паузі|подивилась)$/i;
 function parseSeries(files) {
   const f = files.find(x => x.title.trim().toLowerCase() === 'серіали');
   if (!f) return [];
@@ -1321,10 +1322,14 @@ function parseSeries(files) {
     const parts = text.split(/\s+[–—-]+\s+|\s*[–—]\s*/).map(p => p.trim()).filter(Boolean);
     if (!parts.length) continue;
     const title = parts.shift();
-    let rating = null;
-    if (parts.length && RATING_RE.test(parts[parts.length - 1])) rating = parts.pop();
-    const genres = parts.join(', ').split(/\s*[,;/]\s*/).map(g => g.trim().toLowerCase()).filter(Boolean);
-    out.push({ title, genres, rating, group, cover: img ? (img[1] || img[2]) : null });
+    let rating = null, status = null;
+    const rest = parts.filter(p => {
+      if (!rating && RATING_RE.test(p)) { rating = p.replace(/\s+/g, ''); return false; }
+      if (!status && STATUS_RE.test(p)) { status = p.toLowerCase(); return false; }
+      return true;
+    });
+    const genres = [...new Set(rest.join(', ').split(/\s*[,;]\s*/).map(g => g.trim().toLowerCase().replace(/\s*-\s*/g, ' ')).filter(Boolean))];
+    out.push({ title, genres, rating, status, group, cover: img ? (img[1] || img[2]) : null });
   }
   return out;
 }
