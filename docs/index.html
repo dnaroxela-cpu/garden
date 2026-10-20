@@ -403,6 +403,7 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 .coverpop{position:fixed;z-index:70;width:150px;height:225px;pointer-events:none;border-radius:2px 4px 4px 2px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.18);animation:coverin .25s cubic-bezier(.2,.8,.2,1) both}
 .coverpop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:var(--surface)}
 .coverpop.loading img{opacity:0}
+.coverpop.wide{width:280px;height:158px;border-radius:3px} /* MUBI stills are landscape: show the whole frame */
 .coverpop .cover{position:absolute;inset:0;width:100%;height:100%;font-size:15px;padding:14px}
 @keyframes coverin{from{opacity:0;transform:translateY(8px) rotate(-2deg)}to{opacity:1;transform:none}}
 /* home keeps only the play button of the timeline; the map page shows the full scrubber, legend and buttons */
@@ -1004,7 +1005,7 @@ addEventListener("keydown",e=>{if(e.key==="Escape"&&document.body.classList.cont
 renderBooks();
 // real cover on hover; if the image can't load, a cover drawn from the spine colours stands in
 document.body.insertAdjacentHTML("beforeend",`<div class="coverpop" id="coverpop" hidden></div>`);
-function showCover(sp){const b=BY[sp.dataset.book||sp.dataset.hbook];if(!b)return;const pop=$("#coverpop");
+function showCover(sp){const b=BY[sp.dataset.book||sp.dataset.hbook];if(!b)return;const pop=$("#coverpop");pop.classList.remove("wide");
   const fallback=`<div class="cover cv-fallback" style="background:${b.spine[0]};color:${b.spine[1]}">${esc(short(b.title).split(/[.:]/)[0])}<small>${esc(b.author||"")}</small></div>`;
   pop.innerHTML=b.cover?`<img src="${esc(b.cover)}" alt="Обкладинка «${esc(short(b.title))}»" referrerpolicy="no-referrer">`+fallback:fallback;
   const img=pop.querySelector("img");if(img){pop.classList.add("loading");img.onload=()=>pop.classList.remove("loading");img.onerror=()=>{img.remove();pop.classList.remove("loading")}}
@@ -1032,17 +1033,18 @@ function renderScreen(kind){const box=$("#t-"+kind),list=SCREEN[kind];
     rows+=`<li class="srow" tabindex="0" data-scr="${kind}:${i}"><span class="tt"><span class="t">${esc(s.title)}</span>${s.tag?`<span class="st">${esc(s.tag)}</span>`:""}</span><span class="gs">${esc(s.meta)}</span><span class="r${s.rating?"":" none"}">${s.rating?esc(s.rating):"—"}</span></li>`});
   const n=list.length;box.innerHTML=`<p class="mono series-count">${n} ${kind==="films"?plural(n,"фільм","фільми","фільмів"):plural(n,"серіал","серіали","серіалів")}${kind==="films"?` · <a href="https://mubi.com/en/users/6777405" target="_blank" rel="noopener">мій MUBI ↗</a>`:""}</p><ul class="series">${rows}</ul>`}
 function screenItem(row){const[k,i]=row.dataset.scr.split(":");return SCREEN[k][+i]}
-function showScreenCover(row,px){const s=screenItem(row);if(!s)return;const pop=$("#coverpop"),c=SPINES[hash(s.title)%SPINES.length];
+const isStill=u=>/mubicdn\.net\/images\/film\//.test(u||"");
+function showScreenCover(row,px){const s=screenItem(row);if(!s)return;const pop=$("#coverpop"),c=SPINES[hash(s.title)%SPINES.length];pop.classList.toggle("wide",isStill(s.cover));
   const fallback=`<div class="cover cv-fallback" style="background:${c[0]};color:${c[1]}">${esc(s.title)}<small>${esc(s.meta.split(" · ").pop().split(",").slice(0,2).join(","))}</small></div>`;
   pop.innerHTML=s.cover?`<img src="${esc(s.cover)}" alt="Постер «${esc(s.title)}»" referrerpolicy="no-referrer">`+fallback:fallback;
   const img=pop.querySelector("img");if(img){pop.classList.add("loading");img.onload=()=>pop.classList.remove("loading");img.onerror=()=>{img.remove();pop.classList.remove("loading")}}
-  pop.hidden=false;const r=row.getBoundingClientRect(),w=150,h=225;let x,y;
+  pop.hidden=false;const r=row.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight;let x,y;
   if(px!=null){x=px+28;if(x+w>innerWidth-8)x=Math.max(8,px-w-28);y=Math.max(70,Math.min(innerHeight-h-8,r.top+r.height/2-h/2))}
   else{x=Math.max(8,Math.min(innerWidth-w-8,r.left+row.querySelector(".t").offsetWidth+28));y=r.top-h-10;if(y<70)y=r.bottom+10} // tap or keyboard: above the row, title stays visible
   pop.style.left=x+"px";pop.style.top=y+"px"}
 ["series","films"].forEach(kind=>{const box=$("#t-"+kind);
   box.addEventListener("pointerover",e=>{const r=e.target.closest("[data-scr]");if(r&&e.pointerType==="mouse")showScreenCover(r,e.clientX)});
-  box.addEventListener("pointermove",e=>{const r=e.target.closest("[data-scr]");if(r&&e.pointerType==="mouse"&&!$("#coverpop").hidden){let x=e.clientX+28;if(x+150>innerWidth-8)x=e.clientX-178;$("#coverpop").style.left=Math.max(8,x)+"px"}});
+  box.addEventListener("pointermove",e=>{const r=e.target.closest("[data-scr]");if(r&&e.pointerType==="mouse"&&!$("#coverpop").hidden){const w=$("#coverpop").offsetWidth;let x=e.clientX+28;if(x+w>innerWidth-8)x=e.clientX-w-28;$("#coverpop").style.left=Math.max(8,x)+"px"}});
   box.addEventListener("pointerout",e=>{const r=e.target.closest("[data-scr]");if(r&&!r.contains(e.relatedTarget))hideCover()});
   box.addEventListener("focusin",e=>{const r=e.target.closest("[data-scr]");if(r)showScreenCover(r)});
   box.addEventListener("focusout",hideCover);
