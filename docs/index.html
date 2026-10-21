@@ -414,6 +414,10 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 .hs-h{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
 .hs-row{display:flex;align-items:flex-end;gap:3px;overflow-x:auto;padding-top:14px;border-bottom:1px solid var(--ink);scrollbar-width:thin}
 .spine.mini{font-size:12px;padding:12px 0}
+.spine.mini.now{position:relative;translate:0 -14px;box-shadow:0 0 0 2px var(--bg),0 0 0 4px transparent}
+.spine.mini.now::after{content:"";position:absolute;left:-2px;right:-2px;bottom:-9px;height:3px;background:var(--rainbow);border-radius:2px}
+.hs-now{font-family:var(--f-mono);font-size:13px;color:var(--muted);margin:0 0 4px}
+.hs-now b{font-weight:400;color:var(--ink);background:var(--rainbow) left bottom/100% 1px no-repeat;cursor:pointer}
 .coverpop{position:fixed;z-index:70;width:150px;height:225px;pointer-events:none;border-radius:2px 4px 4px 2px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.18);animation:coverin .25s cubic-bezier(.2,.8,.2,1) both}
 .coverpop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:var(--surface)}
 .coverpop.loading img{opacity:0}
@@ -555,6 +559,12 @@ body.book-open .shelf-drawer{transform:none}
 .srow .r.none{color:var(--muted)}
 @media (max-width:600px){.srow{grid-template-columns:minmax(0,1fr) auto}.srow .gs{grid-column:1/-1;grid-row:2;white-space:normal}.srow .gs::before{display:none}}
 .series-empty{margin-top:32px;color:var(--muted)}
+.ffilters{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:28px 0 0;font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.ffilters label{display:inline-flex;gap:8px;align-items:center}
+.ffilters select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:99px;padding:5px 28px 5px 12px;max-width:min(60vw,240px);appearance:none;-webkit-appearance:none;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:right 14px center,right 9px center;background-size:5px 5px;background-repeat:no-repeat}
+.ffilters select.on{border-color:var(--ink)}
+.ffilters button{font:inherit;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+#t-films .series-count{padding-top:16px}
 
 /* reading piles + threads */
 #t-books{position:relative}
@@ -675,7 +685,7 @@ body.on-home footer.site-foot{margin-top:0}
     </div>
     <section class="home-shelf" aria-label="Полиця">
       <div class="hs-h"><span class="label">Полиця книжок</span><a href="#shelf" data-go="shelf" class="mono">усі конспекти →</a></div>
-      <div class="hs-row" id="home-shelf"></div>
+      <p class="hs-now" id="hs-now" hidden></p><div class="hs-row" id="home-shelf"></div>
     </section>
     <div class="home-below">
       <div><div class="label">Журнал саду</div><div class="journal" id="journal"></div></div>
@@ -937,7 +947,7 @@ BOOKS.forEach(b=>{const k=Object.keys(READ).find(k=>b.title.startsWith(k)),r=k&&
 BOOKS.forEach((b,i)=>{b.spine=SPINES[i%SPINES.length];b.w=Math.round(24+40*Math.sqrt(words(b)/maxW));b.h=200+hash(b.id)%70;
   const m=(b.book||"").match(/·\s*(\d{4})/);b.year=m?+m[1]:null;b.author=(b.book||"").split("·")[0].trim();const[h,s,l]=hsl(b.spine[0]);b.hue=s<.18?400+l*100:h});
 const ARR={read:"коли прочитала",color:"кольором",year:"роком видання",topic:"темою",length:"товщиною",timeline:"на шкалі часу"};
-let arrange="read";try{arrange=localStorage.getItem("shelfArrange")||arrange}catch(e){}if(!ARR[arrange])arrange="color";
+let arrange="year";try{arrange=localStorage.getItem("shelfArrange2")||arrange}catch(e){}if(!ARR[arrange])arrange="color";
 const spineHTML=(b,extra="")=>`<button class="spine" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${b.w}px;height:${b.h}px;${extra}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}${b.year?", "+b.year:""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`;
 function groups(){
   if(arrange==="color")return[[null,[...BOOKS].sort((a,b)=>a.hue-b.hue)]];
@@ -1027,7 +1037,7 @@ $("#t-books").addEventListener("pointerout",e=>{const sp=e.target.closest(".spin
 $("#t-books").addEventListener("focusin",e=>{const sp=e.target.closest(".spine");if(sp)drawThreads(sp)});
 $("#t-books").addEventListener("click",e=>{
   const on=e.target.closest("[data-open-note]");if(on){e.preventDefault();e.stopPropagation();document.body.classList.add("book-open");shelfStack.set([on.dataset.openNote]);return}
-  const a=e.target.closest("[data-arr]");if(a){arrange=a.dataset.arr;try{localStorage.setItem("shelfArrange",arrange)}catch(err){}renderBooks();return}
+  const a=e.target.closest("[data-arr]");if(a){arrange=a.dataset.arr;try{localStorage.setItem("shelfArrange2",arrange)}catch(err){}renderBooks();return}
   const s=e.target.closest("[data-book]");if(!s)return;
   if(shelfStack.ids[0]===s.dataset.book&&document.body.classList.contains("book-open")){shelfStack.ids=[];document.body.classList.remove("book-open");renderBooks();return}
   document.body.classList.add("book-open");shelfStack.set([s.dataset.book]);});
@@ -1045,8 +1055,11 @@ function hideCover(){$("#coverpop").hidden=true}
 document.addEventListener("pointerover",e=>{const sp=e.target.closest(".spine");if(sp&&e.pointerType==="mouse")showCover(sp)});
 document.addEventListener("pointerout",e=>{const sp=e.target.closest(".spine");if(sp&&!sp.contains(e.relatedTarget))hideCover()});
 addEventListener("scroll",hideCover,{passive:true});
-function renderHomeShelf(){$("#home-shelf").innerHTML=[...BOOKS].sort((a,b)=>b.readSort-a.readSort).map(b=>`<button class="spine mini" data-hbook="${b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${Math.max(34,Math.round(b.w*1.05))}px;height:${Math.round(b.h*.98)}px" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`).join("")}
+function renderHomeShelf(){const now=BOOKS.filter(b=>b.reading);$("#hs-now").hidden=!now.length;
+  $("#hs-now").innerHTML="читаю зараз: "+now.map(b=>`<b data-hbook="${b.id}">${esc(short(b.title).split(/[.:]/)[0])}</b>`).join(", ");
+  $("#home-shelf").innerHTML=[...BOOKS].sort((a,b)=>b.readSort-a.readSort).map(b=>`<button class="spine mini${b.reading?" now":""}" data-hbook="${b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${Math.max(34,Math.round(b.w*1.05))}px;height:${Math.round(b.h*.98)}px" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`).join("")}
 renderHomeShelf();
+$("#hs-now").addEventListener("click",e=>{const b=e.target.closest("[data-hbook]");if(!b)return;go("shelf");document.body.classList.add("book-open");shelfStack.set([b.dataset.hbook])});
 $("#home-shelf").addEventListener("click",e=>{const b=e.target.closest("[data-hbook]");if(!b)return;go("shelf");document.body.classList.add("book-open");shelfStack.set([b.dataset.hbook])});
 // series (from the «Серіали» note) and films (from MUBI): plain lists grouped by year; the poster loads only when you hover a row
 const readJSON=id=>{try{const d=JSON.parse(document.getElementById(id).textContent);return Array.isArray(d)?d:[]}catch(e){return[]}};
@@ -1057,11 +1070,21 @@ const SCREEN={
 SCREEN.films.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
 const SCREEN_EMPTY={series:"Тут з'являться серіали з нотатки «Серіали» в Obsidian: один рядок — «Назва — 4/5 — Жанр, Жанр».",
   films:"Тут з'являться фільми з MUBI, щойно сайт збереться на Mac з доступом до mubi.com."};
-function renderScreen(kind){const box=$("#t-"+kind),list=SCREEN[kind];
-  if(!list.length){box.innerHTML=`<p class="mono series-empty">${SCREEN_EMPTY[kind]}</p>`;return}
-  let rows="",g;list.forEach((s,i)=>{if(list.some(x=>x.group)&&s.group!==g){g=s.group;rows+=`<li class="grp-h label">${esc(g||"")}</li>`}
+// фільтри фільмів: десятиліття виходу, жанр, режисер; у кожному списку — лише варіанти, що лишаються при інших фільтрах
+const FF={dec:"",genre:"",dir:""};
+const FF_KEYS={dec:f=>f.year?[Math.floor(f.year/10)*10+"-ті"]:[],genre:f=>f.genres||[],dir:f=>f.directors||[]};
+const ffOk=(f,skip)=>Object.keys(FF).every(k=>k===skip||!FF[k]||FF_KEYS[k](f).includes(FF[k]));
+function filmFiltersHTML(all){
+  const sel=(k,label,sort)=>{const c={};all.filter(f=>ffOk(f,k)).forEach(f=>FF_KEYS[k](f).forEach(v=>c[v]=(c[v]||0)+1));
+    if(FF[k]&&!c[FF[k]])c[FF[k]]=0;const opts=Object.entries(c).sort(sort);
+    return `<label>${label}<select data-ff="${k}" class="${FF[k]?"on":""}"><option value="">усі</option>${opts.map(([v,n])=>`<option value="${esc(v)}"${v===FF[k]?" selected":""}>${esc(v)} · ${n}</option>`).join("")}</select></label>`};
+  const byCount=(a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]);
+  return `<div class="ffilters">${sel("dec","рік",(a,b)=>b[0].localeCompare(a[0]))}${sel("genre","жанр",byCount)}${sel("dir","режисер",byCount)}${Object.values(FF).some(Boolean)?`<button data-ffreset>скинути</button>`:""}</div>`}
+function renderScreen(kind){const box=$("#t-"+kind),all=SCREEN[kind],list=kind==="films"?all.filter(f=>ffOk(f)):all;
+  if(!all.length){box.innerHTML=`<p class="mono series-empty">${SCREEN_EMPTY[kind]}</p>`;return}
+  let rows="",g;list.forEach(s=>{const i=all.indexOf(s);if(list.some(x=>x.group)&&s.group!==g){g=s.group;rows+=`<li class="grp-h label">${esc(g||"")}</li>`}
     rows+=`<li class="srow" tabindex="0" data-scr="${kind}:${i}"><span class="tt"><span class="t">${esc(s.title)}</span>${s.tag?`<span class="st">${esc(s.tag)}</span>`:""}</span><span class="gs">${esc(s.meta)}</span><span class="r${s.rating?"":" none"}">${s.rating?esc(s.rating):"—"}</span></li>`});
-  const n=list.length;box.innerHTML=`<p class="mono series-count">${n} ${kind==="films"?plural(n,"фільм","фільми","фільмів"):plural(n,"серіал","серіали","серіалів")}${kind==="films"?` · <a href="https://mubi.com/en/users/6777405" target="_blank" rel="noopener">мій MUBI ↗</a>`:""}</p><ul class="series">${rows}</ul>`}
+  const n=list.length,focus=document.activeElement&&document.activeElement.dataset.ff;box.innerHTML=(kind==="films"?filmFiltersHTML(all):"")+`<p class="mono series-count">${n<all.length?`${n} з ${all.length} ${all.length%10===1&&all.length%100!==11?"фільму":"фільмів"}`:`${n} ${kind==="films"?plural(n,"фільм","фільми","фільмів"):plural(n,"серіал","серіали","серіалів")}`}${kind==="films"?` · <a href="https://mubi.com/en/users/6777405" target="_blank" rel="noopener">мій MUBI ↗</a>`:""}</p><ul class="series">${rows}</ul>`;if(focus)box.querySelector(`[data-ff="${focus}"]`).focus()}
 function screenItem(row){const[k,i]=row.dataset.scr.split(":");return SCREEN[k][+i]}
 const isStill=u=>/mubicdn\.net\/images\/film\//.test(u||"");
 function showScreenCover(row,px){const s=screenItem(row);if(!s)return;const pop=$("#coverpop"),c=SPINES[hash(s.title)%SPINES.length];pop.classList.toggle("wide",isStill(s.cover));
@@ -1072,6 +1095,8 @@ function showScreenCover(row,px){const s=screenItem(row);if(!s)return;const pop=
   if(px!=null){x=px+28;if(x+w>innerWidth-8)x=Math.max(8,px-w-28);y=Math.max(70,Math.min(innerHeight-h-8,r.top+r.height/2-h/2))}
   else{x=Math.max(8,Math.min(innerWidth-w-8,r.left+row.querySelector(".t").offsetWidth+28));y=r.top-h-10;if(y<70)y=r.bottom+10} // tap or keyboard: above the row, title stays visible
   pop.style.left=x+"px";pop.style.top=y+"px"}
+$("#t-films").addEventListener("change",e=>{const k=e.target.dataset.ff;if(k){FF[k]=e.target.value;renderScreen("films")}});
+$("#t-films").addEventListener("click",e=>{if(e.target.closest("[data-ffreset]")){Object.keys(FF).forEach(k=>FF[k]="");renderScreen("films")}});
 ["series","films"].forEach(kind=>{const box=$("#t-"+kind);
   box.addEventListener("pointerover",e=>{const r=e.target.closest("[data-scr]");if(r&&e.pointerType==="mouse")showScreenCover(r,e.clientX)});
   box.addEventListener("pointermove",e=>{const r=e.target.closest("[data-scr]");if(r&&e.pointerType==="mouse"&&!$("#coverpop").hidden){const w=$("#coverpop").offsetWidth;let x=e.clientX+28;if(x+w>innerWidth-8)x=e.clientX-w-28;$("#coverpop").style.left=Math.max(8,x)+"px"}});
