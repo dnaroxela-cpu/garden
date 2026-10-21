@@ -233,16 +233,25 @@ canvas{display:block;width:100%}
 .queue{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}
 .queue div{border:1px solid var(--rule);border-radius:4px;padding:14px 16px;font-family:var(--f-mono);font-size:14px}
 .queue small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-.quotes{columns:2 320px;column-gap:48px;margin-top:24px}
-.quotes figure{break-inside:avoid;margin:0 0 28px;padding-top:14px;background:var(--rainbow) left top/48px 2px no-repeat}
-.quotes blockquote{margin:0 0 8px;font-family:"Spectral",Georgia,serif;font-style:italic;font-weight:300;font-size:22px;line-height:1.35}
-.quotes figcaption{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
-.quotes figcaption a{color:inherit}
-.quotes .q-s blockquote{font-size:clamp(26px,2.6vw,32px);line-height:1.25}
-.quotes .q-l blockquote{font-size:17px;line-height:1.5}
-.quotes .q-l.clamp blockquote{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;overflow:hidden}
-.quotes .q-more{font-family:var(--f-mono);font-size:13px;color:var(--muted);background:none;border:0;padding:0;margin:0 0 8px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-
+.qcloud{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin:28px 0 0;max-width:980px}
+.qcloud button{background:none;border:0;padding:2px 0;cursor:pointer;color:var(--muted);font-family:"Spectral",Georgia,serif;font-style:italic;font-weight:300;line-height:1.1;transition:color .2s}
+.qcloud button:hover{color:var(--ink)}
+.qcloud button i{font-family:var(--f-mono);font-style:normal;font-size:11px;margin-left:3px;vertical-align:super}
+.qcloud button[aria-pressed="true"]{color:var(--ink)}
+.qcloud button[aria-pressed="true"] b,.qdeck mark{font-weight:400;background:var(--rainbow);-webkit-background-clip:text;background-clip:text;color:transparent}
+.qcloud b{font-weight:inherit}
+.qdeck{min-height:min(58vh,540px);display:flex;flex-direction:column;justify-content:center;padding:32px 0 24px;cursor:e-resize;touch-action:pan-y}
+.qdeck figure{margin:0;animation:qin .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes qin{from{opacity:0;transform:translateY(10px)}}
+.qdeck blockquote{margin:0;font-family:"Spectral",Georgia,serif;font-style:italic;font-weight:300;line-height:1.18;letter-spacing:-.01em;text-wrap:pretty}
+.qdeck .qz1{font-size:clamp(36px,5.6vw,76px)}.qdeck .qz2{font-size:clamp(30px,4.2vw,54px)}.qdeck .qz3{font-size:clamp(24px,3vw,38px);line-height:1.25}.qdeck .qz4{font-size:clamp(18px,1.9vw,24px);line-height:1.45}
+.qdeck .qz1,.qdeck .qz2{max-width:15em}.qdeck .qz3{max-width:24em}.qdeck .qz4{max-width:42em}
+.qdeck figcaption{margin-top:28px;font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.qdeck figcaption a{color:inherit}
+.qnav{display:flex;align-items:center;gap:20px;font-family:var(--f-mono);font-size:13px;color:var(--muted);padding:12px 0 8px;border-top:1px solid var(--rule)}
+.qnav button{background:none;border:0;padding:4px 0;color:var(--muted);font:inherit;cursor:pointer}
+.qnav button:hover{color:var(--ink)}
+.qnav span{margin-right:auto}
 .map{border:1px solid var(--rule);border-radius:8px;height:min(72vh,680px);position:relative;overflow:hidden}
 .map canvas{height:100%}
 .tip{position:absolute;pointer-events:none;font-family:var(--f-mono);font-size:12px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:4px 8px;max-width:240px}
@@ -719,7 +728,7 @@ body.on-home footer.site-foot{margin-top:0}
     <aside class="shelf-drawer" aria-label="Відкрита книжка"><div class="panes in-drawer" id="shelf-panes"></div></aside>
     <div id="t-films" hidden></div>
     <div id="t-series" hidden></div>
-    <div id="t-quotes" hidden><div class="chips" id="qchips" style="margin-top:28px"></div><div class="quotes" id="quotes"></div></div>
+    <div id="t-quotes" hidden><div class="qcloud" id="qcloud" aria-label="Слова, що повторюються"></div><div class="qdeck" id="qdeck" aria-live="polite"></div><div class="qnav"><span id="qcount"></span><button id="qprev" aria-label="Попередня цитата">← назад</button><button id="qnext" aria-label="Наступна цитата">далі →</button></div></div>
     <div id="t-links" hidden><ul class="list" id="links" style="margin-top:24px"></ul></div>
   </section>
 
@@ -1074,29 +1083,39 @@ function showScreenCover(row,px){const s=screenItem(row);if(!s)return;const pop=
     const was=r.classList.contains("on");box.querySelectorAll(".srow.on").forEach(x=>x.classList.remove("on")); // touch: tap shows the poster, tap again hides it
     if(was){hideCover();return}r.classList.add("on");showScreenCover(r)});
   renderScreen(kind)});
-// полиця цитат: короткі — крупно, довгі — дрібніше й згорнуті; фільтр за темами (## у нотатці) та авторами, що повторюються
-let qF="";
+// полиця цитат: по одній на весь екран у випадковому порядку + хмара слів, що повторюються в кількох цитатах
+const Q_STOP=new Set(("the and but you all can not one our too how its are was for has had his her him who why any may out own way see say she they them their there these those this that than then thus what when where which while with without within would could should will shall have does done doing make made just only even also very much many more most some such each every everything anything something nothing ever never always into onto upon over under from about after before again here other others another same both either well still really because enough little long great into your yours being been were it’s don’t can’t isn’t itself myself yourself himself herself ones thing things like stand take gets give goes went come came know get got new find finds want wants let yet now put use day days") .split(" ").concat("що як це але який яка які яке щоб коли вони його її їх ми ви ти він вона воно тому від для при через після більш більше лише навіть тільки бути буде було була були саме також тобто якщо поки ніж чим тим цей ця ці того тієї цього всі все весь вся своє свої свою свій себе собі може можна".split(" ")));
+const qStem=w=>{w=w.toLowerCase().replace(/[’']s$/,"");return w.length>5?w.slice(0,5):w.replace(/s$/,"")};
+const qWords=t=>(t.match(/[\p{L}’']+/gu)||[]).filter(w=>w.length>2&&!Q_STOP.has(w.toLowerCase()));
+const Q_CLOUD=(()=>{const n={},forms={};QUOTES.forEach(q=>{new Set(qWords(q[0]).map(w=>{const s=qStem(w);(forms[s]=forms[s]||{})[w.toLowerCase()]=(forms[s][w.toLowerCase()]||0)+1;return s})).forEach(s=>n[s]=(n[s]||0)+1)});
+  return Object.entries(n).filter(([,c])=>c>1).sort((a,b)=>b[1]-a[1]).slice(0,28).map(([s,c])=>[s,c,Object.entries(forms[s]).sort((a,b)=>b[1]-a[1])[0][0]])})();
+const Q_ORDER=QUOTES.map((q,i)=>i);for(let i=Q_ORDER.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[Q_ORDER[i],Q_ORDER[j]]=[Q_ORDER[j],Q_ORDER[i]]}
+let qW="",qPos=0;
+const qList=()=>Q_ORDER.map(i=>QUOTES[i]).filter(q=>!qW||qWords(q[0]).some(w=>qStem(w)===qW));
+const qMark=t=>t.split(/([\p{L}’']+)/u).map((p,i)=>i%2&&qW&&qStem(p)===qW?`<mark>${esc(p)}</mark>`:esc(p)).join("");
 function renderQuotes(){
-  const cnt=(k)=>QUOTES.reduce((a,q)=>(q[k]&&(a[q[k]]=(a[q[k]]||0)+1),a),{});
-  const topics=Object.entries(cnt("topic")),authors=Object.entries(cnt("author")).filter(([,c])=>c>1).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
-  $("#qchips").innerHTML=[["",QUOTES.length,"Усі"],...topics.map(([t,c])=>["t:"+t,c,t]),...authors.map(([a,c])=>["a:"+a,c,a])]
-    .map(([k,c,l])=>`<button class="chip" aria-pressed="${k===qF}" data-qf="${esc(k)}">${esc(l)}<i>${c}</i></button>`).join("");
-  const list=QUOTES.filter(q=>!qF||(qF[0]==="t"?q.topic:q.author)===qF.slice(2));
-  $("#quotes").innerHTML=list.map(q=>{const n=q[0].length,c=n<=120?"q-s":n>320?"q-l clamp":"";
-    return `<figure class="${c}"><blockquote>«${esc(q[0])}»</blockquote>${n>320?`<button class="q-more" aria-expanded="false">читати далі</button>`:""}${q[1]?`<figcaption>ᔥ ${q.src}</figcaption>`:""}</figure>`}).join("");
-  fitQuotes();
+  const mx=Q_CLOUD.length?Q_CLOUD[0][1]:1;
+  $("#qcloud").innerHTML=Q_CLOUD.map(([s,c,w])=>`<button aria-pressed="${s===qW}" data-qw="${esc(s)}" style="font-size:${Math.round(17+15*(c-2)/Math.max(mx-2,1))}px"><b>${esc(w)}</b><i>${c}</i></button>`).join("");
+  showQuote();
 }
-// прибрати «читати далі», якщо цитата й так уміщається (міряємо лише видиму вкладку)
-function fitQuotes(){document.querySelectorAll("#quotes .clamp").forEach(f=>{const b=f.querySelector("blockquote");if(b.clientHeight&&b.scrollHeight<=b.clientHeight+2){f.classList.remove("clamp");f.querySelector(".q-more").remove()}});
+function showQuote(){
+  const list=qList();if(!list.length){$("#qdeck").innerHTML="";$("#qcount").textContent="";return}
+  qPos=(qPos+list.length)%list.length;const q=list[qPos],n=q[0].length,z=n<=90?1:n<=200?2:n<=420?3:4;
+  $("#qdeck").innerHTML=`<figure><blockquote class="qz${z}">«${qMark(q[0])}»</blockquote>${q[1]?`<figcaption>ᔥ ${q.src}</figcaption>`:""}</figure>`;
+  $("#qcount").textContent=`${qPos+1} / ${list.length}${qW?" · "+Q_CLOUD.find(c=>c[0]===qW)[2]:""}`;
 }
+const qStep=d=>{qPos+=d;showQuote()};
 renderQuotes();
-$("#qchips").addEventListener("click",e=>{const b=e.target.closest("[data-qf]");if(b){qF=qF===b.dataset.qf?"":b.dataset.qf;renderQuotes()}});
-$("#quotes").addEventListener("click",e=>{const b=e.target.closest(".q-more");if(!b)return;const f=b.closest("figure"),open=f.classList.toggle("clamp");b.textContent=open?"читати далі":"згорнути";b.setAttribute("aria-expanded",!open)});
+$("#qcloud").addEventListener("click",e=>{const b=e.target.closest("[data-qw]");if(!b)return;qW=qW===b.dataset.qw?"":b.dataset.qw;qPos=0;renderQuotes()});
+$("#qdeck").addEventListener("click",e=>{if(!e.target.closest("a")&&!getSelection().toString())qStep(1)});
+$("#qprev").onclick=()=>qStep(-1);$("#qnext").onclick=()=>qStep(1);
+addEventListener("keydown",e=>{if(!$("#qdeck").offsetParent||/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key==="ArrowRight")qStep(1);else if(e.key==="ArrowLeft")qStep(-1)});
+{let x0=null;$("#qdeck").addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});$("#qdeck").addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50){e.preventDefault();qStep(dx<0?1:-1)}})}
 const LINKS=[["Andy's working notes","notes.andymatuschak.org","https://notes.andymatuschak.org/About_these_notes"],["The Garden of Maggie Appleton","maggieappleton.com","https://maggieappleton.com/garden"],["Tom Critchlow","tomcritchlow.com","https://tomcritchlow.com/"],["Worrydream quotes","Bret Victor","https://worrydream.com/quotes/"],["Jessica Smith","jayeless.net","https://www.jayeless.net/"],["Joel Hooks","joelhooks.com","https://joelhooks.com/"],["Christoph Locher","christophlocher.com","https://christophlocher.com"],["are.na","бібліотеки знань","https://www.are.na"],["The Garden and the Stream","Mike Caulfield, 2015","https://hapgood.us/2015/10/17/the-garden-and-the-stream-a-technopastoral/"]];
 $("#links").innerHTML=LINKS.map(l=>`<li><a class="row" href="${l[2]}"><span class="g">↗</span><span class="t">${esc(l[0])}</span><span class="lead"></span><span class="d">${esc(l[1])}</span></a></li>`).join("");
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-current",x===b));
-  hideCover();["books","films","series","quotes","links"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab);if(b.dataset.tab==="quotes")fitQuotes()});
+  hideCover();["books","films","series","quotes","links"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
 
 
 // living map: a continuous gentle force simulation; colour = theme on the rainbow, size = note length, pulses travel along [[links]]
