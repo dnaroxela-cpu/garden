@@ -567,7 +567,6 @@ body.book-open .shelf-drawer{transform:none}
 .tnote.dim{opacity:.35}
 .spine.lit{translate:0 -8px}
 .thint{margin:0}
-.read-note{margin:14px 0 0;max-width:80ch}.read-note code{font-family:inherit;background:var(--surface);padding:1px 4px;border-radius:3px}
 .threads{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .threads path{fill:none;stroke:url(#tg);stroke-width:1.6;stroke-dasharray:1;stroke-dashoffset:1;animation:drawthread .7s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes drawthread{to{stroke-dashoffset:0}}
@@ -982,7 +981,6 @@ function renderBooks(){
     <span class="mono">${BOOKS.length} конспектів · ${BOOKS.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів · ${Math.min(...years)}–${Math.max(...years)}</span></div>`;
   const shelfHTML=arrange==="timeline"?`<div class="tl-wrap">${timelineHTML()}</div>`:`<div class="shelf">${groups().map(([label,list])=>`${label&&label[0]==="@"?`<div class="grp full"><div class="yr-h"><b>${label.slice(1)}</b><span class="mono">${list.length} ${list.length===1?"книжка":list.length<5?"книжки":"книжок"} · ${list.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів конспекту</span></div>`:`<div class="grp">${label?`<div class="grp-l">${esc(label)} <i>${list.length}</i></div>`:""}`}<div class="row-sp">${list.map(b=>`<div class="sp-cell">${spineHTML(b)}${arrange==="year"?`<span class="sp-y">${b.year||"—"}</span>`:arrange==="read"?`<span class="sp-y${b.readExact?" exact":""}" title="${b.readExact?"рік прочитання з нотатки":"дата конспекту, поки немає поля finished"}">${b.readLabel}</span>`:""}</div>`).join("")}</div></div>`).join("")}</div>`;
   h+=`<div class="shelf-area${arrange==="timeline"?" tl-mode":""}"><div class="shelf-main">${shelfHTML}</div>${pileHTML()}</div>`;
-  if(arrange==="read")h+=`<p class="mono read-note">Під корінцями — місяць конспекту. Рік прочитання вже вказаний у двох нотатках (Reassembling the Social, Social Construction of What?). Для решти додай у frontmatter <code>finished: 2026-08-24</code>, і книжки розкладуться за справжньою датою.</p>`;
   h+=threadStripHTML();
   h+=`<svg class="threads" aria-hidden="true"></svg>`;
   box.innerHTML=h;
