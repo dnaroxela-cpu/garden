@@ -233,10 +233,15 @@ canvas{display:block;width:100%}
 .queue{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}
 .queue div{border:1px solid var(--rule);border-radius:4px;padding:14px 16px;font-family:var(--f-mono);font-size:14px}
 .queue small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-.quotes{columns:2 320px;column-gap:48px}
+.quotes{columns:2 320px;column-gap:48px;margin-top:24px}
 .quotes figure{break-inside:avoid;margin:0 0 28px;padding-top:14px;background:var(--rainbow) left top/48px 2px no-repeat}
 .quotes blockquote{margin:0 0 8px;font-family:"Spectral",Georgia,serif;font-style:italic;font-weight:300;font-size:22px;line-height:1.35}
 .quotes figcaption{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.quotes figcaption a{color:inherit}
+.quotes .q-s blockquote{font-size:clamp(26px,2.6vw,32px);line-height:1.25}
+.quotes .q-l blockquote{font-size:17px;line-height:1.5}
+.quotes .q-l.clamp blockquote{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;overflow:hidden}
+.quotes .q-more{font-family:var(--f-mono);font-size:13px;color:var(--muted);background:none;border:0;padding:0;margin:0 0 8px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 .map{border:1px solid var(--rule);border-radius:8px;height:min(72vh,680px);position:relative;overflow:hidden}
 .map canvas{height:100%}
@@ -714,7 +719,7 @@ body.on-home footer.site-foot{margin-top:0}
     <aside class="shelf-drawer" aria-label="Відкрита книжка"><div class="panes in-drawer" id="shelf-panes"></div></aside>
     <div id="t-films" hidden></div>
     <div id="t-series" hidden></div>
-    <div id="t-quotes" hidden><div class="quotes" id="quotes" style="margin-top:32px"></div></div>
+    <div id="t-quotes" hidden><div class="chips" id="qchips" style="margin-top:28px"></div><div class="quotes" id="quotes"></div></div>
     <div id="t-links" hidden><ul class="list" id="links" style="margin-top:24px"></ul></div>
   </section>
 
@@ -810,9 +815,23 @@ $("#trails").addEventListener("keydown",e=>{const t=e.target.closest("[data-trai
 
 // quotes from the «Цитати» note
 const qNote=NOTES.find(n=>n.title==="Цитати");
-const QUOTES=qNote?[...new DOMParser().parseFromString(qNote.html,"text/html").querySelectorAll("li")].map(li=>li.textContent.replace(/\s+/g," ").trim()).filter(Boolean).map(t=>{
-  let m=t.match(/^(.*\S)\s*(?:ᔥ|—|–)\s*([^—–ᔥ]{2,})$/)||t.match(/^(.*[”"»])\s+([^”"»]{2,})$/);
-  const body=(m?m[1]:t).trim().replace(/^[“"«'\s]+|[”"»'\s]+$/g,""),src=m?m[2].trim():"";return[body,src]}):[];
+// кожна цитата — [текст, джерело] + .src (HTML джерела з посиланням), .author, .topic (заголовок ## над нею)
+const capWord=w=>/^\p{Lu}{2,}$/u.test(w)?w[0]+w.slice(1).toLowerCase():w;
+const qAuthor=src=>{const by=src.match(/\bby\s+(.+)$/i);if(by)return by[1].trim();src=src.replace(/\s+in\s+.*$/,"");
+  return src.replace(/\([^)]*\)/g,"").split(",").map(p=>p.trim()).find(p=>/^\p{Lu}[\p{L}.'’-]*(?:\s+\p{Lu}[\p{L}.'’-]*){0,3}$/u.test(p))||""};
+const QUOTES=qNote?(()=>{let topic="";const out=[];
+  new DOMParser().parseFromString(qNote.html,"text/html").querySelectorAll("h2,h3,li").forEach(el=>{
+    if(el.tagName!=="LI"){topic=el.textContent.trim();return}
+    const t=el.textContent.replace(/\s+/g," ").trim();if(!t)return;
+    let body=t,src="",m;
+    if(m=t.match(/^(?:As|Як)\s+(.+?)\s+(?:put it|said|wrote|писав|писала|казав|казала)[,:]\s*[“"«](.+)[”"»]\.?$/i))[body,src]=[m[2],m[1]];
+    else if(m=t.match(/^(.*\S)\s*(?:ᔥ|—|–|\s-)\s*([^—–ᔥ]{2,})$/)||t.match(/^(.*[”"»])\s+([^”"»]{2,})$/)||t.match(/^(.*[.!?…])\s+(\p{Lu}[\p{L}.'’-]*(?:\s+\p{Lu}[\p{L}.'’-]*){0,3})$/u))[body,src]=[m[1],m[2]];
+    body=body.trim().replace(/^[“"«'\s]+|[”"»'\s]+\.?$/g,"");src=src.replace(/^[-–—\s]+/,"").trim().split(" ").map(capWord).join(" ");
+    const a=el.querySelector("a[href^='http']");let srcHTML=esc(src);
+    if(a&&src){const txt=a.textContent.trim(),label=/^https?:/.test(txt)?new URL(a.href).hostname.replace(/^www\./,""):txt;
+      srcHTML=src.includes(txt)?esc(src).replace(esc(txt),`<a href="${esc(a.href)}" target="_blank" rel="noopener">${esc(label)}</a>`):esc(src);
+      if(/^https?:/.test(src))src=label}
+    const q=[body,src];q.src=srcHTML;q.author=qAuthor(src);q.topic=topic;out.push(q)});return out})():[];
 let qi=Math.floor(Math.random()*Math.max(QUOTES.length,1));
 const HOMEQ=QUOTES.filter(q=>q[0].length<=200);
 function showQ(){if(!HOMEQ.length)return;const[t,s]=HOMEQ[qi%HOMEQ.length];$("#q").textContent="«"+t+"»";$("#qs").textContent=s?"ᔥ "+s:"";qi++}
@@ -899,7 +918,7 @@ const maxW=Math.max(...BOOKS.map(words));
 function hsl(hex){const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;
   if(!d)return[0,0,l];const s=d/(1-Math.abs(2*l-1));let h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;return[(h*60+360)%360,s,l]}
 // коли прочитала: "РРРР" або "РРРР-ММ"; ключ — початок назви нотатки
-const READ={"The University in Ruins":"2026-09","Wonderstruck":"2026-09","Curious":"2025-01","The Ignorant Schoolmaster":"2026-09","A Technique for Producing Ideas":"2026-03","The Year of Magical Thinking":"2026-08","Where are the missing masses?":"2019","Wait, What?":"2026","The Toaster Project":"2020","Thumbelina":"2026","The Sublime And The Good":"2025","After Finitude":"2020","Science as a Vocation":"2019","The Sense of Wonder":"2025","Чому існує світ?":"2025"};
+const READ={"The University in Ruins":"2026-09","Wonderstruck":"2026-09","Curious":"2025-01","The Ignorant Schoolmaster":"2026-09","A Technique for Producing Ideas":"2026-03","The Year of Magical Thinking":"2026-08","Where are the missing masses?":"2019","Wait, What?":"2026-04","The Toaster Project":"2020","Thumbelina":"2026-09","The Sublime And The Good":"2025","After Finitude":"2020","Science as a Vocation":"2019","The Sense of Wonder":"2025","Чому існує світ?":"2025"};
 BOOKS.forEach(b=>{const k=Object.keys(READ).find(k=>b.title.startsWith(k)),r=k&&READ[k].match(/^(\d{4})(?:-(\d{2}))?$/);
   const m=r||b.html.replace(/<[^>]+>/g," ").match(/(?:Дата|Рік)\s+прочитання:\s*(\d{4})/i);
   if(m&&m[2]){b.readYear=+m[1];b.readExact=true;b.readSort=Date.UTC(+m[1],+m[2],0);b.readLabel=new Date(b.readSort).toLocaleDateString("uk-UA",{month:"short",timeZone:"UTC"})}
@@ -1054,12 +1073,29 @@ function showScreenCover(row,px){const s=screenItem(row);if(!s)return;const pop=
     const was=r.classList.contains("on");box.querySelectorAll(".srow.on").forEach(x=>x.classList.remove("on")); // touch: tap shows the poster, tap again hides it
     if(was){hideCover();return}r.classList.add("on");showScreenCover(r)});
   renderScreen(kind)});
-$("#quotes").innerHTML=QUOTES.map(q=>`<figure><blockquote>«${esc(q[0])}»</blockquote>${q[1]?`<figcaption>ᔥ ${esc(q[1])}</figcaption>`:""}</figure>`).join("");
+// полиця цитат: короткі — крупно, довгі — дрібніше й згорнуті; фільтр за темами (## у нотатці) та авторами, що повторюються
+let qF="";
+function renderQuotes(){
+  const cnt=(k)=>QUOTES.reduce((a,q)=>(q[k]&&(a[q[k]]=(a[q[k]]||0)+1),a),{});
+  const topics=Object.entries(cnt("topic")),authors=Object.entries(cnt("author")).filter(([,c])=>c>1).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  $("#qchips").innerHTML=[["",QUOTES.length,"Усі"],...topics.map(([t,c])=>["t:"+t,c,t]),...authors.map(([a,c])=>["a:"+a,c,a])]
+    .map(([k,c,l])=>`<button class="chip" aria-pressed="${k===qF}" data-qf="${esc(k)}">${esc(l)}<i>${c}</i></button>`).join("");
+  const list=QUOTES.filter(q=>!qF||(qF[0]==="t"?q.topic:q.author)===qF.slice(2));
+  $("#quotes").innerHTML=list.map(q=>{const n=q[0].length,c=n<=120?"q-s":n>320?"q-l clamp":"";
+    return `<figure class="${c}"><blockquote>«${esc(q[0])}»</blockquote>${n>320?`<button class="q-more" aria-expanded="false">читати далі</button>`:""}${q[1]?`<figcaption>ᔥ ${q.src}</figcaption>`:""}</figure>`}).join("");
+  fitQuotes();
+}
+// прибрати «читати далі», якщо цитата й так уміщається (міряємо лише видиму вкладку)
+function fitQuotes(){document.querySelectorAll("#quotes .clamp").forEach(f=>{const b=f.querySelector("blockquote");if(b.clientHeight&&b.scrollHeight<=b.clientHeight+2){f.classList.remove("clamp");f.querySelector(".q-more").remove()}});
+}
+renderQuotes();
+$("#qchips").addEventListener("click",e=>{const b=e.target.closest("[data-qf]");if(b){qF=qF===b.dataset.qf?"":b.dataset.qf;renderQuotes()}});
+$("#quotes").addEventListener("click",e=>{const b=e.target.closest(".q-more");if(!b)return;const f=b.closest("figure"),open=f.classList.toggle("clamp");b.textContent=open?"читати далі":"згорнути";b.setAttribute("aria-expanded",!open)});
 const LINKS=[["Andy's working notes","notes.andymatuschak.org","https://notes.andymatuschak.org/About_these_notes"],["The Garden of Maggie Appleton","maggieappleton.com","https://maggieappleton.com/garden"],["Tom Critchlow","tomcritchlow.com","https://tomcritchlow.com/"],["Worrydream quotes","Bret Victor","https://worrydream.com/quotes/"],["Jessica Smith","jayeless.net","https://www.jayeless.net/"],["Joel Hooks","joelhooks.com","https://joelhooks.com/"],["Christoph Locher","christophlocher.com","https://christophlocher.com"],["are.na","бібліотеки знань","https://www.are.na"],["The Garden and the Stream","Mike Caulfield, 2015","https://hapgood.us/2015/10/17/the-garden-and-the-stream-a-technopastoral/"]];
 $("#links").innerHTML=LINKS.map(l=>`<li><a class="row" href="${l[2]}"><span class="g">↗</span><span class="t">${esc(l[0])}</span><span class="lead"></span><span class="d">${esc(l[1])}</span></a></li>`).join("");
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-current",x===b));
-  hideCover();["books","films","series","quotes","links"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
+  hideCover();["books","films","series","quotes","links"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab);if(b.dataset.tab==="quotes")fitQuotes()});
 
 
 // living map: a continuous gentle force simulation; colour = theme on the rainbow, size = note length, pulses travel along [[links]]
