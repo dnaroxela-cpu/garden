@@ -1399,10 +1399,12 @@ function redirectPage(target, title) {
 <body><p><a href="${esc(target)}">${esc(title)}</a></p></body></html>`;
 }
 
-// відео й подкасти: обкладинка картки і тип (відео/подкаст)
+// посилання (колишні «відео й подкасти»): обкладинка картки і тип (відео, подкаст, стаття…)
 // обкладинка: властивість cover (посилання або [[картинка]] зі сховища) → app/covers/<id>.* → перша картинка в нотатці
 // → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
-const MEDIA_FOLDER = 'Videos + podcasts';
+const MEDIA_FOLDER = /^(посилання|videos \+ podcasts)$/i;
+const MEDIA_TYPES = { video: 'відео', відео: 'відео', podcast: 'подкаст', подкаст: 'подкаст', article: 'стаття', стаття: 'стаття', essay: 'есей', есей: 'есей',
+  book: 'книжка', книжка: 'книжка', course: 'курс', курс: 'курс', newsletter: 'розсилка', розсилка: 'розсилка', website: 'сайт', site: 'сайт', сайт: 'сайт', tool: 'інструмент', інструмент: 'інструмент' };
 async function ogImage(url, cache) {
   const key = 'og:' + url;
   if (key in cache) return cache[key];
@@ -1420,7 +1422,10 @@ async function mediaInfo(file, id, html, cache) {
   const fm = file.fm || {};
   const links = [...html.matchAll(/<a href="(https?:[^"]+)"/g)].map(m => m[1].replace(/&amp;/g, '&'));
   const text = (links.join(' ') + ' ' + html).toLowerCase();
-  const kind = fm.type || fm.kind || (/youtube\.com|youtu\.be|vimeo\.com/.test(text) ? 'відео' : /spotify\.com|podcasts\.apple|podcast|подкаст/.test(text) ? 'подкаст' : null);
+  let kind = fm.type || fm.kind;
+  while (Array.isArray(kind)) kind = kind[0];
+  kind = kind ? (MEDIA_TYPES[String(kind).trim().toLowerCase()] || String(kind).trim().toLowerCase())
+    : /youtube\.com|youtu\.be|vimeo\.com/.test(text) ? 'відео' : /spotify\.com|podcasts\.apple|podcast|подкаст/.test(text) ? 'подкаст' : links.length ? 'стаття' : null;
   let cover = fm.cover || fm.image || fm.poster || null;
   while (Array.isArray(cover)) cover = cover[0]; // [[картинка]] без лапок YAML читає як вкладений список
   if (cover && !/^https?:/.test(cover)) {
@@ -1475,7 +1480,7 @@ async function buildApp(files, coversCache) {
 
   const mediaCache = loadCoversCache();
   for (const n of data) {
-    if (n.folder !== MEDIA_FOLDER) continue;
+    if (!MEDIA_FOLDER.test(n.folder)) continue;
     n.media = await mediaInfo(notes.find(f => path.basename(f.slug) === n.id), n.id, n.html, mediaCache);
   }
   saveCoversCache(mediaCache);
