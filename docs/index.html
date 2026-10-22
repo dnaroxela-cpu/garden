@@ -548,7 +548,7 @@ body.book-open .shelf-drawer{transform:none}
 .series{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--ink)}
 .series .grp-h{padding:28px 0 8px;border-bottom:1px solid var(--rule)}
 .srow{display:grid;grid-template-columns:minmax(0,auto) 1fr auto;align-items:baseline;gap:6px 16px;padding-block:12px;border-bottom:1px solid var(--rule);cursor:default;outline-offset:4px}
-#t-films .srow{cursor:pointer}
+#t-films .srow,#t-media .srow{cursor:pointer}
 .srow .tt{min-width:0}
 .srow .t{font-size:18px;transition:color .2s}
 .srow .st{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:10px;white-space:nowrap}
@@ -732,14 +732,14 @@ body.on-home footer.site-foot{margin-top:0}
       <button data-tab="films">Фільми</button>
       <button data-tab="series">Серіали</button>
       <button data-tab="quotes">Цитати</button>
-      <button data-tab="links">Закладки</button>
+      <button data-tab="media">Відео й подкасти</button>
     </div>
     <div id="t-books"></div>
     <aside class="shelf-drawer" aria-label="Відкрита книжка"><div class="panes in-drawer" id="shelf-panes"></div></aside>
     <div id="t-films" hidden></div>
     <div id="t-series" hidden></div>
     <div id="t-quotes" hidden><div class="qcloud" id="qcloud" aria-label="Слова, що повторюються"></div><div class="qdeck" id="qdeck" aria-live="polite"></div><div class="qnav"><span id="qcount"></span><button id="qprev" aria-label="Попередня цитата">← назад</button><button id="qnext" aria-label="Наступна цитата">далі →</button></div></div>
-    <div id="t-links" hidden><ul class="list" id="links" style="margin-top:24px"></ul></div>
+    <div id="t-media" hidden></div>
   </section>
 
 
@@ -764,7 +764,7 @@ const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
 const STATUS={"Seeds":"seedling","Book Reviews":"budding","Blog Notes":"evergreen"};
 const STL={seedling:"ескіз",budding:"в роботі",evergreen:"завершене"};
-const FOLDER_UA={"Seeds":"Чернетки","Book Reviews":"Книжки","Blog Notes":"Есеї"};
+const FOLDER_UA={"Seeds":"Чернетки","Book Reviews":"Книжки","Blog Notes":"Есеї","Videos + podcasts":"Відео й подкасти"};
 NOTES.forEach(n=>{n.status=STATUS[n.folder]||"seedling";n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
 NOTES.forEach(n=>n.links.forEach(l=>BY[l]&&BY[l].back.push(n.id)));
 const $=s=>document.querySelector(s);
@@ -1136,11 +1136,16 @@ $("#qdeck").addEventListener("click",e=>{if(!e.target.closest("a")&&!getSelectio
 $("#qprev").onclick=()=>qStep(-1);$("#qnext").onclick=()=>qStep(1);
 addEventListener("keydown",e=>{if(!$("#qdeck").offsetParent||/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key==="ArrowRight")qStep(1);else if(e.key==="ArrowLeft")qStep(-1)});
 {let x0=null;$("#qdeck").addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});$("#qdeck").addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50){e.preventDefault();qStep(dx<0?1:-1)}})}
-const LINKS=[["Andy's working notes","notes.andymatuschak.org","https://notes.andymatuschak.org/About_these_notes"],["The Garden of Maggie Appleton","maggieappleton.com","https://maggieappleton.com/garden"],["Tom Critchlow","tomcritchlow.com","https://tomcritchlow.com/"],["Worrydream quotes","Bret Victor","https://worrydream.com/quotes/"],["Jessica Smith","jayeless.net","https://www.jayeless.net/"],["Joel Hooks","joelhooks.com","https://joelhooks.com/"],["Christoph Locher","christophlocher.com","https://christophlocher.com"],["are.na","бібліотеки знань","https://www.are.na"],["The Garden and the Stream","Mike Caulfield, 2015","https://hapgood.us/2015/10/17/the-garden-and-the-stream-a-technopastoral/"]];
-$("#links").innerHTML=LINKS.map(l=>`<li><a class="row" href="${l[2]}"><span class="g">↗</span><span class="t">${esc(l[0])}</span><span class="lead"></span><span class="d">${esc(l[1])}</span></a></li>`).join("");
+// відео й подкасти: нотатки з папки «Videos + podcasts», відкриваються збоку, як конспекти книжок
+const MEDIA=NOTES.filter(n=>n.folder==="Videos + podcasts");
+$("#t-media").innerHTML=MEDIA.length?`<p class="mono series-count">${MEDIA.length} ${plural(MEDIA.length,"нотатка","нотатки","нотаток")}</p><ul class="series">${MEDIA.map(n=>`<li class="srow media" tabindex="0" data-media="${n.id}"><span class="tt"><span class="t">${esc(n.title)}</span></span><span class="gs">${esc(n.excerpt||"")}</span><span class="r">${fmt(n.date)}</span></li>`).join("")}</ul>`
+  :`<p class="mono series-empty">Тут з'являться нотатки з папки «Videos + podcasts» в Obsidian.</p>`;
+const openMedia=r=>{document.body.classList.add("book-open");shelfStack.set([r.dataset.media])};
+$("#t-media").addEventListener("click",e=>{const r=e.target.closest("[data-media]");if(r)openMedia(r)});
+$("#t-media").addEventListener("keydown",e=>{const r=e.target.closest("[data-media]");if(r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openMedia(r)}});
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-current",x===b));
-  hideCover();["books","films","series","quotes","links"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
+  hideCover();["books","films","series","quotes","media"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
 
 
 // living map: a continuous gentle force simulation; colour = theme on the rainbow, size = note length, pulses travel along [[links]]
