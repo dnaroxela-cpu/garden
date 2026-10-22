@@ -82,7 +82,7 @@ function readFiles(dir, base = dir) {
       const dateShort = dateObj.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short', year: 'numeric' });
       const words = raw.replace(/#+\s/g, '').split(/\s+/).length;
       const readTime = Math.max(1, Math.round(words / 200));
-      results.push({ title, slug, raw, body: bodyOnly, tags, folder, dateStr, dateShort, dateMs: dateObj.getTime(), readTime, rel, full, author, year });
+      results.push({ title, slug, raw, body: bodyOnly, tags, folder, dateStr, dateShort, dateMs: dateObj.getTime(), readTime, rel, full, author, year, fm: frontmatter });
     }
   }
   return results;
@@ -1399,6 +1399,53 @@ function redirectPage(target, title) {
 <body><p><a href="${esc(target)}">${esc(title)}</a></p></body></html>`;
 }
 
+// відео й подкасти: обкладинка картки і тип (відео/подкаст)
+// обкладинка: властивість cover (посилання або [[картинка]] зі сховища) → app/covers/<id>.* → перша картинка в нотатці
+// → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
+const MEDIA_FOLDER = 'Videos + podcasts';
+async function ogImage(url, cache) {
+  const key = 'og:' + url;
+  if (key in cache) return cache[key];
+  let img = null;
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(8000) });
+    const page = await res.text();
+    const m = page.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)/i) || page.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    if (m) img = new URL(m[1].replace(/&amp;/g, '&'), url).href;
+  } catch (e) { return null; } // збій мережі не кешуємо — спробуємо наступної збірки
+  cache[key] = img;
+  return img;
+}
+async function mediaInfo(file, id, html, cache) {
+  const fm = file.fm || {};
+  const links = [...html.matchAll(/<a href="(https?:[^"]+)"/g)].map(m => m[1].replace(/&amp;/g, '&'));
+  const text = (links.join(' ') + ' ' + html).toLowerCase();
+  const kind = fm.type || fm.kind || (/youtube\.com|youtu\.be|vimeo\.com/.test(text) ? 'відео' : /spotify\.com|podcasts\.apple|podcast|подкаст/.test(text) ? 'подкаст' : null);
+  let cover = fm.cover || fm.image || fm.poster || null;
+  while (Array.isArray(cover)) cover = cover[0]; // [[картинка]] без лапок YAML читає як вкладений список
+  if (cover && !/^https?:/.test(cover)) {
+    const name = String(cover).replace(/^!?\[\[|\]\]$/g, '').split('|')[0];
+    const src = findMediaSrc(name, file);
+    if (src) { fs.copyFileSync(src, path.join(OUT, name)); cover = encodeURI(name); } else cover = null;
+  }
+  if (!cover) {
+    const dir = path.join(APP_DIR, 'covers');
+    const own = fs.existsSync(dir) && fs.readdirSync(dir).find(f => f.replace(/\.[^.]+$/, '') === id);
+    if (own) {
+      fs.mkdirSync(path.join(OUT, 'covers'), { recursive: true });
+      fs.copyFileSync(path.join(dir, own), path.join(OUT, 'covers', own));
+      cover = 'covers/' + encodeURIComponent(own);
+    }
+  }
+  if (!cover) cover = (html.match(/<img src="([^"]+)"/) || [])[1] || null;
+  if (!cover) {
+    const yt = links.map(u => u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/)).find(Boolean);
+    if (yt) cover = `https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg`;
+  }
+  if (!cover && links.length) cover = await ogImage(links[0], cache);
+  return { cover, kind };
+}
+
 async function buildApp(files, coversCache) {
   const notes = files.filter(f => f.folder && f.title.trim().toLowerCase() !== 'стежки');
   const ids = new Set(notes.map(f => path.basename(f.slug)));
@@ -1425,6 +1472,13 @@ async function buildApp(files, coversCache) {
       html,
     };
   });
+
+  const mediaCache = loadCoversCache();
+  for (const n of data) {
+    if (n.folder !== MEDIA_FOLDER) continue;
+    n.media = await mediaInfo(notes.find(f => path.basename(f.slug) === n.id), n.id, n.html, mediaCache);
+  }
+  saveCoversCache(mediaCache);
 
   // journal: compare paragraphs with the previous build
   const STATE = path.join(OUT, 'garden-state.json'), JOURNAL = path.join(OUT, 'journal.json');
@@ -1464,7 +1518,7 @@ async function buildApp(files, coversCache) {
   const written = new Set(['index.html']);
   fs.writeFileSync(path.join(OUT, 'index.html'), page);
   for (const asset of fs.readdirSync(APP_DIR)) {
-    if (asset.endsWith('.html')) continue;
+    if (asset.endsWith('.html') || asset === 'covers') continue; // covers/ копіює mediaInfo — лише потрібні
     fs.copyFileSync(path.join(APP_DIR, asset), path.join(OUT, asset));
   }
 

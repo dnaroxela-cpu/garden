@@ -548,7 +548,7 @@ body.book-open .shelf-drawer{transform:none}
 .series{list-style:none;margin:8px 0 0;padding:0;border-top:1px solid var(--ink)}
 .series .grp-h{padding:28px 0 8px;border-bottom:1px solid var(--rule)}
 .srow{display:grid;grid-template-columns:minmax(0,auto) 1fr auto;align-items:baseline;gap:6px 16px;padding-block:12px;border-bottom:1px solid var(--rule);cursor:default;outline-offset:4px}
-#t-films .srow,#t-media .srow{cursor:pointer}
+#t-films .srow{cursor:pointer}
 .srow .tt{min-width:0}
 .srow .t{font-size:18px;transition:color .2s}
 .srow .st{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:10px;white-space:nowrap}
@@ -559,6 +559,19 @@ body.book-open .shelf-drawer{transform:none}
 .srow .r.none{color:var(--muted)}
 @media (max-width:600px){.srow{grid-template-columns:minmax(0,1fr) auto}.srow .gs{grid-column:1/-1;grid-row:2;white-space:normal}.srow .gs::before{display:none}}
 .series-empty{margin-top:32px;color:var(--muted)}
+/* відео й подкасти: сітка карток з обкладинками */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:44px 28px;margin-top:32px}
+.mcard{display:flex;flex-direction:column;gap:10px;text-align:left;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;font:inherit;outline-offset:6px}
+.mcard .im{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#0d0f12;margin-bottom:6px}
+.mcard .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.mcard .im img.loading{opacity:0}
+.mcard .im .ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:18px;font-family:var(--f-display);font-size:clamp(22px,2.4vw,30px);line-height:1.1}
+.mcard:hover .im img,.mcard:focus-visible .im img{transform:scale(1.035)}
+.mcard .mm{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.mcard .mm b{font-weight:400;color:var(--ink)}
+.mcard h3{margin:0;font-family:var(--f-display);font-weight:500;font-size:22px;line-height:1.2}
+.mcard:hover h3,.mcard:focus-visible h3{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.mcard p{margin:0;font-size:15px;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .ffilters{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:28px 0 0;font-family:var(--f-mono);font-size:13px;color:var(--muted)}
 .ffilters label{display:inline-flex;gap:8px;align-items:center}
 .ffilters select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:99px;padding:5px 28px 5px 12px;max-width:min(60vw,240px);appearance:none;-webkit-appearance:none;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:right 14px center,right 9px center;background-size:5px 5px;background-repeat:no-repeat}
@@ -1136,13 +1149,13 @@ $("#qdeck").addEventListener("click",e=>{if(!e.target.closest("a")&&!getSelectio
 $("#qprev").onclick=()=>qStep(-1);$("#qnext").onclick=()=>qStep(1);
 addEventListener("keydown",e=>{if(!$("#qdeck").offsetParent||/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key==="ArrowRight")qStep(1);else if(e.key==="ArrowLeft")qStep(-1)});
 {let x0=null;$("#qdeck").addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});$("#qdeck").addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50){e.preventDefault();qStep(dx<0?1:-1)}})}
-// відео й подкасти: нотатки з папки «Videos + podcasts», відкриваються збоку, як конспекти книжок
+// відео й подкасти: нотатки з папки «Videos + podcasts» — сітка карток з обкладинками; відкриваються збоку, як конспекти книжок
 const MEDIA=NOTES.filter(n=>n.folder==="Videos + podcasts");
-$("#t-media").innerHTML=MEDIA.length?`<p class="mono series-count">${MEDIA.length} ${plural(MEDIA.length,"нотатка","нотатки","нотаток")}</p><ul class="series">${MEDIA.map(n=>`<li class="srow media" tabindex="0" data-media="${n.id}"><span class="tt"><span class="t">${esc(n.title)}</span></span><span class="gs">${esc(n.excerpt||"")}</span><span class="r">${fmt(n.date)}</span></li>`).join("")}</ul>`
+$("#t-media").innerHTML=MEDIA.length?`<div class="mgrid">${MEDIA.map(n=>{const m=n.media||{},c=SPINES[hash(n.id)%SPINES.length];
+  return `<button class="mcard" data-media="${n.id}"><span class="im" style="background:${c[0]}"><span class="ph" style="color:${c[1]}">${esc(n.title)}</span>${m.cover?`<img class="loading" src="${esc(m.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="this.classList.remove('loading')" onerror="this.remove()">`:""}</span>
+    <span class="mm">${m.kind?`<b>${esc(m.kind)}</b> · `:""}${fmt(n.date,1)}</span><h3>${esc(n.title)}</h3>${n.excerpt?`<p>${esc(n.excerpt)}</p>`:""}</button>`}).join("")}</div>`
   :`<p class="mono series-empty">Тут з'являться нотатки з папки «Videos + podcasts» в Obsidian.</p>`;
-const openMedia=r=>{document.body.classList.add("book-open");shelfStack.set([r.dataset.media])};
-$("#t-media").addEventListener("click",e=>{const r=e.target.closest("[data-media]");if(r)openMedia(r)});
-$("#t-media").addEventListener("keydown",e=>{const r=e.target.closest("[data-media]");if(r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openMedia(r)}});
+$("#t-media").addEventListener("click",e=>{const r=e.target.closest("[data-media]");if(r){document.body.classList.add("book-open");shelfStack.set([r.dataset.media])}});
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-current",x===b));
   hideCover();["books","films","series","quotes","media"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
