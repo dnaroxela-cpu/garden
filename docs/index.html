@@ -645,6 +645,21 @@ body.on-home footer.site-foot{margin-top:0}
 .jmore{font:inherit;font-family:var(--f-mono);font-size:12px;background:none;border:0;padding:10px 0 0;color:var(--muted);cursor:pointer}
 .jmore:hover{color:var(--ink)}
 .trails{margin-top:14px;display:flex;flex-direction:column}
+/* стежки: м'які гілки, що виростають з одного кореня (злиплі SVG-трубки з фільтром goo) */
+.vines{position:relative;margin-top:6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.vines svg{display:block;overflow:visible}
+.vines .tube{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.vines .vine{cursor:pointer;transition:opacity .3s}
+.vines.hl .vine:not(.on){opacity:.22}
+.vines .sheen{fill:none;stroke:#fff;stroke-opacity:.45;stroke-width:2.5;stroke-linecap:round;pointer-events:none}
+.vines .lbl{cursor:pointer}
+.vines .lbl rect{fill:var(--bg);stroke:var(--ink);stroke-width:1}
+.vines .lbl text{font-family:var(--f-mono);font-size:11px;fill:var(--ink)}
+.vines .lbl:hover rect,.vines .lbl:focus-visible rect{fill:var(--ink)}.vines .lbl:hover text,.vines .lbl:focus-visible text{fill:var(--bg)}
+.vines .tname{cursor:pointer}
+.vines .tname text{font-family:"Geologica",var(--f-display);font-weight:500;font-size:19px;fill:var(--ink)}
+.vines .tname tspan{font-family:var(--f-mono);font-size:11px;font-weight:400;fill:var(--muted)}
+.vines .root text{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
 .tr-item{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:none;border:0;border-top:1px solid var(--rule);padding:18px 0 20px;cursor:pointer}
 .tr-item:first-child{border-top:0;padding-top:4px}
 .tr-h{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
@@ -858,7 +873,46 @@ const DEFAULT_TRAILS=[
 ];
 const TRAILS=((TRAILS_DATA&&TRAILS_DATA.length)?TRAILS_DATA:DEFAULT_TRAILS.map(tr=>({...tr,ids:tr.t.map(x=>NOTES.find(n=>short(n.title).startsWith(x)||n.title.startsWith(x))).filter(Boolean).map(n=>n.id)})))
   .map(tr=>({...tr,ids:tr.ids.filter(id=>BY[id])})).filter(tr=>tr.ids.length>1);
-$("#trails").innerHTML=TRAILS.map((tr,k)=>`<div class="tr-item" role="button" tabindex="0" data-trail="${k}"><div class="tr-h"><b>${esc(tr.name)}</b><span>${tr.ids.length} ${plural(tr.ids.length,"нотатка","нотатки","нотаток")} · пройти →</span></div><p>${esc(tr.desc)}</p><div class="route">${tr.ids.map((id,i)=>`<button class="stop" data-stop="${i}" title="${esc(short(BY[id].title))}"><i></i><span>${esc(short(BY[id].title).split(/[.:]/)[0])}</span></button>`).join("")}</div></div>`).join("");
+// стежки як м'які гілки: кожна стежка — товста трубка від спільного кореня через свої нотатки;
+// трубки, вузли (більші для довших нотаток), відростки й потовщення злипаються фільтром goo
+const VINE_COLORS=["#ff0080","#ff8c00","#40e0d0","#7b6cf0","#c8b400"];
+function renderTrails(){
+  const box=$("#trails"),W=Math.max(820,box.clientWidth||820),band=136,H=TRAILS.length*band+40,x0=26,y0=H/2,xs=W*.2,xe=W-120;
+  // позиція нотатки: x — середнє місце в стежках, y — середня смуга (спільна для кількох стежок нотатка стає місцем злиття)
+  const pos={};TRAILS.forEach((tr,k)=>tr.ids.forEach((id,i)=>{const p=pos[id]=pos[id]||{x:0,y:0,n:0};p.x+=xs+(xe-xs)*(tr.ids.length>1?i/(tr.ids.length-1):.5);p.y+=30+band*k+band*.6;p.n++}));
+  Object.values(pos).forEach(p=>{p.x/=p.n;p.y/=p.n});
+  const words=id=>(BY[id].html||"").replace(/<[^>]+>/g," ").split(/\s+/).length,mw=Math.max(...Object.keys(pos).map(words));
+  const wob=(id,k)=>((hash(id+k)%100)/100-.5)*30;
+  // плавна крива через точки (Catmull-Rom → Безьє)
+  const curve=pts=>pts.map((p,i)=>{if(!i)return`M${p[0]},${p[1]}`;const a=pts[i-2]||pts[i-1],b=pts[i-1],c=p,d=pts[i+1]||p;
+    return`C${b[0]+(c[0]-a[0])/6},${b[1]+(c[1]-a[1])/6} ${c[0]-(d[0]-b[0])/6},${c[1]-(d[1]-b[1])/6} ${c[0]},${c[1]}`}).join("");
+  const vines=TRAILS.map((tr,k)=>{const col=VINE_COLORS[k%VINE_COLORS.length],ty=30+band*k+band*.6;
+    const pts=[[x0,y0],[x0+60,y0+(ty-y0)*.35],[xs*.62,ty+wob(tr.name,1)]];
+    tr.ids.forEach((id,i)=>{const p=pos[id];if(i){const q=pts[pts.length-1];pts.push([(q[0]+p.x)/2,(q[1]+p.y)/2+wob(id,i)])}pts.push([p.x,p.y])});
+    const blobs=tr.ids.map(id=>{const p=pos[id];return`<circle cx="${p.x}" cy="${p.y}" r="${14+16*Math.sqrt(words(id)/mw)}"/>`}).join("");
+    // відростки: короткі гілочки від вузла з круглою бруньочкою на кінці
+    const buds=tr.ids.map((id,i)=>{const p=pos[id],h=hash(id+tr.name),dir=i%2?1:-1,len=24+h%20,ex=p.x+14+h%18,ey=p.y+dir*len;
+      return`<path class="tube" d="M${p.x},${p.y} Q${p.x+4},${p.y+dir*len*.6} ${ex},${ey}" stroke-width="7"/><circle cx="${ex}" cy="${ey}" r="${6+h%5}"/>`}).join("");
+    return{k,col,ty,d:curve(pts),blobs,buds,tr}});
+  const labels=[];vines.forEach(v=>v.tr.ids.forEach((id,i)=>{if(labels.some(l=>l.id===id))return;const p=pos[id],up=i%2===0;
+    const t=short(BY[id].title).split(/[.:?]/)[0].slice(0,30),w=t.length*6.7+14;labels.push({id,k:v.k,i,x:Math.min(W-w-2,Math.max(2,p.x-w/2)),y:up?p.y-54:p.y+34,w,t})}));
+  box.innerHTML=`<div class="vines" id="vines"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Стежки садом">
+    <defs><filter id="goo" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur in="SourceGraphic" stdDeviation="7"/><feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 26 -10"/></filter></defs>
+    ${vines.map(v=>`<g class="vine" data-trail="${v.k}" filter="url(#goo)" fill="${v.col}" stroke="${v.col}"><path class="tube" d="${v.d}" stroke-width="19"/>${v.blobs}${v.buds}<g class="lumps"></g></g>`).join("")}
+    ${vines.map(v=>`<path class="sheen" d="${v.d}" transform="translate(-2,-4)" stroke-dasharray="54 22 16 40 90 30"/>`).join("")}
+    <circle cx="${x0}" cy="${y0}" r="20" fill="var(--ink)"/><g class="root"><text x="${x0}" y="${y0+40}" text-anchor="middle">сад</text></g>
+    ${vines.map(v=>`<g class="tname" data-trail="${v.k}" tabindex="0" role="button"><text x="${xs*.62-6}" y="${v.ty-62}">${esc(v.tr.name)} <tspan dx="6">${v.tr.ids.length} · пройти →</tspan></text></g>`).join("")}
+    ${labels.map(l=>`<g class="lbl" data-trail="${l.k}" data-stop="${l.i}" tabindex="0" role="button"><rect x="${l.x}" y="${l.y}" width="${l.w}" height="19" rx="9.5"/><text x="${l.x+7}" y="${l.y+13}">${esc(l.t)}</text></g>`).join("")}
+  </svg></div>`;
+  // потовщення вздовж гілки — щоб товщина «дихала», як у намальованих гангліях
+  $("#vines").querySelectorAll(".vine").forEach(g=>{const path=g.querySelector(".tube"),L=path.getTotalLength(),k=g.dataset.trail;let out="";
+    for(let s=40,i=0;s<L-20;s+=26+hash(k+"s"+i)%34,i++){const p=path.getPointAtLength(s);out+=`<circle cx="${p.x}" cy="${p.y+(hash(k+i)%7)-3}" r="${8+hash(k+"r"+i)%8}"/>`}
+    g.querySelector(".lumps").innerHTML=out});
+}
+renderTrails();
+{let rw=0;addEventListener("resize",()=>{const w=$("#trails").clientWidth;if(Math.abs(w-rw)>40){rw=w;renderTrails()}})}
+$("#trails").addEventListener("pointerover",e=>{const g=e.target.closest("[data-trail]"),v=$("#vines");if(!v)return;v.classList.toggle("hl",!!g);v.querySelectorAll(".vine").forEach(x=>x.classList.toggle("on",!!g&&x.dataset.trail===g.dataset.trail))});
+$("#trails").addEventListener("pointerleave",()=>{const v=$("#vines");v&&v.classList.remove("hl")});
 function walkTrail(k,i=0){const tr=TRAILS[k];current=tr.ids[tr.ids.length-1];document.body.classList.remove("book-open");noteStack.ids=tr.ids.slice();go("note");noteStack.render(i)}
 $("#trails").addEventListener("click",e=>{const t=e.target.closest("[data-trail]");if(!t)return;const st=e.target.closest("[data-stop]");walkTrail(+t.dataset.trail,st?+st.dataset.stop:0)});
 $("#trails").addEventListener("keydown",e=>{const t=e.target.closest("[data-trail]");if(t&&(e.key==="Enter"||e.key===" ")&&e.target===t){e.preventDefault();walkTrail(+t.dataset.trail)}});
