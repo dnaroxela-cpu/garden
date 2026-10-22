@@ -1402,7 +1402,7 @@ function redirectPage(target, title) {
 // посилання (колишні «відео й подкасти»): обкладинка картки і тип (відео, подкаст, стаття…)
 // обкладинка: властивість cover → app/covers → перша картинка в нотатці
 // → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
-const MEDIA_FOLDER = /^(посилання|videos \+ podcasts)$/i;
+const MEDIA_FOLDER = /^(links|посилання|videos \+ podcasts)$/i;
 const MEDIA_TYPES = { video: 'відео', відео: 'відео', podcast: 'подкаст', подкаст: 'подкаст', article: 'стаття', стаття: 'стаття', essay: 'есей', есей: 'есей',
   book: 'книжка', книжка: 'книжка', course: 'курс', курс: 'курс', newsletter: 'розсилка', розсилка: 'розсилка', website: 'сайт', site: 'сайт', сайт: 'сайт', tool: 'інструмент', інструмент: 'інструмент' };
 async function ogImage(url, cache) {

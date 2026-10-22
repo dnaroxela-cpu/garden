@@ -810,7 +810,7 @@ const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
 const STATUS={"Seeds":"seedling","Book Reviews":"budding","Blog Notes":"evergreen"};
 const STL={seedling:"ескіз",budding:"в роботі",evergreen:"завершене"};
-const FOLDER_UA={"Seeds":"Чернетки","Book Reviews":"Книжки","Blog Notes":"Есеї","Videos + podcasts":"Посилання"};
+const FOLDER_UA={"Seeds":"Чернетки","Book Reviews":"Книжки","Blog Notes":"Есеї","Videos + podcasts":"Посилання","Links":"Посилання"};
 NOTES.forEach(n=>{n.status=STATUS[n.folder]||"seedling";n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
 NOTES.forEach(n=>n.links.forEach(l=>BY[l]&&BY[l].back.push(n.id)));
 const $=s=>document.querySelector(s);
@@ -1222,10 +1222,10 @@ addEventListener("keydown",e=>{if(!$("#qdeck").offsetParent||/INPUT|TEXTAREA/.te
 {let x0=null;$("#qdeck").addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});$("#qdeck").addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50){e.preventDefault();qStep(dx<0?1:-1)}})}
 // посилання: нотатки з папки «Посилання» (раніше «Videos + podcasts») — сітка карток з обкладинками;
 // фільтри за типом (відео, подкаст, стаття…) і тегом; відкриваються збоку, як конспекти книжок
-const MEDIA=NOTES.filter(n=>/^(посилання|videos \+ podcasts)$/i.test(n.folder));
+const MEDIA=NOTES.filter(n=>/^(links|посилання|videos \+ podcasts)$/i.test(n.folder));
 const mf={kind:"",tag:""};
 function renderMedia(){
-  if(!MEDIA.length){$("#t-media").innerHTML=`<p class="mono series-empty">Тут з'являться нотатки з папки «Посилання» в Obsidian.</p>`;return}
+  if(!MEDIA.length){$("#t-media").innerHTML=`<p class="mono series-empty">Тут з'являться нотатки з папки «Links» в Obsidian.</p>`;return}
   const kindOf=n=>(n.media&&n.media.kind)||"інше",ok=(n,skip)=>(skip==="kind"||!mf.kind||kindOf(n)===mf.kind)&&(skip==="tag"||!mf.tag||n.tags.includes(mf.tag));
   const count=(k,vals)=>{const c={};MEDIA.filter(n=>ok(n,k)).forEach(n=>vals(n).forEach(v=>c[v]=(c[v]||0)+1));if(mf[k]&&!c[mf[k]])c[mf[k]]=0;return Object.entries(c).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))};
   const chips=(k,list,label)=>`<button class="chip" aria-pressed="${!mf[k]}" data-mf="${k}" data-v="">${label}<i>${MEDIA.filter(n=>ok(n,k)).length}</i></button>`+list.map(([v,c])=>`<button class="chip" aria-pressed="${mf[k]===v}" data-mf="${k}" data-v="${esc(v)}">${k==="tag"?"#":""}${esc(v)}<i>${c}</i></button>`).join("");
