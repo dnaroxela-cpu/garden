@@ -416,12 +416,12 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 .foot-links .foot-meta a:hover{-webkit-text-fill-color:currentColor}
 .home-shelf{margin-top:48px}
 .hs-h{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
-.hs-row{display:flex;align-items:flex-end;gap:3px;overflow-x:auto;padding-top:14px;border-bottom:1px solid var(--ink);scrollbar-width:thin}
+.hs-row{display:flex;align-items:stretch;gap:3px;overflow-x:auto;padding-top:14px;border-bottom:1px solid var(--ink);scrollbar-width:thin}
 .spine.mini{font-size:12px;padding:12px 0}
 /* книжки, які читаю зараз: стоять обкладинкою до нас на початку полиці */
-.hs-now{display:flex;flex-direction:column;gap:8px;flex:none;margin-right:14px}
+.hs-now{display:flex;flex-direction:column;gap:8px;flex:none;margin-right:14px}.hs-now:last-child{margin-right:0}
 .hs-now .label{font-size:11px}
-.hs-now>div{display:flex;gap:10px;align-items:flex-end}
+.hs-now>div{display:flex;gap:10px;align-items:flex-end;margin-top:auto}.hs-now.read>div{gap:3px}
 .hcover{position:relative;flex:none;height:250px;aspect-ratio:2/3;border:0;padding:0;cursor:pointer;border-radius:2px 4px 4px 2px;overflow:hidden;box-shadow:inset 5px 0 0 rgba(0,0,0,.16),0 12px 28px rgba(0,0,0,.18);transition:translate .2s ease}
 .hcover:hover,.hcover:focus-visible{translate:0 -8px}
 .hcover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -869,7 +869,7 @@ const TRAILS_DATA=(()=>{try{return JSON.parse(document.getElementById("trails-da
 const DEFAULT_TRAILS=[
  {name:"Про подив",desc:"Від Рейчел Карсон до Гелен Де Круз: як дивування вчить нас бачити світ.",t:["The Sense of Wonder","Як допомогти дітям","Wonderstruck","Про красу та мораль","The Sublime And The Good"]},
  {name:"Освіта без вчителя",desc:"Учитель, який не знає, і студенти, яких ми ще не знаємо.",t:["The Ignorant Schoolmaster","Thumbelina","Розум та мислення","The University in Ruins","Вища освіта та університет"]},
- {name:"Як народжуються ідеї",desc:"Від рецепту Джеймса Вебба Янга до власного саду нотаток.",t:["A Technique for Producing Ideas","Maленькі початки","Ideas List","Цифровий сад"]},
+ {name:"Як народжуються ідеї",desc:"Від рецепту Джеймса Вебба Янга до власного саду нотаток.",t:["A Technique for Producing Ideas","Maленькі початки","Цифровий сад"]},
 ];
 const TRAILS=((TRAILS_DATA&&TRAILS_DATA.length)?TRAILS_DATA:DEFAULT_TRAILS.map(tr=>({...tr,ids:tr.t.map(x=>NOTES.find(n=>short(n.title).startsWith(x)||n.title.startsWith(x))).filter(Boolean).map(n=>n.id)})))
   .map(tr=>({...tr,ids:tr.ids.filter(id=>BY[id])})).filter(tr=>tr.ids.length>1);
@@ -1142,7 +1142,7 @@ document.addEventListener("pointerout",e=>{const sp=e.target.closest(".spine");i
 addEventListener("scroll",hideCover,{passive:true});
 function renderHomeShelf(){const now=BOOKS.filter(b=>b.reading);
   $("#home-shelf").innerHTML=(now.length?`<div class="hs-now"><span class="label">Читаю зараз</span><div>${now.map(b=>`<button class="hcover" data-hbook="${b.id}" style="background:${b.spine[0]}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span class="ph" style="color:${b.spine[1]}">${esc(short(b.title).split(/[.:]/)[0])}</span>${b.cover?`<img src="${esc(b.cover)}" alt="${esc(short(b.title))}" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</button>`).join("")}</div></div>`:"")
-    +[...BOOKS].filter(b=>!b.reading).sort((a,b)=>b.readSort-a.readSort).map(b=>`<button class="spine mini" data-hbook="${b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${Math.max(34,Math.round(b.w*1.05))}px;height:${Math.round(b.h*.98)}px" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`).join("")}
+    +`<div class="hs-now read"><span class="label">Прочитала</span><div>`+[...BOOKS].filter(b=>!b.reading).sort((a,b)=>b.readSort-a.readSort).map(b=>`<button class="spine mini" data-hbook="${b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${Math.max(34,Math.round(b.w*1.05))}px;height:${Math.round(b.h*.98)}px" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`).join("")+`</div></div>`}
 renderHomeShelf();
 $("#home-shelf").addEventListener("click",e=>{const b=e.target.closest("[data-hbook]");if(!b)return;go("shelf");document.body.classList.add("book-open");shelfStack.set([b.dataset.hbook])});
 // series (from the «Серіали» note) and films (from MUBI): plain lists grouped by year; the poster loads only when you hover a row
