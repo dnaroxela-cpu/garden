@@ -1400,7 +1400,7 @@ function redirectPage(target, title) {
 }
 
 // посилання (колишні «відео й подкасти»): обкладинка картки і тип (відео, подкаст, стаття…)
-// обкладинка: властивість cover (посилання або [[картинка]] зі сховища) → app/covers/<id>.* → перша картинка в нотатці
+// обкладинка: властивість cover → app/covers → перша картинка в нотатці
 // → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
 const MEDIA_FOLDER = /^(посилання|videos \+ podcasts)$/i;
 const MEDIA_TYPES = { video: 'відео', відео: 'відео', podcast: 'подкаст', подкаст: 'подкаст', article: 'стаття', стаття: 'стаття', essay: 'есей', есей: 'есей',
@@ -1418,6 +1418,31 @@ async function ogImage(url, cache) {
   cache[key] = img;
   return img;
 }
+// обкладинка з властивості cover (посилання або [[картинка]] зі сховища, яку копіюємо в docs/)
+function fmCover(file) {
+  const fm = file.fm || {};
+  let cover = fm.cover || fm.image || fm.poster || null;
+  while (Array.isArray(cover)) cover = cover[0]; // [[картинка]] без лапок YAML читає як вкладений список
+  if (!cover || /^https?:/.test(cover)) return cover;
+  const name = String(cover).replace(/^!?\[\[|\]\]$/g, '').split('|')[0];
+  const src = findMediaSrc(name, file);
+  if (!src) return null;
+  fs.copyFileSync(src, path.join(OUT, name));
+  return encodeURI(name);
+}
+// обкладинка з репозиторію: app/covers/<id>.* або посилання в app/covers/covers.json ({"<id>": "https://…"})
+function ownCover(id) {
+  const dir = path.join(APP_DIR, 'covers');
+  if (!fs.existsSync(dir)) return null;
+  let map = {};
+  try { map = JSON.parse(fs.readFileSync(path.join(dir, 'covers.json'), 'utf8')); } catch (e) {}
+  if (map[id]) return map[id];
+  const own = fs.readdirSync(dir).find(f => f !== 'covers.json' && f.replace(/\.[^.]+$/, '') === id);
+  if (!own) return null;
+  fs.mkdirSync(path.join(OUT, 'covers'), { recursive: true });
+  fs.copyFileSync(path.join(dir, own), path.join(OUT, 'covers', own));
+  return 'covers/' + encodeURIComponent(own);
+}
 async function mediaInfo(file, id, html, cache) {
   const fm = file.fm || {};
   const links = [...html.matchAll(/<a href="(https?:[^"]+)"/g)].map(m => m[1].replace(/&amp;/g, '&'));
@@ -1426,22 +1451,7 @@ async function mediaInfo(file, id, html, cache) {
   while (Array.isArray(kind)) kind = kind[0];
   kind = kind ? (MEDIA_TYPES[String(kind).trim().toLowerCase()] || String(kind).trim().toLowerCase())
     : /youtube\.com|youtu\.be|vimeo\.com/.test(text) ? 'відео' : /spotify\.com|podcasts\.apple|podcast|подкаст/.test(text) ? 'подкаст' : links.length ? 'стаття' : null;
-  let cover = fm.cover || fm.image || fm.poster || null;
-  while (Array.isArray(cover)) cover = cover[0]; // [[картинка]] без лапок YAML читає як вкладений список
-  if (cover && !/^https?:/.test(cover)) {
-    const name = String(cover).replace(/^!?\[\[|\]\]$/g, '').split('|')[0];
-    const src = findMediaSrc(name, file);
-    if (src) { fs.copyFileSync(src, path.join(OUT, name)); cover = encodeURI(name); } else cover = null;
-  }
-  if (!cover) {
-    const dir = path.join(APP_DIR, 'covers');
-    const own = fs.existsSync(dir) && fs.readdirSync(dir).find(f => f.replace(/\.[^.]+$/, '') === id);
-    if (own) {
-      fs.mkdirSync(path.join(OUT, 'covers'), { recursive: true });
-      fs.copyFileSync(path.join(dir, own), path.join(OUT, 'covers', own));
-      cover = 'covers/' + encodeURIComponent(own);
-    }
-  }
+  let cover = fmCover(file) || ownCover(id);
   if (!cover) cover = (html.match(/<img src="([^"]+)"/) || [])[1] || null;
   if (!cover) {
     const yt = links.map(u => u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/)).find(Boolean);
@@ -1473,7 +1483,7 @@ async function buildApp(files, coversCache) {
       id, title: file.title, folder: file.folder.split(path.sep)[0], tags: file.tags,
       excerpt: noteExcerpt(file.raw), date: file.dateMs, links: [...links],
       book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
-      cover: isBook ? (coversCache[file.title] || null) : null,
+      cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
       html,
     };
   });

@@ -410,14 +410,22 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 .home-below>*{padding:28px 0 36px}
 .home-below>:first-child{padding-right:24px}.home-below>:last-child{padding-left:24px;border-left:1px solid var(--rule)}
 .home-below .list .row .t{font-size:15px}
+.home-below.solo{grid-template-columns:minmax(0,1fr)}.home-below.solo>*{padding-left:0;padding-right:0;border-left:0}
+#v-journal .journal{max-width:760px}
+.foot-meta a{color:inherit}
 .home-shelf{margin-top:48px}
 .hs-h{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
 .hs-row{display:flex;align-items:flex-end;gap:3px;overflow-x:auto;padding-top:14px;border-bottom:1px solid var(--ink);scrollbar-width:thin}
 .spine.mini{font-size:12px;padding:12px 0}
-.spine.mini.now{position:relative;translate:0 -14px;box-shadow:0 0 0 2px var(--bg),0 0 0 4px transparent}
-.spine.mini.now::after{content:"";position:absolute;left:-2px;right:-2px;bottom:-9px;height:3px;background:var(--rainbow);border-radius:2px}
-.hs-now{font-family:var(--f-mono);font-size:13px;color:var(--muted);margin:0 0 4px}
-.hs-now b{font-weight:400;color:var(--ink);background:var(--rainbow) left bottom/100% 1px no-repeat;cursor:pointer}
+/* книжки, які читаю зараз: стоять обкладинкою до нас на початку полиці */
+.hs-now{display:flex;flex-direction:column;gap:8px;flex:none;margin-right:14px}
+.hs-now .label{font-size:11px}
+.hs-now>div{display:flex;gap:10px;align-items:flex-end}
+.hcover{position:relative;flex:none;height:250px;aspect-ratio:2/3;border:0;padding:0;cursor:pointer;border-radius:2px 4px 4px 2px;overflow:hidden;box-shadow:inset 5px 0 0 rgba(0,0,0,.16),0 12px 28px rgba(0,0,0,.18);transition:translate .2s ease}
+.hcover:hover,.hcover:focus-visible{translate:0 -8px}
+.hcover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hcover .ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;text-align:left;font-family:var(--f-display);font-size:18px;line-height:1.15}
+@media (max-width:600px){.hcover{height:210px}}
 .coverpop{position:fixed;z-index:70;width:150px;height:225px;pointer-events:none;border-radius:2px 4px 4px 2px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.18);animation:coverin .25s cubic-bezier(.2,.8,.2,1) both}
 .coverpop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:var(--surface)}
 .coverpop.loading img{opacity:0}
@@ -700,10 +708,9 @@ body.on-home footer.site-foot{margin-top:0}
     </div>
     <section class="home-shelf" aria-label="Полиця">
       <div class="hs-h"><span class="label">Полиця книжок</span><a href="#shelf" data-go="shelf" class="mono">усі конспекти →</a></div>
-      <p class="hs-now" id="hs-now" hidden></p><div class="hs-row" id="home-shelf"></div>
+      <div class="hs-row" id="home-shelf"></div>
     </section>
-    <div class="home-below">
-      <div><div class="label">Журнал саду</div><div class="journal" id="journal"></div></div>
+    <div class="home-below solo">
       <div><div class="label">Стежки</div><div class="trails" id="trails"></div></div>
     </div>
   </section>
@@ -732,6 +739,14 @@ body.on-home footer.site-foot{margin-top:0}
       <p>Тексти, які вже дозріли до читання від початку до кінця. Зараз це розділ Blog Notes.</p>
     </div>
     <ul class="list" id="essays"></ul>
+  </section>
+
+  <section class="view" id="v-journal" hidden>
+    <div class="head">
+      <h1>Журнал саду</h1>
+      <p>Що змінювалося в саду: нові нотатки й правки, день за днем.</p>
+    </div>
+    <div class="journal" id="journal"></div>
   </section>
 
   <section class="view" id="v-note" hidden>
@@ -764,7 +779,7 @@ body.on-home footer.site-foot{margin-top:0}
       <span class="label">Де ще мене знайти</span>
       <a href="https://www.instagram.com/dnaroxela/" target="_blank" rel="noopener">Instagram <span>↗</span></a>
       <a href="https://t.me/curiositytechnique" target="_blank" rel="noopener">Telegram-канал <span>↗</span></a>
-      <p class="mono foot-meta">Sasha's Garden · <span id="foot"></span></p>
+      <p class="mono foot-meta">Sasha's Garden · <span id="foot"></span> · <a href="#journal" data-go="journal">журнал саду →</a></p>
     </div>
   </footer>
 </div>
@@ -1070,11 +1085,10 @@ function hideCover(){$("#coverpop").hidden=true}
 document.addEventListener("pointerover",e=>{const sp=e.target.closest(".spine");if(sp&&e.pointerType==="mouse")showCover(sp)});
 document.addEventListener("pointerout",e=>{const sp=e.target.closest(".spine");if(sp&&!sp.contains(e.relatedTarget))hideCover()});
 addEventListener("scroll",hideCover,{passive:true});
-function renderHomeShelf(){const now=BOOKS.filter(b=>b.reading);$("#hs-now").hidden=!now.length;
-  $("#hs-now").innerHTML="читаю зараз: "+now.map(b=>`<b data-hbook="${b.id}">${esc(short(b.title).split(/[.:]/)[0])}</b>`).join(", ");
-  $("#home-shelf").innerHTML=[...BOOKS].sort((a,b)=>b.readSort-a.readSort).map(b=>`<button class="spine mini${b.reading?" now":""}" data-hbook="${b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${Math.max(34,Math.round(b.w*1.05))}px;height:${Math.round(b.h*.98)}px" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`).join("")}
+function renderHomeShelf(){const now=BOOKS.filter(b=>b.reading);
+  $("#home-shelf").innerHTML=(now.length?`<div class="hs-now"><span class="label">Читаю зараз</span><div>${now.map(b=>`<button class="hcover" data-hbook="${b.id}" style="background:${b.spine[0]}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span class="ph" style="color:${b.spine[1]}">${esc(short(b.title).split(/[.:]/)[0])}</span>${b.cover?`<img src="${esc(b.cover)}" alt="${esc(short(b.title))}" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</button>`).join("")}</div></div>`:"")
+    +[...BOOKS].filter(b=>!b.reading).sort((a,b)=>b.readSort-a.readSort).map(b=>`<button class="spine mini" data-hbook="${b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${Math.max(34,Math.round(b.w*1.05))}px;height:${Math.round(b.h*.98)}px" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`).join("")}
 renderHomeShelf();
-$("#hs-now").addEventListener("click",e=>{const b=e.target.closest("[data-hbook]");if(!b)return;go("shelf");document.body.classList.add("book-open");shelfStack.set([b.dataset.hbook])});
 $("#home-shelf").addEventListener("click",e=>{const b=e.target.closest("[data-hbook]");if(!b)return;go("shelf");document.body.classList.add("book-open");shelfStack.set([b.dataset.hbook])});
 // series (from the «Серіали» note) and films (from MUBI): plain lists grouped by year; the poster loads only when you hover a row
 const readJSON=id=>{try{const d=JSON.parse(document.getElementById(id).textContent);return Array.isArray(d)?d:[]}catch(e){return[]}};
@@ -1362,7 +1376,7 @@ function go(v){
   try{history.replaceState(null,"",v==="note"?noteHash():"#"+v)}catch(e){}
   if(v!=="shelf")document.body.classList.remove("book-open");
   if(window.placeStage&&placeStage(v)&&bigSim)bigSim._moved=true;
-  $("#crumb").textContent=({home:"",garden:"сад",blog:"есеї",shelf:"полиця",note:"сад",map:"мапа"})[v]||"";document.querySelector(".bar").classList.remove("hide");requestAnimationFrame(()=>window.moveInd&&moveInd());
+  $("#crumb").textContent=({home:"",garden:"сад",blog:"есеї",shelf:"полиця",note:"сад",map:"мапа",journal:"журнал"})[v]||"";document.querySelector(".bar").classList.remove("hide");requestAnimationFrame(()=>window.moveInd&&moveInd());
   document.body.classList.toggle("on-home",v==="home");document.body.classList.toggle("on-note",v==="note");
   window.scrollTo(0,0);requestAnimationFrame(()=>{drawAll();onScroll();window.overPhoto&&overPhoto();window.placePin&&placePin()});
 }
