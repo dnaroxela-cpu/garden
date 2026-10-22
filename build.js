@@ -36,6 +36,13 @@ marked.use({
 const VAULT = process.env.VAULT || '/Users/dnaroxela/Documents/Obsidian Vault';
 const OUT = process.env.OUT || path.join(__dirname, 'docs');
 
+// «tags» property: a YAML list or a "a, b" / "a b" string; a leading # is dropped
+function fmTags(fm) {
+  const v = fm.tags ?? fm.Tags ?? fm.tag ?? fm.Tag;
+  if (!v) return [];
+  return (Array.isArray(v) ? v : String(v).split(/[,\s]+/)).map(t => String(t).trim().replace(/^#/, '')).filter(Boolean);
+}
+
 function readFiles(dir, base = dir) {
   const results = [];
   const items = fs.readdirSync(dir);
@@ -55,11 +62,11 @@ function readFiles(dir, base = dir) {
       // FIX 3: use frontmatter date if available, fallback to mtime
       const fmDate = frontmatter.date || frontmatter.Date || frontmatter.created || frontmatter.Created || null;
       const bodyOnly = parsed.content;
-      const tags = [...new Set(
-        [...bodyOnly.matchAll(/(?<!\n)#([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_-]*)/g)]
-          .map(m => m[1])
-          .filter(t => t.length > 1)
-      )];
+      // tags: the «tags» property first, then any #tags still left in the text
+      const tags = [...new Set([
+        ...fmTags(frontmatter),
+        ...[...bodyOnly.replace(/^(```|~~~)[\s\S]*?^\1/gm, "").replace(/`[^`\n]*`/g, "").matchAll(/(?:^|[\s(])#([\p{L}_][\p{L}\p{N}_-]*)/gmu)].map(m => m[1]),
+      ].filter(t => t.length > 1))];
       const title = item.replace('.md', '');
       const slug = rel.replace('.md', '').replace(/\s+/g, '-').toLowerCase()
         .replace(/[«»''""]/g, '').replace(/[^a-z0-9а-яА-Я\-\/]/gi, '-').replace(/-+/g, '-');
@@ -1194,7 +1201,7 @@ async function build() {
     if (file.title === 'index') continue;
     const withWikilinks = convertWikilinks(file.body, files);
     const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
-    const rawClean = rawFixed.replace(/(?<![#\n]) *#([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_-]*)/g, '').replace(/^\s*#([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_-]*)(\s|$)/gm, '');
+    const rawClean = rawFixed.replace(/(?<![#\n]) *#([\p{L}_][\p{L}\p{N}_-]*)/gu, '').replace(/^\s*#([\p{L}_][\p{L}\p{N}_-]*)(\s|$)/gmu, '');
     const fileKey = path.basename(file.slug);
     const { raw: rawWithFootnotes, footnotes } = extractFootnotes(rawClean, fileKey);
     const bodyHtml = resolveMdLinks(marked(rawWithFootnotes), files);
@@ -1399,7 +1406,7 @@ async function buildApp(files, coversCache) {
     const id = path.basename(file.slug);
     const withWikilinks = convertWikilinks(file.body, files);
     const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
-    const rawClean = rawFixed.replace(/(?<![#\n]) *#([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_-]*)/g, '').replace(/^\s*#([a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_-]*)(\s|$)/gm, '');
+    const rawClean = rawFixed.replace(/(?<![#\n]) *#([\p{L}_][\p{L}\p{N}_-]*)/gu, '').replace(/^\s*#([\p{L}_][\p{L}\p{N}_-]*)(\s|$)/gmu, '');
     const { raw: withFn, footnotes } = extractFootnotes(rawClean, id);
     let html = resolveMdLinks(marked(withFn), files);
     if (footnotes.length) html += `<section class="footnotes"><ol>${footnotes.map(f => `<li id="${f.id}">${f.html}</li>`).join('')}</ol></section>`;
