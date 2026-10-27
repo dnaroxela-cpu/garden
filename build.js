@@ -1399,6 +1399,73 @@ function redirectPage(target, title) {
 <body><p><a href="${esc(target)}">${esc(title)}</a></p></body></html>`;
 }
 
+// нотатка-дошка (властивість layout: board або дошка):
+//   текст до першого ### — звичайна нотатка, вона стоїть ліворуч від дошки;
+//   кожен ### — джерело; його пункти списку — цитати (^id у кінці рядка), пункти-посилання без тексту — матеріали джерела;
+//   ==виділене== у цитаті — те, що видно на картці (інакше перше речення);
+//   «## Зв'язки» — рядки `- [[#^a]] → [[#^b]] — підпис` ([[#Джерело]] — зв'язок із самим джерелом);
+//   блок `%% дошка` … `%%` — теми: `Назва теми: id, id, id`; цитати без теми йдуть у «Нерозібране».
+const isBoardNote = file => /^(board|дошка)$/i.test(String(file.fm.layout || '').trim());
+const BOARD_URL = /https?:\/\/[^\s)]+/g;
+const boardSlug = s => s.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').toLowerCase().replace(/[’']s\b.*$/, '').trim().split(/\s+/).pop().replace(/[^\p{L}\p{N}]/gu, '');
+function parseBoard(body) {
+  const first = body.search(/^###\s/m);
+  if (first < 0) return { intro: body, sources: [], quotes: [], edges: [], zones: [] };
+  const intro = body.slice(0, first), rest = body.slice(first);
+  const relAt = rest.search(/^##\s+Зв['’]язки/m);
+  const main = relAt < 0 ? rest : rest.slice(0, relAt), tail = relAt < 0 ? '' : rest.slice(relAt);
+  const sources = [], quotes = [], byId = {};
+  let cur = null;
+  for (const line of main.replace(/%%[\s\S]*?%%/g, '').split('\n')) {
+    const h = line.match(/^###\s+(.*)/);
+    if (h) {
+      const title = h[1].trim(), plain = title.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1');
+      cur = { id: boardSlug(title), title, short: ((plain.match(/^(.*?)[’']s\b/) || [, plain])[1]).trim(), links: [] };
+      sources.push(cur); continue;
+    }
+    if (!cur || !line.trim()) continue;
+    let text = line.replace(/^\s*(?:\d+\.|[*-])\s+/, '').trim();
+    let id = null;
+    const idm = text.match(/\s\^([\w-]+)$/);
+    if (idm) { id = idm[1]; text = text.slice(0, idm.index).trim(); }
+    const urls = text.match(BOARD_URL);
+    if (!id && urls && text.replace(BOARD_URL, '').trim().length < 60) { cur.links.push({ url: urls[0], label: text.replace(BOARD_URL, '').trim() }); continue; }
+    id = id || cur.id + (quotes.filter(q => q.src === cur.id).length + 1);
+    // хто сказав: «Ім'я Прізвище: …» на початку або «… Ім'я Прізвище» в кінці короткої цитати
+    let who = null, m;
+    if ((m = text.match(/^([A-ZА-ЯІЇЄҐ][\p{L}.]+(?: [A-ZА-ЯІЇЄҐ][\p{L}.]+){1,2}):\s+/u))) { who = m[1]; text = text.slice(m[0].length); }
+    else if (text.length < 160 && (m = text.match(/[.!?…]\s+([A-Z][a-z]+(?: [A-Z][a-z]+){1,2})$/))) { who = m[1]; text = text.slice(0, -m[1].length).trim(); }
+    const q = { id, src: cur.id, text, who };
+    quotes.push(q); byId[id] = q;
+  }
+  const node = x => byId[x] ? x : (sources.some(s => s.id === boardSlug(x)) ? '#' + boardSlug(x) : null);
+  const edges = [];
+  for (const m of tail.matchAll(/^\s*[-*]\s*\[\[#\^?([^\]|]+)[^\]]*\]\]\s*(?:→|->)\s*\[\[#\^?([^\]|]+)[^\]]*\]\]\s*(?:[—–-]\s*(.+))?$/gm)) {
+    const a = node(m[1].trim()), b = node(m[2].trim());
+    if (a && b) edges.push({ a, b, label: (m[3] || '').trim() });
+  }
+  const zones = [], placed = new Set();
+  const block = tail.match(/%%\s*дошка\s*\n([\s\S]*?)%%/i);
+  if (block) for (const l of block[1].split('\n')) {
+    const m = l.match(/^(.+?):\s*(.*)$/);
+    if (!m) continue;
+    const ids = m[2].split(',').map(s => s.trim().replace(/^\^/, '')).filter(id => byId[id] && !placed.has(id));
+    ids.forEach(id => placed.add(id));
+    zones.push({ name: m[1].trim(), ids });
+  }
+  const loose = quotes.filter(q => !placed.has(q.id)).map(q => q.id);
+  if (loose.length) zones.push({ name: 'Нерозібране', ids: loose, inbox: true });
+  return { intro, sources, quotes, edges, zones };
+}
+// суть цитати для картки: ==виділене== або перше речення
+function boardGist(text) {
+  const hl = [...text.matchAll(/==(.+?)==/g)].map(m => m[1]);
+  const plain = s => s.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(BOARD_URL, '').replace(/==/g, '').replace(/\s+/g, ' ').trim();
+  if (hl.length) return plain(hl.join(' … '));
+  const p = plain(text), s = p.match(/^.{20,}?[.!?…](?=\s|$)/);
+  return s ? s[0] : p;
+}
+
 // посилання (колишні «відео й подкасти»): обкладинка картки і тип (відео, подкаст, стаття…)
 // обкладинка: властивість cover → app/covers → перша картинка в нотатці
 // → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
@@ -1466,25 +1533,37 @@ async function buildApp(files, coversCache) {
   const ids = new Set(notes.map(f => path.basename(f.slug)));
   const data = notes.map(file => {
     const id = path.basename(file.slug);
-    const withWikilinks = convertWikilinks(file.body, files);
+    const board = isBoardNote(file) ? parseBoard(file.body) : null;
+    // у дошці [[#^id|текст]] веде до цитати на дошці
+    const qrefs = s => board ? s.replace(/\[\[#\^([\w-]+)(?:\|([^\]]+))?\]\]/g, (m, q, t) => `<a href="#" data-q="${q}">${t || q}</a>`) : s;
+    const withWikilinks = convertWikilinks(qrefs(board ? board.intro : file.body), files);
     const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
     const rawClean = rawFixed.replace(/(?<![#\n]) *#([\p{L}_][\p{L}\p{N}_-]*)/gu, '').replace(/^\s*#([\p{L}_][\p{L}\p{N}_-]*)(\s|$)/gmu, '');
     const { raw: withFn, footnotes } = extractFootnotes(rawClean, id);
     let html = resolveMdLinks(marked(withFn), files);
     if (footnotes.length) html += `<section class="footnotes"><ol>${footnotes.map(f => `<li id="${f.id}">${f.html}</li>`).join('')}</ol></section>`;
     const links = new Set();
-    html = html.replace(/<a href="([^"#?]+)\.html"/g, (m, slug) => {
+    const noteLinks = h => h.replace(/<a href="([^"#?]+)\.html"/g, (m, slug) => {
       let s; try { s = decodeURIComponent(slug); } catch (e) { s = slug; }
       if (ids.has(s) && s !== id) { links.add(s); return `<a href="#note" data-note="${s}"`; }
       return m;
     });
+    html = noteLinks(html);
+    const inline = s => noteLinks(resolveMdLinks(marked.parseInline(convertWikilinks(s, files)), files))
+      .replace(/==([^=]+)==/g, '<mark>$1</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
     const isBook = file.folder.startsWith('Book Reviews');
     return {
       id, title: file.title, folder: file.folder.split(path.sep)[0], tags: file.tags,
-      excerpt: noteExcerpt(file.raw), date: file.dateMs, links: [...links],
+      excerpt: noteExcerpt(board ? board.intro : file.raw), date: file.dateMs, links: [...links],
       book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
       cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
       html,
+      board: board && board.quotes.length ? {
+        sources: board.sources.map(s => ({ id: '#' + s.id, title: inline(s.title), short: s.short, links: s.links })),
+        quotes: board.quotes.map(q => ({ id: q.id, src: '#' + q.src, who: q.who, html: inline(q.text), gist: boardGist(q.text),
+          words: q.text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(BOARD_URL, '').split(/\s+/).filter(Boolean).length })),
+        edges: board.edges, zones: board.zones,
+      } : undefined,
     };
   });
 
