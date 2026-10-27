@@ -1466,6 +1466,58 @@ function boardGist(text) {
   return s ? s[0] : p;
 }
 
+// дошка з Obsidian Canvas: файл «<Назва нотатки>.canvas» будь-де в сховищі стає дошкою цієї нотатки
+// (і має перевагу над дошкою зі списків у самій нотатці). Картки стоять так само, як у Canvas:
+// групи з назвами, текстові картки, картинки, посилання, нотатки, стрілки з підписами.
+// У текстовій картці останній рядок «— Хтось» — підпис джерела, «^id» у кінці — мітка для [[#^id|посилань]] з тексту нотатки.
+function readCanvases(dir, out = {}) {
+  for (const item of fs.readdirSync(dir)) {
+    if (item.startsWith('.') || item === 'private' || item === 'templates') continue;
+    const full = path.join(dir, item);
+    if (fs.statSync(full).isDirectory()) readCanvases(full, out);
+    else if (item.endsWith('.canvas')) {
+      try { out[item.slice(0, -7).trim().toLowerCase()] = JSON.parse(fs.readFileSync(full, 'utf8')); }
+      catch (e) { console.log('⚠️ не вдалося прочитати', item, e.message); }
+    }
+  }
+  return out;
+}
+const CANVAS_IMG = /\.(png|jpe?g|gif|webp|svg|avif)$/i;
+function canvasBoard(json, { block, noteId }) {
+  const nodes = (json.nodes || []).filter(n => ['text', 'file', 'link', 'group'].includes(n.type) && isFinite(n.x) && isFinite(n.y));
+  if (!nodes.length) return null;
+  const minX = Math.min(...nodes.map(n => n.x)), minY = Math.min(...nodes.map(n => n.y));
+  const out = nodes.map(n => {
+    const o = { id: n.id, type: n.type, x: n.x - minX, y: n.y - minY, w: n.width || 250, h: n.height || 60, color: n.color || null };
+    if (n.type === 'group') o.label = n.label || '';
+    else if (n.type === 'link') o.url = n.url;
+    else if (n.type === 'text') {
+      let t = String(n.text || '');
+      const id = t.match(/\s\^([\w-]+)\s*$/);
+      if (id) { o.qid = id[1]; t = t.slice(0, id.index); }
+      const by = t.match(/\n\s*[—–]\s*([^\n]+?)\s*$/);
+      if (by) { o.src = by[1].replace(/\[\[([^\]|]+\|)?([^\]]+)\]\]/g, '$2').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1'); t = t.slice(0, by.index); }
+      o.html = block(t);
+      o.plain = t.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[=*_#>`[\]]/g, '').replace(/\s+/g, ' ').trim();
+    } else {
+      const f = String(n.file || ''), name = path.basename(f);
+      if (CANVAS_IMG.test(f)) {
+        const src = path.join(VAULT, f), dest = path.join(OUT, name);
+        if (fs.existsSync(src) && !fs.existsSync(dest)) fs.copyFileSync(src, dest);
+        o.img = name;
+      } else {
+        o.title = name.replace(/\.md$/i, '');
+        o.note = noteId(o.title);
+      }
+    }
+    return o;
+  });
+  const ids = new Set(out.map(n => n.id));
+  const edges = (json.edges || []).filter(e => ids.has(e.fromNode) && ids.has(e.toNode))
+    .map(e => ({ a: e.fromNode, b: e.toNode, fs: e.fromSide || null, ts: e.toSide || null, label: e.label || '', color: e.color || null }));
+  return { canvas: true, nodes: out, edges };
+}
+
 // посилання (колишні «відео й подкасти»): обкладинка картки і тип (відео, подкаст, стаття…)
 // обкладинка: властивість cover → app/covers → перша картинка в нотатці
 // → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
@@ -1531,11 +1583,13 @@ async function mediaInfo(file, id, html, cache) {
 async function buildApp(files, coversCache) {
   const notes = files.filter(f => f.folder && f.title.trim().toLowerCase() !== 'стежки');
   const ids = new Set(notes.map(f => path.basename(f.slug)));
+  const canvases = readCanvases(VAULT);
   const data = notes.map(file => {
     const id = path.basename(file.slug);
-    const board = isBoardNote(file) ? parseBoard(file.body) : null;
+    const canvas = canvases[file.title.trim().toLowerCase()];
+    const board = !canvas && isBoardNote(file) ? parseBoard(file.body) : null;
     // у дошці [[#^id|текст]] веде до цитати на дошці
-    const qrefs = s => board ? s.replace(/\[\[#\^([\w-]+)(?:\|([^\]]+))?\]\]/g, (m, q, t) => `<a href="#" data-q="${q}">${t || q}</a>`) : s;
+    const qrefs = s => board || canvas ? s.replace(/\[\[#\^([\w-]+)(?:\|([^\]]+))?\]\]/g, (m, q, t) => `<a href="#" data-q="${q}">${t || q}</a>`) : s;
     const withWikilinks = convertWikilinks(qrefs(board ? board.intro : file.body), files);
     const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
     const rawClean = rawFixed.replace(/(?<![#\n]) *#([\p{L}_][\p{L}\p{N}_-]*)/gu, '').replace(/^\s*#([\p{L}_][\p{L}\p{N}_-]*)(\s|$)/gmu, '');
@@ -1551,6 +1605,9 @@ async function buildApp(files, coversCache) {
     html = noteLinks(html);
     const inline = s => noteLinks(resolveMdLinks(marked.parseInline(convertWikilinks(s, files)), files))
       .replace(/==([^=]+)==/g, '<mark>$1</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
+    const block = s => noteLinks(resolveMdLinks(marked(convertEmbeds(convertWikilinks(s, files), file)), files))
+      .replace(/==([^=]+)==/g, '<mark>$1</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
+    const noteId = t => { const f = files.find(x => x.title.trim().toLowerCase() === t.trim().toLowerCase()); const s = f && path.basename(f.slug); return s && ids.has(s) ? s : null; };
     const isBook = file.folder.startsWith('Book Reviews');
     return {
       id, title: file.title, folder: file.folder.split(path.sep)[0], tags: file.tags,
@@ -1558,7 +1615,7 @@ async function buildApp(files, coversCache) {
       book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
       cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
       html,
-      board: board && board.quotes.length ? {
+      board: canvas ? canvasBoard(canvas, { block, noteId }) || undefined : board && board.quotes.length ? {
         sources: board.sources.map(s => ({ id: '#' + s.id, title: inline(s.title), short: s.short, links: s.links })),
         quotes: board.quotes.map(q => ({ id: q.id, src: '#' + q.src, who: q.who, html: inline(q.text), gist: boardGist(q.text),
           words: q.text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(BOARD_URL, '').split(/\s+/).filter(Boolean).length })),

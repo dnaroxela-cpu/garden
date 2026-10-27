@@ -584,6 +584,23 @@ body.on-note footer{margin-top:24px}
 .bd-read li button{font:inherit;text-align:left;width:100%;cursor:pointer;display:block;font-size:14px;line-height:1.4;padding:7px 10px;border-radius:6px;background:var(--surface);border:0;border-left:4px solid var(--c);color:var(--ink)}
 .bd-read li small{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-bottom:2px}
 .bd-hint{flex-basis:100%;margin:0;font-size:11px;color:var(--muted)}
+.bd-group{position:absolute;border:1.5px dashed var(--rule);border-radius:18px}
+.bd-group.tint{border-color:color-mix(in srgb,var(--c) 55%,var(--rule));background:color-mix(in srgb,var(--c) 7%,transparent)}
+.bd-group h2{position:absolute;left:4px;bottom:100%;margin:0 0 8px;font-family:var(--f-display);font-weight:700;font-size:26px;letter-spacing:-.015em;line-height:1.1;white-space:nowrap}
+.bd-card.cv{display:flex;flex-direction:column;padding:12px 14px;overflow:hidden;border:1px solid var(--rule)}
+.bd-card.cv.tint{background:color-mix(in srgb,var(--c) 18%,var(--surface));border-color:color-mix(in srgb,var(--c) 45%,var(--rule))}
+.bd-card.cv .md{flex:1;min-height:0;overflow:hidden;font-size:15px;line-height:1.45}
+.bd-card.cv .md>:first-child{margin-top:0}.bd-card.cv .md>:last-child{margin-bottom:0}
+.bd-card.cv .md p{margin:0 0 .6em}.bd-card.cv .md h1,.bd-card.cv .md h2,.bd-card.cv .md h3{font-family:var(--f-display);font-size:20px;line-height:1.2;margin:0 0 .4em}
+.bd-card.cv .md ul,.bd-card.cv .md ol{margin:0 0 .6em;padding-left:1.2em}
+.bd-card.cv .md mark{background:color-mix(in srgb,var(--c,#ffe000) 45%,transparent);color:inherit}
+.bd-card.cv .md img{max-width:100%}
+.bd-card.cv.over .md{-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.bd-card.cv .by{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-card.cv.file{padding:0}.bd-card.cv.file img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.bd-card.cv a,.bd-card.cv span{background:none;font-family:var(--f-mono);font-size:13px;word-break:break-all}
+.bd-card.cv a small,.bd-card.cv span small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+.bd-card.cv .md a{font-family:inherit;font-size:inherit;word-break:normal;background:var(--rainbow) left bottom/100% 1px no-repeat}
 .prose a[data-q]{cursor:pointer}
 .prose a[data-q].on{background-size:100% 100%;color:var(--bg)}
 @media (max-width:719px){.bd-legend,.bd-hint{display:none}.bd-tools{padding:10px 12px}.bd-read{width:100%}}
@@ -1094,7 +1111,97 @@ const BD_COLORS=["#ff5c9d","#ff8c00","#9d8cff","#40e0d0","#b5d63a","#f2c200","#f
 const BD_PRESETS=["перегукується","розвиває","суперечить","напруга","приклад","те саме","сумнів","джерело"];
 const BD={CW:260,GAP:16,PAD:20,TOP:64,ZG:70};
 let board=null;
+// board from an Obsidian Canvas («<note title>.canvas»): every card, group and arrow stands where it stands in Obsidian; editing happens there
+const CV_COLORS={"1":"#ff5c9d","2":"#ff8c00","3":"#f2c200","4":"#b5d63a","5":"#40e0d0","6":"#9d8cff"};
+const CV_PAD=60;
+function makeCanvas(host,n){
+  const B=n.board,NODES={},BYQ={};
+  const col=c=>c?(CV_COLORS[c]||c):null;
+  host.innerHTML=`<div class="bd-tools">
+      <div class="bd-seg" aria-label="Масштаб"><button data-z="-1" aria-label="Зменшити">−</button><span class="bd-zv"></span><button data-z="1" aria-label="Збільшити">+</button><button data-z="fit">уся дошка</button></div>
+      <p class="bd-hint">Наведи на картку — видно її зв'язки · клік — повний текст · змінювати дошку — в Obsidian</p>
+    </div>
+    <div class="bd-stage"><div class="bd-vp"><div class="bd-sizer"><div class="bd-board"><svg class="bd-edges"></svg></div></div></div><aside class="bd-read" hidden></aside></div>`;
+  const q=s=>host.querySelector(s),vp=q(".bd-vp"),sizer=q(".bd-sizer"),bd=q(".bd-board"),svg=q(".bd-edges"),read=q(".bd-read");
+  let scale=1,focused=null,selected=null,W=0,H=0;
+  const els={};
+  // groups underneath, then cards, in canvas order
+  for(const x of [...B.nodes.filter(x=>x.type==="group"),...B.nodes.filter(x=>x.type!=="group")]){
+    NODES[x.id]=x;if(x.qid)BYQ[x.qid]=x.id;
+    const el=document.createElement("div"),c=col(x.color);
+    Object.assign(el.style,{left:x.x+CV_PAD+"px",top:x.y+CV_PAD+"px",width:x.w+"px",height:x.h+"px"});
+    if(c)el.style.setProperty("--c",c);
+    if(x.type==="group"){el.className="bd-group"+(c?" tint":"");el.innerHTML=x.label?`<h2>${esc(x.label)}</h2>`:""}
+    else{
+      el.className="bd-card cv"+(c?" tint":"")+(x.type==="text"?"":" "+x.type);
+      el.innerHTML=x.type==="text"?`<div class="md">${x.html}</div>${x.src?`<div class="by">— ${esc(x.src)}</div>`:""}`
+        :x.img?`<img src="${encodeURI(x.img)}" alt="" loading="lazy">`
+        :x.type==="link"?`<a href="${esc(x.url)}" target="_blank" rel="noopener"><small>${esc(x.url.replace(/^https?:\/\/(www\.)?/,"").split("/")[0])}</small>${esc(x.url)}</a>`
+        :x.note?`<a href="#note" data-note="${x.note}"><small>нотатка</small>${esc(x.title)}</a>`:`<span><small>файл</small>${esc(x.title)}</span>`;
+      el.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")focus(x.id)});
+      el.addEventListener("pointerleave",()=>focus(null));
+      if(x.type==="text")el.addEventListener("click",e=>{if(!e.target.closest("a"))select(x.id)});
+    }
+    bd.appendChild(el);els[x.id]=el;
+    W=Math.max(W,x.x+x.w+CV_PAD*2);H=Math.max(H,x.y+x.h+CV_PAD*2);
+  }
+  // links to other notes open beside, like everywhere else
+  host.addEventListener("click",e=>{const a=e.target.closest("[data-note]");if(!a)return;e.preventDefault();e.stopPropagation();noteStack.openFrom(0,a.dataset.note)},true);
+  requestAnimationFrame(()=>Object.values(els).forEach(el=>{const m=el.querySelector(".md");if(m&&m.scrollHeight>m.clientHeight+2)el.classList.add("over")}));
+
+  // arrows: from the middle of a side, curving out along it, as Obsidian draws them
+  const side=(x,s)=>{const X=x.x+CV_PAD,Y=x.y+CV_PAD;return s==="top"?[X+x.w/2,Y,0,-1]:s==="bottom"?[X+x.w/2,Y+x.h,0,1]:s==="left"?[X,Y+x.h/2,-1,0]:[X+x.w,Y+x.h/2,1,0]};
+  function guess(a,b){const dx=(b.x+b.w/2)-(a.x+a.w/2),dy=(b.y+b.h/2)-(a.y+a.h/2);
+    return Math.abs(dx)>Math.abs(dy)?(dx>0?["right","left"]:["left","right"]):(dy>0?["bottom","top"]:["top","bottom"])}
+  B.edges.forEach((e,i)=>{
+    const a=NODES[e.a],b=NODES[e.b],g=guess(a,b),[x1,y1,nx1,ny1]=side(a,e.fs||g[0]),[x2,y2,nx2,ny2]=side(b,e.ts||g[1]);
+    const k=Math.max(40,Math.hypot(x2-x1,y2-y1)*.35),c1=[x1+nx1*k,y1+ny1*k],c2=[x2+nx2*k,y2+ny2*k];
+    const c=col(e.color)||col(a.color)||"var(--muted)";
+    const p=document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("d",`M${x1},${y1} C${c1} ${c2} ${x2},${y2}`);p.style.stroke=c;p.dataset.i=i;svg.appendChild(p);
+    if(e.label){const l=document.createElement("span");l.className="bd-lbl";l.textContent=e.label;l.dataset.i=i;l.style.setProperty("--c",c.startsWith("var")?"var(--surface)":c);
+      l.style.left=(x1+3*c1[0]+3*c2[0]+x2)/8+"px";l.style.top=(y1+3*c1[1]+3*c2[1]+y2)/8+"px";bd.appendChild(l)}
+  });
+
+  function size(){Object.assign(bd.style,{width:W+"px",height:H+"px",transform:`scale(${scale})`});svg.setAttribute("width",W);svg.setAttribute("height",H);
+    sizer.style.width=W*scale+(read.hidden?0:read.offsetWidth)+"px";sizer.style.height=H*scale+"px";q(".bd-zv").textContent=Math.round(scale*100)+"%"}
+  const zoom=s=>{scale=Math.min(1.5,Math.max(.15,s));size()};
+  const fit=()=>zoom(Math.min(1,(vp.clientWidth-4)/W,Math.max(.45,(vp.clientHeight-4)/H)));
+
+  function focus(id){focused=id;paint();document.querySelectorAll(".prose a[data-q]").forEach(a=>a.classList.toggle("on",BYQ[a.dataset.q]===(id||selected)))}
+  function paint(){
+    const f=focused||selected,near=new Set();
+    if(f){near.add(f);B.edges.forEach(e=>{if(e.a===f||e.b===f){near.add(e.a);near.add(e.b)}})}
+    for(const[id,el]of Object.entries(els)){if(NODES[id].type==="group")continue;
+      el.classList.toggle("bd-faded",!!f&&!near.has(id));el.classList.toggle("hot",!!f&&near.has(id)&&id!==f);el.classList.toggle("sel",id===selected)}
+    B.edges.forEach((e,i)=>{const off=!!f&&e.a!==f&&e.b!==f;
+      svg.querySelector(`path[data-i="${i}"]`)?.classList.toggle("bd-faded",off);bd.querySelector(`.bd-lbl[data-i="${i}"]`)?.classList.toggle("bd-faded",off)});
+  }
+  const short=x=>x.type==="text"?(x.plain.length>110?x.plain.slice(0,110)+"…":x.plain):x.label||x.title||x.url||x.img||"";
+  function select(id,reveal){
+    selected=id;focus(null);
+    if(!id){read.hidden=true;size();return}
+    const x=NODES[id],rel=B.edges.filter(e=>e.a===id||e.b===id),c=col(x.color)||"var(--rule)";
+    read.style.setProperty("--c",c);read.hidden=false;
+    read.innerHTML=`<button class="x" aria-label="Закрити">×</button>${x.src?`<span class="chip">${esc(x.src)}</span>`:""}
+      <blockquote class="prose">${x.html}</blockquote>
+      ${rel.length?`<h4 class="label">Зв'язки</h4><ul>${rel.map(e=>{const o=NODES[e.a===id?e.b:e.a];
+        return`<li><button data-go="${esc(o.id)}" style="--c:${col(o.color)||"var(--rule)"}"><small>${esc(e.label||"зв'язок")}${o.src?" · "+esc(o.src):""}</small>${esc(short(o))}</button></li>`}).join("")}</ul>`:""}`;
+    read.querySelector(".x").onclick=()=>select(null);
+    read.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const o=NODES[b.dataset.go];o.type==="text"?select(o.id,true):reveal_(o.id)});
+    size();if(reveal)reveal_(id);
+  }
+  function reveal_(id){const x=NODES[id];vp.scrollTo({left:(x.x+CV_PAD+x.w/2)*scale-(vp.clientWidth-(read.hidden?0:read.offsetWidth))/2,top:(x.y+CV_PAD)*scale-vp.clientHeight/4,behavior:REDUCED?"auto":"smooth"})}
+  vp.addEventListener("click",e=>{if(!e.target.closest(".bd-card,.bd-lbl")&&selected)select(null)});
+  host.querySelector(".bd-tools").addEventListener("click",e=>{const b=e.target.closest("[data-z]");if(b)b.dataset.z==="fit"?fit():zoom(scale+ +b.dataset.z*.1)});
+  vp.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();zoom(scale-e.deltaY*.002)}},{passive:false});
+  // first look: readable cards, scroll for the rest; «уся дошка» shows everything
+  requestAnimationFrame(()=>{if(host.isConnected)zoom(Math.min(1,Math.max(.45,(vp.clientWidth-4)/W)))});
+  board={select:qid=>{const id=BYQ[qid]||(NODES[qid]&&qid);if(id&&NODES[id].type==="text")select(id,true)},focus:qid=>focus(qid?BYQ[qid]||null:null),host};
+  return board;
+}
 function makeBoard(host,n){
+  if(n.board.canvas)return makeCanvas(host,n);
   const B=n.board,key="board:"+n.id,NODES={};
   B.sources.forEach((s,i)=>{s.c=BD_COLORS[i%BD_COLORS.length];s.head=true;s.src=s;s.plain=s.title.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'");NODES[s.id]=s});
   B.quotes.forEach(q=>{q.src=NODES[q.src];NODES[q.id]=q});
