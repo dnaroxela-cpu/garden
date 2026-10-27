@@ -519,6 +519,75 @@ body.on-home .dirnote{display:none}
 @media (max-width:719px){.panes{scroll-snap-type:x mandatory}.pane{position:relative;flex-basis:100vw;width:100vw;box-shadow:none}.pane-in{padding:20px 16px 48px}}
 body.on-note footer{margin-top:24px}
 
+/* note-board: quotes from the sources (### in the note) laid out by theme, lines between them; the note's own text stays in the pane beside it */
+.board-side{flex:1 0 420px;min-width:420px;position:relative;border-left:1px solid var(--rule);display:flex;flex-direction:column}
+.board-inline{position:relative;display:flex;flex-direction:column;height:72vh;margin-top:32px;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.bd-tools{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--rule);font-family:var(--f-mono);font-size:12px}
+.bd-seg{display:inline-flex;border:1px dashed var(--rule);border-radius:8px;padding:3px;gap:2px;align-items:center}
+.bd-seg button,.bd-edit button{font:inherit;background:none;border:0;cursor:pointer;padding:4px 10px;border-radius:5px;color:var(--muted)}
+.bd-seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.bd-seg span{min-width:40px;text-align:center;color:var(--muted)}
+.bd-legend{display:flex;flex-wrap:wrap;gap:5px}
+.bd-legend button{font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;border:1px solid var(--rule);background:none;color:var(--ink)}
+.bd-legend button i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.bd-legend button.dim{opacity:.35}
+.bd-edit{display:flex;gap:4px}.bd-edit[hidden]{display:none}
+.bd-edit button{border:1px dashed var(--rule);color:var(--ink)}
+.bd-stage{position:relative;flex:1;min-height:0;display:flex}
+.bd-vp{position:relative;flex:1;min-width:0;overflow:auto;background-image:radial-gradient(var(--rule) 1.2px,transparent 1.4px);background-size:20px 20px}
+.bd-sizer{position:relative}
+.bd-board{position:absolute;left:0;top:0;transform-origin:0 0}
+.bd-edges{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:1}
+.bd-edges path{fill:none;stroke-width:4;stroke-linecap:round;opacity:.75;transition:opacity .2s}
+.bd-edges path.tmp{stroke:var(--muted);stroke-dasharray:6 6;stroke-width:2.5}
+.bd-zone{position:absolute;border:1.5px dashed var(--rule);border-radius:18px;transition:border-color .2s,background .2s}
+.bd-zone h2{position:absolute;left:20px;top:14px;margin:0;font-family:var(--f-display);font-weight:700;font-size:26px;letter-spacing:-.015em;line-height:1.1}
+.bd-zone small{position:absolute;right:20px;top:22px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.bd-zone.inbox h2{color:var(--muted)}
+.bd-zone.drop{border-color:var(--ink);background:var(--accent-soft)}
+.bd-card{position:absolute;width:260px;background:var(--surface);border-radius:8px;padding:10px 12px 9px;z-index:2;cursor:pointer;touch-action:pan-x pan-y;user-select:none;
+  transition:opacity .2s,box-shadow .2s,left .3s,top .3s}
+.bd-card .chip{display:inline-block;font-family:var(--f-mono);font-size:10.5px;padding:1px 7px;border-radius:4px;margin-bottom:7px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:color-mix(in srgb,var(--c) 32%,transparent)}
+.bd-card .chip em{font-style:normal;opacity:.7}
+.bd-card .t{font-size:15px;line-height:1.42;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.bd-card.short .t{font-family:var(--f-display);font-weight:500;font-size:17px;line-height:1.28}
+.bd-card .ft{font-family:var(--f-mono);font-size:10px;color:var(--muted);margin-top:7px;display:flex;justify-content:space-between;gap:8px}
+.bd-card .dot{position:absolute;right:-8px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:var(--c);border:3px solid var(--bg);cursor:crosshair;display:none}
+.bd-card.src{background:color-mix(in srgb,var(--c) 26%,var(--bg));padding:11px 14px;cursor:default}
+.bd-card.src h3{font-family:var(--f-display);font-weight:700;font-size:17px;line-height:1.2;margin:0 0 6px}
+.bd-card.src h3 a,.bd-card .t a{background:none;color:inherit}
+.bd-card.src .lk{display:flex;flex-wrap:wrap;gap:3px 10px;font-family:var(--f-mono);font-size:10.5px}
+.bd-card.src .lk a{color:var(--muted)}
+.bd-card.src .ft{margin-top:6px}
+.editing .bd-card:not(.src){cursor:grab;touch-action:none}
+.editing .bd-card .dot{display:block}
+.bd-card.drag{cursor:grabbing;box-shadow:0 12px 32px #0003;transition:none;z-index:9}
+.bd-card.hot{box-shadow:0 0 0 2px var(--c)}
+.bd-card.sel{box-shadow:0 0 0 3px var(--ink)}
+.bd-lbl{position:absolute;transform:translate(-50%,-50%);font-family:var(--f-mono);font-size:10.5px;padding:2px 7px;border-radius:4px;background:var(--c);color:#141414;white-space:nowrap;z-index:3;transition:opacity .2s}
+.editing .bd-lbl{cursor:pointer}
+.bd-faded{opacity:.1!important}
+.bd-menu{position:fixed;z-index:60;background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:4px;font-family:var(--f-mono);font-size:12px;box-shadow:0 8px 24px #0003;display:flex;flex-direction:column;min-width:160px}
+.bd-menu button{font:inherit;text-align:left;background:none;border:0;color:var(--ink);cursor:pointer;padding:5px 9px;border-radius:5px}
+.bd-menu button:hover{background:var(--surface)}
+.bd-menu .del{color:#d0345a}
+.bd-read{position:absolute;right:0;top:0;bottom:0;width:min(380px,100%);z-index:5;background:var(--bg);border-left:1px solid var(--rule);box-shadow:-16px 0 32px rgba(0,0,0,.08);overflow-y:auto;padding:20px 22px 40px}
+.bd-read[hidden]{display:none}
+.bd-read .x{position:absolute;right:12px;top:10px;font:inherit;font-size:20px;background:none;border:0;color:var(--muted);cursor:pointer}
+.bd-read .chip{display:inline-block;font-family:var(--f-mono);font-size:11px;padding:2px 8px;border-radius:4px;background:color-mix(in srgb,var(--c) 32%,transparent)}
+.bd-read .who{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin:10px 0 14px}
+.bd-read blockquote{margin:0;padding:0;border:0;background:none;font-size:16.5px;line-height:1.65}
+.bd-read blockquote mark{background:color-mix(in srgb,var(--c) 40%,transparent);color:inherit;padding:0 2px}
+.bd-read h4{margin:24px 0 8px}
+.bd-read ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.bd-read li button{font:inherit;text-align:left;width:100%;cursor:pointer;display:block;font-size:14px;line-height:1.4;padding:7px 10px;border-radius:6px;background:var(--surface);border:0;border-left:4px solid var(--c);color:var(--ink)}
+.bd-read li small{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-bottom:2px}
+.bd-hint{flex-basis:100%;margin:0;font-size:11px;color:var(--muted)}
+.prose a[data-q]{cursor:pointer}
+.prose a[data-q].on{background-size:100% 100%;color:var(--bg)}
+@media (max-width:719px){.bd-legend,.bd-hint{display:none}.bd-tools{padding:10px 12px}.bd-read{width:100%}}
+
 /* shelf: arrangements, timeline, drawer of panes */
 .shelf-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 24px;padding-block:28px 8px}
 .arr{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -976,7 +1045,7 @@ function paneHTML(n,i,closable){
       <div class="meta"><span class="g">${glyph(n.status,14)}${STL[n.status]}</span><span class="mt">оновлено ${fmt(n.date,true)} · ${Math.max(1,Math.round(words(n)/200))} хв читання</span></div>
       <h1>${esc(short(n.title))}</h1>${n.book?`<p class="byline">${esc(n.book.split("·")[0].trim())}${/·\s*\d{4}/.test(n.book)?` <span>· ${n.book.match(/(\d{4})/)[1]}</span>`:""}</p>`:""}
       <div class="tags">${n.tags.map(t=>`<a href="#garden" data-tag="${esc(t)}">#${esc(t)}</a>`).join("")}</div>
-      <div class="prose">${n.html}</div>
+      <div class="prose">${n.html}</div>${n.board?`<div class="board-inline" data-board="${n.id}"></div>`:""}
       <div class="pane-foot">
         <div><h4 class="label">Згадується в</h4><div class="backlinks">${n.back.map(id=>linkItem(BY[id])).join("")||`<p class="empty">Поки жодна нотатка не посилається сюди.</p>`}</div></div>
         <div><h4 class="label">Схожі за темою</h4><div class="backlinks">${related(n).map(linkItem).join("")||`<p class="empty">Без тегів, тож схожих поки немає.</p>`}</div></div>
@@ -999,9 +1068,12 @@ class Stack{
   openFrom(i,id){if(this.ids[i+1]===id){this.render(i+1);return}this.ids=this.ids.slice(0,i+1).concat(id);this.render()}
   render(scrollTo){
     const box=this.box;
-    const side=this.mapSide&&this.ids.length===1&&innerWidth>=1000;
-    box.innerHTML=this.ids.map((id,i)=>paneHTML(BY[id],i,i>0||this.closeFirst)).join("")+(side?`<aside class="map-side"><div class="ms-h"><span class="label">На мапі</span><b>${esc(short(BY[this.ids[0]].title))}</b></div><canvas aria-label="Мапа з цією нотаткою"></canvas></aside>`:"");
+    const boardSide=this.mapSide&&this.ids.length===1&&BY[this.ids[0]].board&&innerWidth>=1000;
+    const side=!boardSide&&this.mapSide&&this.ids.length===1&&innerWidth>=1000;
+    box.innerHTML=this.ids.map((id,i)=>paneHTML(BY[id],i,i>0||this.closeFirst)).join("")+(boardSide?`<section class="board-side" aria-label="Дошка цитат"></section>`:side?`<aside class="map-side"><div class="ms-h"><span class="label">На мапі</span><b>${esc(short(BY[this.ids[0]].title))}</b></div><canvas aria-label="Мапа з цією нотаткою"></canvas></aside>`:"");
     if(side){const id=this.ids[0];requestAnimationFrame(()=>{const c=box.querySelector(".map-side canvas");if(!c)return;noteSim=makeSim(c,{mark:id,onOpen:nid=>{if(nid!==id)this.openFrom(0,nid)}});noteSim.size()})}else if(this.mapSide)noteSim=null;
+    box.querySelectorAll(".board-inline").forEach(el=>{if(boardSide)el.remove();else makeBoard(el,BY[el.dataset.board])});
+    if(boardSide)makeBoard(box.querySelector(".board-side"),BY[this.ids[0]]);
     box.querySelectorAll(".pane").forEach((p,i)=>{p.style.left=(narrow()?0:i*SPINE)+"px";p.querySelector(".pane-in").addEventListener("scroll",onScroll,{passive:true})});
     this.changed();
     requestAnimationFrame(()=>{const i=scrollTo??this.ids.length-1;const pw=Math.min(PANE_W(),box.clientWidth);box.scrollTo({left:Math.max(0,i*(pw-(narrow()?0:SPINE))),behavior:REDUCED?"auto":"smooth"});this.collapse();onScroll()});
@@ -1014,6 +1086,212 @@ noteStack.mapSide=true;
 noteStack.ids=[current];
 function renderNote(scrollTo){noteStack.render(scrollTo)}
 function updateCollapsed(){noteStack.collapse();shelfStack&&shelfStack.collapse()}
+
+// note-board: a note with «layout: board» keeps its text in the pane; its quotes (### sources, list items) sit on a board beside it,
+// grouped into themes (the «%% дошка» block) with lines between them («## Зв'язки»). Rearranging here is a draft kept in this browser;
+// «Скопіювати для нотатки» gives the two blocks to paste back into the note.
+const BD_COLORS=["#ff5c9d","#ff8c00","#9d8cff","#40e0d0","#b5d63a","#f2c200","#ff6b4a"];
+const BD_PRESETS=["перегукується","розвиває","суперечить","напруга","приклад","те саме","сумнів","джерело"];
+const BD={CW:260,GAP:16,PAD:20,TOP:64,ZG:70};
+let board=null;
+function makeBoard(host,n){
+  const B=n.board,key="board:"+n.id,NODES={};
+  B.sources.forEach((s,i)=>{s.c=BD_COLORS[i%BD_COLORS.length];s.head=true;s.src=s;s.plain=s.title.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'");NODES[s.id]=s});
+  B.quotes.forEach(q=>{q.src=NODES[q.src];NODES[q.id]=q});
+  let zones,E;
+  const fresh=()=>{zones=B.zones.map(z=>({...z,ids:[...z.ids]}));E=B.edges.map(e=>({...e}))};
+  fresh();
+  try{const d=JSON.parse(localStorage.getItem(key)||"null");if(d){
+    const seen=new Set();zones=d.zones.map(z=>({name:z.name,inbox:z.inbox,ids:z.ids.filter(id=>NODES[id]&&!NODES[id].head&&!seen.has(id)&&seen.add(id))}));
+    const loose=B.quotes.filter(q=>!seen.has(q.id)).map(q=>q.id);
+    if(loose.length){const ib=zones.find(z=>z.inbox);ib?ib.ids.push(...loose):zones.push({name:"Нерозібране",inbox:true,ids:loose})}
+    E=d.edges.filter(e=>NODES[e.a]&&NODES[e.b])}}catch(e){}
+  const save=()=>{try{localStorage.setItem(key,JSON.stringify({zones,edges:E}))}catch(e){}};
+
+  host.innerHTML=`<div class="bd-tools">
+      <div class="bd-seg" role="group" aria-label="Режим"><button data-m="0" aria-pressed="true">Перегляд</button><button data-m="1" aria-pressed="false">Розставити</button></div>
+      <div class="bd-seg" aria-label="Масштаб"><button data-z="-1" aria-label="Зменшити">−</button><span class="bd-zv"></span><button data-z="1" aria-label="Збільшити">+</button><button data-z="fit">уся дошка</button></div>
+      <div class="bd-legend">${B.sources.map(s=>`<button data-s="${esc(s.id)}" style="--c:${s.c}" title="${esc(s.plain)}"><i></i>${esc(s.short)}</button>`).join("")}</div>
+      <div class="bd-edit" hidden><button data-copy>Скопіювати для нотатки</button><button data-reset>Скинути</button></div>
+      <p class="bd-hint"></p>
+    </div>
+    <div class="bd-stage"><div class="bd-vp"><div class="bd-sizer"><div class="bd-board"><svg class="bd-edges"></svg></div></div></div><aside class="bd-read" hidden></aside></div>`;
+  const q=s=>host.querySelector(s),vp=q(".bd-vp"),sizer=q(".bd-sizer"),bd=q(".bd-board"),svg=q(".bd-edges"),read=q(".bd-read"),hint=q(".bd-hint");
+  const cards={},zoneEls={},hidden=new Set();
+  let edit=false,scale=1,focused=null,selected=null,dragging=null,moved=false,perRow=1;
+
+  for(const s of B.sources){
+    const el=card(s,"bd-card src");
+    el.innerHTML=`<h3>${s.title}</h3>${s.links.length?`<div class="lk">${s.links.map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label||l.url.replace(/^https?:\/\/(www\.)?/,"").split("/")[0])}</a>`).join("")}</div>`:""}<div class="ft">${B.quotes.filter(x=>x.src===s).length} цитат</div>`;
+  }
+  for(const x of B.quotes){
+    const more=x.words-x.gist.split(/\s+/).length;
+    const el=card(x,"bd-card"+(x.gist.length<70?" short":""));
+    el.innerHTML=`<span class="chip">${x.who?`${esc(x.who)} <em>· ${esc(x.src.short)}</em>`:esc(x.src.short)}</span><div class="t">${esc(x.gist)}</div><div class="ft"><span>^${esc(x.id)}</span><span>${more>8?`+${more} слів`:""}</span></div><span class="dot" title="Потягни до іншої цитати"></span>`;
+  }
+  function card(x,cls){
+    const el=document.createElement("div");el.className=cls;el.style.setProperty("--c",x.src.c);bd.appendChild(el);cards[x.id]=el;
+    el.addEventListener("pointerenter",e=>{if(!edit&&e.pointerType==="mouse")focus(x.id)});
+    el.addEventListener("pointerleave",()=>{if(!edit)focus(null)});
+    el.addEventListener("pointerdown",e=>{if(e.target.closest("a")||!edit||x.head)return;e.target.classList.contains("dot")?startLink(e,x):startDrag(e,x)});
+    el.addEventListener("click",e=>{if(!e.target.closest("a")&&!x.head&&!moved)select(x.id)});
+    return el;
+  }
+
+  // layout: sources along the top, themes below; cards inside a theme pack into two columns
+  function layout(){
+    const zw=2*BD.CW+BD.GAP+2*BD.PAD;
+    perRow=Math.max(1,Math.min(3,Math.floor((vp.clientWidth/.62+BD.ZG)/(zw+BD.ZG))));
+    const W=perRow*zw+(perRow-1)*BD.ZG;
+    let x=40,y=40,rowH=0;
+    for(const s of B.sources){const el=cards[s.id];if(x>40&&x+BD.CW>40+W){x=40;y+=rowH+BD.GAP;rowH=0}
+      el.style.left=x+"px";el.style.top=y+"px";rowH=Math.max(rowH,el.offsetHeight);x+=BD.CW+BD.GAP}
+    y+=rowH+90;
+    const live=new Set(zones.map(z=>z.name));
+    for(const k in zoneEls)if(!live.has(k)){zoneEls[k].remove();delete zoneEls[k]}
+    for(let r=0;r<zones.length;r+=perRow){
+      rowH=0;
+      zones.slice(r,r+perRow).forEach((z,k)=>{
+        const zx=40+k*(zw+BD.ZG),col=[y+BD.TOP,y+BD.TOP];
+        for(const id of z.ids){if(dragging===id)continue;const c=col[0]<=col[1]?0:1,el=cards[id];
+          el.style.left=zx+BD.PAD+c*(BD.CW+BD.GAP)+"px";el.style.top=col[c]+"px";col[c]+=el.offsetHeight+BD.GAP}
+        const h=Math.max(...col,y+BD.TOP+90)-y+BD.PAD-BD.GAP;
+        let ze=zoneEls[z.name];
+        if(!ze){ze=zoneEls[z.name]=document.createElement("div");ze.className="bd-zone"+(z.inbox?" inbox":"");bd.prepend(ze)}
+        ze.innerHTML=`<h2>${esc(z.name)}</h2><small>${z.ids.length}</small>`;ze.dataset.z=z.name;
+        Object.assign(ze.style,{left:zx+"px",top:y+"px",width:zw+"px",height:h+"px"});
+        rowH=Math.max(rowH,h);
+      });
+      y+=rowH+BD.ZG;
+    }
+    size();
+  }
+  function size(){
+    let W=0,H=0;
+    for(const el of[...Object.values(cards),...Object.values(zoneEls)]){W=Math.max(W,el.offsetLeft+el.offsetWidth);H=Math.max(H,el.offsetTop+el.offsetHeight)}
+    W+=40;H+=60;
+    Object.assign(bd.style,{width:W+"px",height:H+"px",transform:`scale(${scale})`});svg.setAttribute("width",W);svg.setAttribute("height",H);
+    sizer.style.width=W*scale+(read.hidden?0:read.offsetWidth)+"px";sizer.style.height=H*scale+"px";q(".bd-zv").textContent=Math.round(scale*100)+"%";
+  }
+  const zoom=s=>{scale=Math.min(1.4,Math.max(.3,s));size()};
+  const fit=()=>zoom(Math.min(1,(vp.clientWidth-4)/parseFloat(bd.style.width)));
+
+  // lines
+  const rect=id=>{const el=cards[id];return{x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}};
+  function ends(a,b){
+    const ra=rect(a),rb=rect(b),ca={x:ra.x+ra.w/2,y:ra.y+ra.h/2},cb={x:rb.x+rb.w/2,y:rb.y+rb.h/2};
+    if(Math.max(rb.x-(ra.x+ra.w),ra.x-(rb.x+rb.w))>10){const s=Math.sign(cb.x-ca.x);return[{x:ca.x+s*ra.w/2,y:ca.y},{x:cb.x-s*rb.w/2,y:cb.y},1]}
+    const s=Math.sign(cb.y-ca.y)||1;return[{x:ca.x,y:ca.y+s*ra.h/2},{x:cb.x,y:cb.y-s*rb.h/2},0];
+  }
+  function curve(p,r,h){const k=h?(r.x-p.x)/2:(r.y-p.y)/2;
+    return h?`M${p.x},${p.y} C${p.x+k},${p.y} ${r.x-k},${r.y} ${r.x},${r.y}`:`M${p.x},${p.y} C${p.x},${p.y+k} ${r.x},${r.y-k} ${r.x},${r.y}`}
+  function lines(){
+    svg.querySelectorAll("path:not(.tmp)").forEach(p=>p.remove());bd.querySelectorAll(".bd-lbl").forEach(l=>l.remove());
+    E.forEach((e,i)=>{
+      const[p,r,h]=ends(e.a,e.b),c=NODES[e.a].src.c;
+      const path=document.createElementNS("http://www.w3.org/2000/svg","path");path.setAttribute("d",curve(p,r,h));path.style.stroke=c;path.dataset.i=i;svg.prepend(path);
+      if(!e.label)return;
+      const l=document.createElement("span");l.className="bd-lbl";l.textContent=e.label;l.dataset.i=i;l.style.setProperty("--c",c);
+      l.style.left=(p.x+r.x)/2+"px";l.style.top=(p.y+r.y)/2+"px";l.addEventListener("click",ev=>{if(edit)menu(i,ev)});bd.appendChild(l);
+    });
+    paint();
+  }
+  Object.values(cards).forEach(el=>el.addEventListener("transitionend",e=>{if(e.propertyName==="top"||e.propertyName==="left")lines()}));
+
+  // focus (hover), selection (click), source filter
+  function focus(id){focused=id;paint();document.querySelectorAll(".prose a[data-q]").forEach(a=>a.classList.toggle("on",a.dataset.q===(id||selected)))}
+  function paint(){
+    const f=focused||selected,near=new Set();
+    if(f){near.add(f);E.forEach(e=>{if(e.a===f||e.b===f){near.add(e.a);near.add(e.b)}})}
+    for(const[id,el]of Object.entries(cards)){
+      el.classList.toggle("bd-faded",hidden.has(NODES[id].src.id)||(!!f&&!near.has(id)&&!NODES[id].head));
+      el.classList.toggle("hot",!!f&&near.has(id)&&id!==f);el.classList.toggle("sel",id===selected);
+    }
+    E.forEach((e,i)=>{const off=(f&&e.a!==f&&e.b!==f)||hidden.has(NODES[e.a].src.id)||hidden.has(NODES[e.b].src.id);
+      svg.querySelector(`path[data-i="${i}"]`)?.classList.toggle("bd-faded",!!off);bd.querySelector(`.bd-lbl[data-i="${i}"]`)?.classList.toggle("bd-faded",!!off)});
+  }
+  function select(id,reveal){
+    selected=id;focus(null);
+    if(!id){read.hidden=true;size();return}
+    const x=NODES[id],z=zones.find(z=>z.ids.includes(id)),rel=E.filter(e=>e.a===id||e.b===id);
+    read.style.setProperty("--c",x.src.c);read.hidden=false;
+    read.innerHTML=`<button class="x" aria-label="Закрити">×</button><span class="chip">${esc(x.src.short)}</span>
+      <div class="who">${x.who?esc(x.who)+" · ":""}${esc(x.src.plain)}${z?" · "+esc(z.name):""}</div><blockquote>${x.html}</blockquote>
+      ${rel.length?`<h4 class="label">Зв'язки</h4><ul>${rel.map(e=>{const o=NODES[e.a===id?e.b:e.a];
+        return`<li><button data-go="${esc(o.id)}" style="--c:${o.src.c}"><small>${esc(e.label||"зв'язок")} · ${o.head?"джерело":esc(o.src.short)}</small>${esc(o.head?o.plain:o.gist)}</button></li>`}).join("")}</ul>`:""}`;
+    read.querySelector(".x").onclick=()=>select(null);size();
+    read.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{if(!NODES[b.dataset.go].head)select(b.dataset.go,true)});
+    if(reveal){const el=cards[id];vp.scrollTo({left:el.offsetLeft*scale-(vp.clientWidth-read.offsetWidth)/2+BD.CW*scale/2,top:el.offsetTop*scale-vp.clientHeight/3,behavior:REDUCED?"auto":"smooth"})}
+  }
+  vp.addEventListener("click",e=>{if(!e.target.closest(".bd-card,.bd-lbl")&&selected)select(null)});
+
+  // edit: drag a card into another theme, drag the dot onto another card to connect them
+  const at=e=>{const r=bd.getBoundingClientRect();return{x:(e.clientX-r.left)/scale,y:(e.clientY-r.top)/scale}};
+  const zoneAt=p=>Object.values(zoneEls).find(z=>p.x>=z.offsetLeft&&p.x<=z.offsetLeft+z.offsetWidth&&p.y>=z.offsetTop&&p.y<=z.offsetTop+z.offsetHeight);
+  function startDrag(ev,x){
+    ev.preventDefault();const el=cards[x.id];el.setPointerCapture(ev.pointerId);moved=false;
+    const p0=at(ev),ox=p0.x-el.offsetLeft,oy=p0.y-el.offsetTop;
+    const mv=e=>{const p=at(e);if(!moved&&Math.hypot(p.x-p0.x,p.y-p0.y)<4)return;
+      if(!moved){moved=true;dragging=x.id;el.classList.add("drag")}
+      el.style.left=p.x-ox+"px";el.style.top=p.y-oy+"px";lines();
+      const z=zoneAt(p);Object.values(zoneEls).forEach(o=>o.classList.toggle("drop",o===z))};
+    const up=e=>{el.removeEventListener("pointermove",mv);el.removeEventListener("pointerup",up);Object.values(zoneEls).forEach(o=>o.classList.remove("drop"));
+      if(!moved)return;el.classList.remove("drag");dragging=null;
+      const p=at(e),zel=zoneAt(p);
+      if(zel){const from=zones.find(z=>z.ids.includes(x.id)),to=zones.find(z=>z.name===zel.dataset.z);
+        from.ids.splice(from.ids.indexOf(x.id),1);const i=to.ids.findIndex(id=>cards[id].offsetTop+cards[id].offsetHeight/2>p.y);to.ids.splice(i<0?to.ids.length:i,0,x.id);
+        zones=zones.filter(z=>!z.inbox||z.ids.length);save()}
+      layout();lines();setTimeout(()=>moved=false)};
+    el.addEventListener("pointermove",mv);el.addEventListener("pointerup",up);
+  }
+  function startLink(ev,x){
+    ev.preventDefault();ev.stopPropagation();const dot=ev.target;dot.setPointerCapture(ev.pointerId);
+    const tmp=document.createElementNS("http://www.w3.org/2000/svg","path");tmp.classList.add("tmp");svg.appendChild(tmp);
+    const r=rect(x.id),p1={x:r.x+r.w,y:r.y+r.h/2};
+    const mv=e=>tmp.setAttribute("d",curve(p1,at(e),1));
+    const up=e=>{dot.removeEventListener("pointermove",mv);dot.removeEventListener("pointerup",up);tmp.remove();
+      const t=document.elementsFromPoint(e.clientX,e.clientY).map(n=>n.closest&&n.closest(".bd-card")).find(Boolean);
+      const tid=t&&Object.keys(cards).find(k=>cards[k]===t);
+      if(tid&&tid!==x.id&&!E.some(o=>(o.a===x.id&&o.b===tid)||(o.a===tid&&o.b===x.id))){E.push({a:x.id,b:tid,label:BD_PRESETS[0]});save();lines();menu(E.length-1,e)}};
+    dot.addEventListener("pointermove",mv);dot.addEventListener("pointerup",up);
+  }
+  let pop=null;
+  const closeMenu=()=>{pop&&pop.remove();pop=null};
+  function menu(i,ev){
+    closeMenu();ev.stopPropagation&&ev.stopPropagation();
+    pop=document.createElement("div");pop.className="bd-menu";pop.style.left=Math.min(ev.clientX+8,innerWidth-180)+"px";pop.style.top=Math.min(ev.clientY+8,innerHeight-310)+"px";
+    pop.innerHTML=BD_PRESETS.map(p=>`<button data-l="${p}">${E[i].label===p?"● ":""}${p}</button>`).join("")+`<button class="del">прибрати зв'язок</button>`;
+    pop.addEventListener("pointerdown",e=>e.stopPropagation());
+    pop.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.classList.contains("del"))E.splice(i,1);else E[i].label=b.dataset.l;save();closeMenu();lines()});
+    document.body.appendChild(pop);
+  }
+  document.addEventListener("pointerdown",closeMenu);
+
+  const ref=id=>NODES[id].head?`[[#${NODES[id].plain}]]`:`[[#^${id}]]`;
+  const noteText=()=>["## Зв'язки",...E.map(e=>`- ${ref(e.a)} → ${ref(e.b)}${e.label?" — "+e.label:""}`),"","%% дошка",...zones.filter(z=>z.ids.length).map(z=>`${z.name}: ${z.ids.join(", ")}`),"%%"].join("\n");
+
+  // controls
+  const setMode=on=>{edit=on;host.classList.toggle("editing",on);host.querySelectorAll("[data-m]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.m===+on)));
+    q(".bd-edit").hidden=!on;select(null);closeMenu();
+    hint.textContent=on?"Перетягни картку в іншу тему · крапку — до іншої цитати, щоб зв'язати · клік на підпис — змінити":"Наведи на цитату — видно її зв'язки · клік — повний текст"};
+  host.querySelector(".bd-tools").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    if(b.dataset.m)setMode(b.dataset.m==="1");
+    else if(b.dataset.z)b.dataset.z==="fit"?fit():zoom(scale+ +b.dataset.z*.1);
+    else if(b.dataset.s){hidden.has(b.dataset.s)?hidden.delete(b.dataset.s):hidden.add(b.dataset.s);b.classList.toggle("dim");paint()}
+    else if("copy"in b.dataset){const t=b.textContent;(navigator.clipboard?navigator.clipboard.writeText(noteText()):Promise.reject()).then(()=>b.textContent="Скопійовано ✓",()=>b.textContent="Не вдалося").finally(()=>setTimeout(()=>b.textContent=t,1600))}
+    else if("reset"in b.dataset){try{localStorage.removeItem(key)}catch(e){}fresh();Object.values(zoneEls).forEach(z=>z.remove());for(const k in zoneEls)delete zoneEls[k];layout();lines()}});
+  vp.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();zoom(scale-e.deltaY*.002)}},{passive:false});
+
+  setMode(false);
+  const start=()=>{if(!host.isConnected)return;layout();fit();lines()};
+  requestAnimationFrame(start);document.fonts&&document.fonts.ready.then(start);
+  board={select:id=>NODES[id]&&select(id,true),focus:id=>!edit&&focus(id),host};
+  return board;
+}
+// [[#^id|текст]] у тексті нотатки показує цитату на дошці
+document.addEventListener("click",e=>{const a=e.target.closest("a[data-q]");if(!a)return;e.preventDefault();e.stopPropagation();if(board&&board.host.isConnected){board.select(a.dataset.q);if(board.host.classList.contains("board-inline"))board.host.scrollIntoView({block:"nearest",behavior:REDUCED?"auto":"smooth"})}},true);
+{let over=null;document.addEventListener("mouseover",e=>{const a=e.target.closest&&e.target.closest(".prose a[data-q]"),id=a?a.dataset.q:null;
+  if(id!==over&&board&&board.host.isConnected){over=id;board.focus(id)}})}
 
 // shelf
 const SPINES=[["#2f4858","#f2c14e"],["#e9e4d0","#2f6f4e"],["#d9561f","#fff6ea"],["#1d2a44","#f4d6a0"],["#111111","#e9e9e0"],["#f2c14e","#1f1f1f"],["#6b6e58","#f6f8ea"],["#8c2f1b","#f3e7d3"],["#c9d6e8","#24324a"],["#e8e3dc","#c2410c"],["#3f3f3a","#d8d4c4"],["#f4f1ea","#111111"],["#7aa6a1","#10302d"],["#2c3e2e","#e7e9d6"],["#b5462b","#fbeee2"],["#dfe6c4","#3b4a1e"],["#ff8c00","#1a1a1a"]];
