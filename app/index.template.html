@@ -601,6 +601,10 @@ body.on-note footer{margin-top:24px}
 .bd-card.cv a,.bd-card.cv span{background:none;font-family:var(--f-mono);font-size:13px;word-break:break-all}
 .bd-card.cv a small,.bd-card.cv span small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
 .bd-card.cv .md a{font-family:inherit;font-size:inherit;word-break:normal;background:var(--rainbow) left bottom/100% 1px no-repeat}
+.panes.board-full>.pane{display:none}
+.panes.board-full .board-side{border-left:0}
+.bd-full{font:inherit;cursor:pointer;background:none;border:1px solid var(--ink);border-radius:8px;padding:6px 12px;color:var(--ink)}
+.bd-full:hover{background:var(--ink);color:var(--bg)}
 .prose a[data-q]{cursor:pointer}
 .prose a[data-q].on{background-size:100% 100%;color:var(--bg)}
 @media (max-width:719px){.bd-legend,.bd-hint{display:none}.bd-tools{padding:10px 12px}.bd-read{width:100%}}
@@ -1090,7 +1094,8 @@ class Stack{
     box.innerHTML=this.ids.map((id,i)=>paneHTML(BY[id],i,i>0||this.closeFirst)).join("")+(boardSide?`<section class="board-side" aria-label="Дошка цитат"></section>`:side?`<aside class="map-side"><div class="ms-h"><span class="label">На мапі</span><b>${esc(short(BY[this.ids[0]].title))}</b></div><canvas aria-label="Мапа з цією нотаткою"></canvas></aside>`:"");
     if(side){const id=this.ids[0];requestAnimationFrame(()=>{const c=box.querySelector(".map-side canvas");if(!c)return;noteSim=makeSim(c,{mark:id,onOpen:nid=>{if(nid!==id)this.openFrom(0,nid)}});noteSim.size()})}else if(this.mapSide)noteSim=null;
     box.querySelectorAll(".board-inline").forEach(el=>{if(boardSide)el.remove();else makeBoard(el,BY[el.dataset.board])});
-    if(boardSide)makeBoard(box.querySelector(".board-side"),BY[this.ids[0]]);
+    box.classList.toggle("board-full",!!boardSide&&boardFullPref());
+    if(boardSide){const host=box.querySelector(".board-side");makeBoard(host,BY[this.ids[0]]);boardFullButton(host,BY[this.ids[0]])}
     box.querySelectorAll(".pane").forEach((p,i)=>{p.style.left=(narrow()?0:i*SPINE)+"px";p.querySelector(".pane-in").addEventListener("scroll",onScroll,{passive:true})});
     this.changed();
     requestAnimationFrame(()=>{const i=scrollTo??this.ids.length-1;const pw=Math.min(PANE_W(),box.clientWidth);box.scrollTo({left:Math.max(0,i*(pw-(narrow()?0:SPINE))),behavior:REDUCED?"auto":"smooth"});this.collapse();onScroll()});
@@ -1111,6 +1116,16 @@ const BD_COLORS=["#ff5c9d","#ff8c00","#9d8cff","#40e0d0","#b5d63a","#f2c200","#f
 const BD_PRESETS=["перегукується","розвиває","суперечить","напруга","приклад","те саме","сумнів","джерело"];
 const BD={CW:260,GAP:16,PAD:20,TOP:64,ZG:70};
 let board=null;
+// a board beside its note can take the whole screen; the choice is remembered in this browser
+function boardFullPref(){try{return localStorage.getItem("boardFull")==="1"}catch(e){return false}}
+function boardFullButton(host,n){
+  const on=boardFullPref(),b=document.createElement("button");
+  b.className="bd-full";b.setAttribute("aria-pressed",on);
+  b.innerHTML=on?`← ${esc(short(n.title))}`:"на весь екран";
+  b.title=on?"Показати текст нотатки":"Сховати текст і показати дошку на весь екран";
+  b.onclick=()=>{try{localStorage.setItem("boardFull",on?"0":"1")}catch(e){}renderNote()};
+  host.querySelector(".bd-tools").prepend(b);
+}
 // board from an Obsidian Canvas («<note title>.canvas»): every card, group and arrow stands where it stands in Obsidian; editing happens there
 const CV_COLORS={"1":"#ff5c9d","2":"#ff8c00","3":"#f2c200","4":"#b5d63a","5":"#40e0d0","6":"#9d8cff"};
 const CV_PAD=60;
