@@ -5,7 +5,7 @@
 
 ## Як це працює
 - Робоча гілка: **`main`**.
-- `build.js` читає нотатки з локального Obsidian-сховища (`VAULT` = `/Users/dnaroxela/Documents/Obsidian Vault`) і генерує статичні HTML-сторінки в `docs/`.
+- `build.js` читає нотатки з локального Obsidian-сховища (`VAULT` = `/Users/dnaroxela/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian Vault` — сховище в iCloud, папка Obsidian) і генерує статичні HTML-сторінки в `docs/`.
 - Самих Markdown-нотаток у репозиторії немає — лише згенерований `docs/`. Тому повністю перезібрати сайт можна тільки на Mac власниці: `node build.js`, потім commit і push у `main`.
 - `.github/workflows/deploy.yml` при push у `main` публікує папку `docs/` на GitHub Pages: https://dnaroxela-cpu.github.io/garden/
 - Портфоліо живе окремо: https://dnaroxela.xyz

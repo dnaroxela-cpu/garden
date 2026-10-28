@@ -33,7 +33,7 @@ marked.use({
 });
 
 // CONFIG
-const VAULT = process.env.VAULT || '/Users/dnaroxela/Documents/Obsidian Vault';
+const VAULT = process.env.VAULT || '/Users/dnaroxela/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian Vault';
 const OUT = process.env.OUT || path.join(__dirname, 'docs');
 
 // «tags» property: a YAML list or a "a, b" / "a b" string; a leading # is dropped
