@@ -609,6 +609,7 @@ body.on-note footer{margin-top:24px}
 .th summary::-webkit-details-marker{display:none}
 .th summary::before{content:"+";font-family:var(--f-mono);font-size:16px;color:var(--muted);width:14px}
 .th[open] summary::before{content:"−"}
+.th summary span{border-bottom:3px solid var(--c,transparent)}
 .th summary small{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .th summary em{flex-basis:100%;padding-left:26px;font-family:var(--f-mono);font-style:normal;font-size:12px;color:var(--muted)}
 .th summary:hover span{text-decoration:underline;text-decoration-color:var(--rule)}
@@ -618,7 +619,8 @@ body.on-note footer{margin-top:24px}
 .qt .md ul{margin:0;padding-left:1.1em}
 .qt img{max-width:100%;border-radius:4px}
 .qt>a{font-family:var(--f-mono);font-size:13px;word-break:break-all}
-.th.srcs .qt{font-size:14px}
+.th-src{padding-left:26px;margin:-6px 0 18px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.th-src p,.th-src ul{margin:0}.th-src ul{padding-left:1.1em}.th-src a{word-break:break-all}
 .qt .rel{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .qt .rel button{font-family:var(--f-mono);font-size:11px;text-align:left;background:none;border:1px solid var(--rule);border-radius:99px;padding:2px 9px;color:var(--ink);cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .qt .rel button:hover{border-color:var(--ink)}
@@ -630,7 +632,7 @@ body.on-note footer{margin-top:24px}
 .bd-full:hover{background:var(--ink);color:var(--bg)}
 .prose a[data-q]{cursor:pointer}
 .prose a[data-q].on{background-size:100% 100%;color:var(--bg)}
-@media (max-width:719px){.th ol{padding-left:0}.th summary em{padding-left:0}}
+@media (max-width:719px){.th ol,.th-src{padding-left:0}.th summary em{padding-left:0}}
 @media (max-width:719px){.bd-legend,.bd-hint{display:none}.bd-tools{padding:10px 12px}.bd-read{width:100%}}
 
 /* shelf: arrangements, timeline, drawer of panes */
@@ -1156,7 +1158,7 @@ function boardFullButton(host,n){
 }
 // a note with an Obsidian Canvas («<note title>.canvas») reads as an essay, the Canvas is only where it is put together:
 // the quotes its text points to ([[#^id|…]]) stand on the margin beside the line (on a narrow pane they open under the paragraph),
-// and below the text every Canvas group is a theme with its cards in reading order; arrows become «→ label · who» links between them
+// and below the text all the cards stand under their sources, in the order of the Canvas groups (themes); arrows become «→ label · who» links between them
 const CV_COLORS={"1":"#ff5c9d","2":"#ff8c00","3":"#f2c200","4":"#b5d63a","5":"#40e0d0","6":"#9d8cff"};
 function makeQuotes(pane,n){
   const B=n.board,NODES={},BYQ={},col=c=>c?(CV_COLORS[c]||c):"var(--rule)";
@@ -1166,25 +1168,38 @@ function makeQuotes(pane,n){
   const groups=B.nodes.filter(x=>x.type==="group").sort(byPos),cards=B.nodes.filter(x=>x.type!=="group").sort(byPos);
   // a card belongs to the smallest group around its middle
   const home=c=>groups.filter(g=>{const cx=c.x+c.w/2,cy=c.y+c.h/2;return cx>g.x&&cx<g.x+g.w&&cy>g.y&&cy<g.y+g.h}).sort((a,b)=>a.w*a.h-b.w*b.h)[0];
-  const themes=groups.map(g=>({g,cards:[]})),loose=[];
-  cards.forEach(c=>{const g=home(c);g?themes.find(t=>t.g===g).cards.push(c):loose.push(c)});
-  if(loose.length)themes.push({g:{label:"Поза темами"},cards:loose});
-  const isSrc=t=>/^(джерела|sources?)$/i.test(t.g.label);
-  const list=[...themes.filter(t=>t.cards.length&&!isSrc(t)),...themes.filter(t=>t.cards.length&&isSrc(t))];
+  const isSrc=g=>g&&/^(джерела|sources?)$/i.test(g.label);
+  const theme=c=>{const g=home(c);return g&&!isSrc(g)?g.label:""};
+  // quotes go under their source: the card of the same colour in the «Джерела» group (its first line is the name, the rest its links),
+  // else the last part of «— Хтось · Джерело»; cards with neither end up in «Без джерела»
+  const srcCards=cards.filter(c=>isSrc(home(c))),SRC=new Map();
+  srcCards.forEach(c=>{const d=document.createElement("div");d.innerHTML=c.html;const h=d.firstElementChild||d,name=h.textContent.trim();h.remove();
+    SRC.set(c.color?"c"+c.color:"s"+name,{id:c.id,name,more:d.innerHTML.trim(),cards:[]})});
+  const last=x=>x.src.split("·").pop().trim();
+  const keyOf=c=>c.color&&SRC.has("c"+c.color)?"c"+c.color:c.src?"s"+last(c):"";
+  cards.filter(c=>!isSrc(home(c))).forEach(c=>{const k=keyOf(c);
+    if(!SRC.has(k))SRC.set(k,{name:k?last(c):"Без джерела",cards:[]});SRC.get(k).cards.push(c)});
+  const order=[...SRC.keys()].filter(k=>k).concat(SRC.has("")?[""]:[]);
+  // in a source, quotes keep the order of the themes they stand in on the Canvas
+  const rank=c=>{const g=home(c);return g?groups.indexOf(g):groups.length};
   const who=x=>x.type==="group"?x.label:x.src?x.src.split("·")[0].trim():x.type==="text"?(x.plain.length>48?x.plain.slice(0,48)+"…":x.plain):x.title||x.url||x.img||"";
-  const body=x=>x.type==="text"?`<div class="md">${x.html}</div>${x.src?`<p class="by">— ${esc(x.src)}</p>`:""}`
+  const body=(x,by)=>x.type==="text"?`<div class="md">${x.html}</div>${(by??x.src)?`<p class="by">— ${esc(by??x.src)}</p>`:""}`
     :x.img?`<img src="${encodeURI(x.img)}" alt="" loading="lazy">`
     :x.type==="link"?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.url.replace(/^https?:\/\/(www\.)?/,""))}</a>`
     :x.note?`<a href="#note" data-note="${x.note}">${esc(x.title)}</a>`:`<span>${esc(x.title)}</span>`;
   const rels=x=>{const r=B.edges.filter(e=>e.a===x.id||e.b===x.id);
-    return r.length?`<div class="rel">${r.map(e=>{const o=NODES[e.a===x.id?e.b:e.a];return`<button data-to="${esc(o.id)}">${e.a===x.id?"→":"←"} ${esc(e.label||"зв'язок")} · ${esc(who(o))}</button>`}).join("")}</div>`:""};
-  q(".themes").innerHTML=`<h2 class="label">Цитати за темами</h2>`+list.map(t=>{
-    const names=[...new Set(t.cards.filter(c=>c.src).map(who))];
-    return`<details class="th${isSrc(t)?" srcs":""}"${t.g.id?` id="th-${esc(t.g.id)}"`:""}><summary><span>${esc(t.g.label||"Без назви")}</span><small>${t.cards.length}</small>${names.length?`<em>${esc(names.join(", "))}</em>`:""}</summary>
-      <ol>${t.cards.map(c=>`<li class="qt" id="qt-${esc(c.id)}" style="--c:${col(c.color)}">${body(c)}${rels(c)}</li>`).join("")}</ol></details>`}).join("");
+    return r.length?`<div class="rel">${r.map(e=>{const o=NODES[e.a===x.id?e.b:e.a];return`<button data-to="${esc(o.id)}">${e.a===x.id?"→":"←"} ${esc(e.label||"зв'язок")} · ${esc(o.id in SRCID?SRCID[o.id]:who(o))}</button>`}).join("")}</div>`:""};
+  const SRCID={};SRC.forEach(s=>{if(s.id)SRCID[s.id]=s.name});
+  q(".themes").innerHTML=`<h2 class="label">Цитати за джерелами</h2>`+order.map(k=>{const s=SRC.get(k);
+    if(!s.cards.length&&!s.more)return"";
+    const list=s.cards.sort((a,b)=>rank(a)-rank(b)||byPos(a,b)),quoted=c=>c.src&&c.src.includes("·"),also=[...new Set(list.filter(quoted).map(who))];
+    return`<details class="th"${s.id?` id="qt-${esc(s.id)}"`:""}${k.startsWith("c")?` style="--c:${col(k.slice(1))}"`:""}><summary><span>${esc(s.name)}</span><small>${list.length}</small>${also.length?`<em>також: ${esc(also.join(", "))}</em>`:""}</summary>
+      ${s.more?`<div class="th-src">${s.more}</div>`:""}
+      <ol>${list.map(c=>`<li class="qt" id="qt-${esc(c.id)}" style="--c:${col(c.color)}">${body(c,[quoted(c)?who(c):"",theme(c)].filter(Boolean).join(" · "))}${rels(c)}</li>`).join("")}</ol></details>`}).join("");
   q(".themes").addEventListener("click",e=>{const b=e.target.closest("[data-to]");if(b)show(b.dataset.to)});
-  // to a card or a theme: open it, bring it into view, let it blink
-  function show(id){const el=pane.querySelector("#qt-"+CSS.escape(id))||pane.querySelector("#th-"+CSS.escape(id));if(!el)return;
+  // to a card or a source: open it, bring it into view, let it blink; an arrow to a Canvas group goes to its first card
+  function show(id){if(NODES[id]&&NODES[id].type==="group"){const c=cards.find(c=>home(c)===NODES[id]);if(!c)return;id=c.id}
+    const el=pane.querySelector("#qt-"+CSS.escape(id));if(!el)return;
     const d=el.closest("details");if(d)d.open=true;
     el.scrollIntoView({block:"center",behavior:REDUCED?"auto":"smooth"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}
 
@@ -1192,7 +1207,7 @@ function makeQuotes(pane,n){
   const refs=[],seen=new Set();
   prose.querySelectorAll("a[data-q]").forEach(a=>{const id=BYQ[a.dataset.q];if(id&&!seen.has(id)){seen.add(id);refs.push([a,NODES[id]])}});
   const note=(x,cls)=>{const el=document.createElement("aside");el.className="sn "+cls;el.style.setProperty("--c",col(x.color));el.dataset.q=x.qid;
-    el.innerHTML=body(x)+`<button class="to" data-to="${esc(x.id)}">у темі ↓</button>`;
+    el.innerHTML=body(x)+`<button class="to" data-to="${esc(x.id)}">у джерелі ↓</button>`;
     el.addEventListener("click",e=>{const b=e.target.closest("[data-to]");if(b){show(b.dataset.to);return}if(!e.target.closest("a")){el.classList.toggle("open");layout()}});
     return el};
   const notes=wide?refs.map(([a,x])=>[a,margin.appendChild(note(x,""))]):[];
