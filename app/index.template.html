@@ -584,29 +584,53 @@ body.on-note footer{margin-top:24px}
 .bd-read li button{font:inherit;text-align:left;width:100%;cursor:pointer;display:block;font-size:14px;line-height:1.4;padding:7px 10px;border-radius:6px;background:var(--surface);border:0;border-left:4px solid var(--c);color:var(--ink)}
 .bd-read li small{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-bottom:2px}
 .bd-hint{flex-basis:100%;margin:0;font-size:11px;color:var(--muted)}
-.bd-group{position:absolute;border:1.5px dashed var(--rule);border-radius:18px}
-.bd-group.tint{border-color:color-mix(in srgb,var(--c) 55%,var(--rule));background:color-mix(in srgb,var(--c) 7%,transparent)}
-.bd-group h2{position:absolute;left:4px;bottom:100%;margin:0 0 8px;font-family:var(--f-display);font-weight:700;font-size:26px;letter-spacing:-.015em;line-height:1.1;white-space:nowrap}
-.bd-card.cv{display:flex;flex-direction:column;padding:12px 14px;overflow:hidden;border:1px solid var(--rule)}
-.bd-card.cv.tint{background:color-mix(in srgb,var(--c) 18%,var(--surface));border-color:color-mix(in srgb,var(--c) 45%,var(--rule))}
-.bd-card.cv .md{flex:1;min-height:0;overflow:hidden;font-size:15px;line-height:1.45}
-.bd-card.cv .md>:first-child{margin-top:0}.bd-card.cv .md>:last-child{margin-bottom:0}
-.bd-card.cv .md p{margin:0 0 .6em}.bd-card.cv .md h1,.bd-card.cv .md h2,.bd-card.cv .md h3{font-family:var(--f-display);font-size:20px;line-height:1.2;margin:0 0 .4em}
-.bd-card.cv .md ul,.bd-card.cv .md ol{margin:0 0 .6em;padding-left:1.2em}
-.bd-card.cv .md mark{background:color-mix(in srgb,var(--c,#ffe000) 45%,transparent);color:inherit}
-.bd-card.cv .md img{max-width:100%}
-.bd-card.cv.over .md{-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
-.bd-card.cv .by{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bd-card.cv.file{padding:0}.bd-card.cv.file img{width:100%;height:100%;object-fit:cover;border-radius:8px}
-.bd-card.cv a,.bd-card.cv span{background:none;font-family:var(--f-mono);font-size:13px;word-break:break-all}
-.bd-card.cv a small,.bd-card.cv span small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
-.bd-card.cv .md a{font-family:inherit;font-size:inherit;word-break:normal;background:var(--rainbow) left bottom/100% 1px no-repeat}
+/* a Canvas note as an essay: quotes on the margin beside the text, themes from the Canvas groups below it */
+.pane.wide{flex:1 0 auto;width:auto}
+.pane.wide .pane-in>*{max-width:1040px}
+.pane.wide .essay{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:48px}
+.sn-col{position:relative}
+.pane:not(.wide) .sn-col{display:none}
+.sn{position:absolute;left:0;right:0;font-size:14px;line-height:1.5;padding:2px 0 2px 14px;border-left:3px solid var(--c);cursor:pointer;transition:top .25s,background .2s}
+.sn .md{max-height:10.5em;overflow:hidden}
+.sn.over:not(.open) .md{-webkit-mask-image:linear-gradient(#000 60%,transparent);mask-image:linear-gradient(#000 60%,transparent)}
+.sn.open .md{max-height:none}
+.sn.hot{background:color-mix(in srgb,var(--c) 12%,transparent)}
+.sn.inline{position:static;margin:-.3em 0 1.4em;font-size:15px;cursor:default}
+.sn .md p{margin:0 0 .5em}.sn .md>:last-child{margin-bottom:0}
+.sn mark,.qt mark{background:color-mix(in srgb,var(--c) 40%,transparent);color:inherit;padding:0 2px}
+.sn .by,.qt .by{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin:6px 0 0}
+.sn .to{font-family:var(--f-mono);font-size:11px;background:none;border:0;padding:0;margin-top:4px;color:var(--muted);cursor:pointer;opacity:0;transition:opacity .2s}
+.sn:hover .to,.sn.inline .to,.sn .to:focus-visible{opacity:1}
+.sn .to:hover{color:var(--ink)}
+.themes{margin-top:56px}
+.themes>.label{margin:0 0 8px}
+.th{border-top:1px solid var(--rule)}
+.th summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;padding:16px 0;font-family:var(--f-display);font-size:22px;font-weight:500;line-height:1.25}
+.th summary::-webkit-details-marker{display:none}
+.th summary::before{content:"+";font-family:var(--f-mono);font-size:16px;color:var(--muted);width:14px}
+.th[open] summary::before{content:"−"}
+.th summary small{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.th summary em{flex-basis:100%;padding-left:26px;font-family:var(--f-mono);font-style:normal;font-size:12px;color:var(--muted)}
+.th summary:hover span{text-decoration:underline;text-decoration-color:var(--rule)}
+.th ol{list-style:none;padding:0 0 0 26px;margin:0 0 32px;columns:2 320px;column-gap:40px}
+.qt{break-inside:avoid;margin:0 0 26px;padding-left:14px;border-left:3px solid var(--c);font-size:15.5px;line-height:1.55}
+.qt .md p{margin:0 0 .6em}.qt .md>:last-child{margin-bottom:0}
+.qt .md ul{margin:0;padding-left:1.1em}
+.qt img{max-width:100%;border-radius:4px}
+.qt>a{font-family:var(--f-mono);font-size:13px;word-break:break-all}
+.th.srcs .qt{font-size:14px}
+.qt .rel{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.qt .rel button{font-family:var(--f-mono);font-size:11px;text-align:left;background:none;border:1px solid var(--rule);border-radius:99px;padding:2px 9px;color:var(--ink);cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qt .rel button:hover{border-color:var(--ink)}
+.qt.flash,.sn.flash,.th.flash{animation:qflash 1.6s}
+@keyframes qflash{0%,40%{background:color-mix(in srgb,var(--c,var(--ink)) 22%,transparent)}100%{background:transparent}}
 .panes.board-full>.pane{display:none}
 .panes.board-full .board-side{border-left:0}
 .bd-full{font:inherit;cursor:pointer;background:none;border:1px solid var(--ink);border-radius:8px;padding:6px 12px;color:var(--ink)}
 .bd-full:hover{background:var(--ink);color:var(--bg)}
 .prose a[data-q]{cursor:pointer}
 .prose a[data-q].on{background-size:100% 100%;color:var(--bg)}
+@media (max-width:719px){.th ol{padding-left:0}.th summary em{padding-left:0}}
 @media (max-width:719px){.bd-legend,.bd-hint{display:none}.bd-tools{padding:10px 12px}.bd-read{width:100%}}
 
 /* shelf: arrangements, timeline, drawer of panes */
@@ -1066,7 +1090,8 @@ function paneHTML(n,i,closable){
       <div class="meta"><span class="g">${glyph(n.status,14)}${STL[n.status]}</span><span class="mt">оновлено ${fmt(n.date,true)} · ${Math.max(1,Math.round(words(n)/200))} хв читання</span></div>
       <h1>${esc(short(n.title))}</h1>${n.book?`<p class="byline">${esc(n.book.split("·")[0].trim())}${/·\s*\d{4}/.test(n.book)?` <span>· ${n.book.match(/(\d{4})/)[1]}</span>`:""}</p>`:""}
       <div class="tags">${n.tags.map(t=>`<a href="#garden" data-tag="${esc(t)}">#${esc(t)}</a>`).join("")}</div>
-      <div class="prose">${n.html}</div>${n.board?`<div class="board-inline" data-board="${n.id}"></div>`:""}
+      ${n.board&&n.board.canvas?`<div class="essay"><div class="prose">${n.html}</div><div class="sn-col" aria-label="На полях"></div></div><section class="themes" data-quotes="${n.id}"></section>`
+        :`<div class="prose">${n.html}</div>${n.board?`<div class="board-inline" data-board="${n.id}"></div>`:""}`}
       <div class="pane-foot">
         <div><h4 class="label">Згадується в</h4><div class="backlinks">${n.back.map(id=>linkItem(BY[id])).join("")||`<p class="empty">Поки жодна нотатка не посилається сюди.</p>`}</div></div>
         <div><h4 class="label">Схожі за темою</h4><div class="backlinks">${related(n).map(linkItem).join("")||`<p class="empty">Без тегів, тож схожих поки немає.</p>`}</div></div>
@@ -1089,10 +1114,13 @@ class Stack{
   openFrom(i,id){if(this.ids[i+1]===id){this.render(i+1);return}this.ids=this.ids.slice(0,i+1).concat(id);this.render()}
   render(scrollTo){
     const box=this.box;
-    const boardSide=this.mapSide&&this.ids.length===1&&BY[this.ids[0]].board&&innerWidth>=1000;
-    const side=!boardSide&&this.mapSide&&this.ids.length===1&&innerWidth>=1000;
+    const one=this.mapSide&&this.ids.length===1&&innerWidth>=1000&&BY[this.ids[0]].board;
+    const wide=one&&one.canvas,boardSide=one&&!one.canvas; // a Canvas note takes the whole width: text, its margin, themes below
+    const side=!boardSide&&!wide&&this.mapSide&&this.ids.length===1&&innerWidth>=1000;
     box.innerHTML=this.ids.map((id,i)=>paneHTML(BY[id],i,i>0||this.closeFirst)).join("")+(boardSide?`<section class="board-side" aria-label="Дошка цитат"></section>`:side?`<aside class="map-side"><div class="ms-h"><span class="label">На мапі</span><b>${esc(short(BY[this.ids[0]].title))}</b></div><canvas aria-label="Мапа з цією нотаткою"></canvas></aside>`:"");
     if(side){const id=this.ids[0];requestAnimationFrame(()=>{const c=box.querySelector(".map-side canvas");if(!c)return;noteSim=makeSim(c,{mark:id,onOpen:nid=>{if(nid!==id)this.openFrom(0,nid)}});noteSim.size()})}else if(this.mapSide)noteSim=null;
+    if(wide)box.querySelector(".pane").classList.add("wide");
+    box.querySelectorAll(".themes[data-quotes]").forEach(el=>makeQuotes(el.closest(".pane"),BY[el.dataset.quotes]));
     box.querySelectorAll(".board-inline").forEach(el=>{if(boardSide)el.remove();else makeBoard(el,BY[el.dataset.board])});
     box.classList.toggle("board-full",!!boardSide&&boardFullPref());
     if(boardSide){const host=box.querySelector(".board-side");makeBoard(host,BY[this.ids[0]]);boardFullButton(host,BY[this.ids[0]])}
@@ -1126,97 +1154,66 @@ function boardFullButton(host,n){
   b.onclick=()=>{try{localStorage.setItem("boardFull",on?"0":"1")}catch(e){}renderNote()};
   host.querySelector(".bd-tools").prepend(b);
 }
-// board from an Obsidian Canvas («<note title>.canvas»): every card, group and arrow stands where it stands in Obsidian; editing happens there
+// a note with an Obsidian Canvas («<note title>.canvas») reads as an essay, the Canvas is only where it is put together:
+// the quotes its text points to ([[#^id|…]]) stand on the margin beside the line (on a narrow pane they open under the paragraph),
+// and below the text every Canvas group is a theme with its cards in reading order; arrows become «→ label · who» links between them
 const CV_COLORS={"1":"#ff5c9d","2":"#ff8c00","3":"#f2c200","4":"#b5d63a","5":"#40e0d0","6":"#9d8cff"};
-const CV_PAD=60;
-function makeCanvas(host,n){
-  const B=n.board,NODES={},BYQ={};
-  const col=c=>c?(CV_COLORS[c]||c):null;
-  host.innerHTML=`<div class="bd-tools">
-      <div class="bd-seg" aria-label="Масштаб"><button data-z="-1" aria-label="Зменшити">−</button><span class="bd-zv"></span><button data-z="1" aria-label="Збільшити">+</button><button data-z="fit">уся дошка</button></div>
-      <p class="bd-hint">Наведи на картку — видно її зв'язки · клік — повний текст · змінювати дошку — в Obsidian</p>
-    </div>
-    <div class="bd-stage"><div class="bd-vp"><div class="bd-sizer"><div class="bd-board"><svg class="bd-edges"></svg></div></div></div><aside class="bd-read" hidden></aside></div>`;
-  const q=s=>host.querySelector(s),vp=q(".bd-vp"),sizer=q(".bd-sizer"),bd=q(".bd-board"),svg=q(".bd-edges"),read=q(".bd-read");
-  let scale=1,focused=null,selected=null,W=0,H=0;
-  const els={};
-  // groups underneath, then cards, in canvas order
-  for(const x of [...B.nodes.filter(x=>x.type==="group"),...B.nodes.filter(x=>x.type!=="group")]){
-    NODES[x.id]=x;if(x.qid)BYQ[x.qid]=x.id;
-    const el=document.createElement("div"),c=col(x.color);
-    Object.assign(el.style,{left:x.x+CV_PAD+"px",top:x.y+CV_PAD+"px",width:x.w+"px",height:x.h+"px"});
-    if(c)el.style.setProperty("--c",c);
-    if(x.type==="group"){el.className="bd-group"+(c?" tint":"");el.innerHTML=x.label?`<h2>${esc(x.label)}</h2>`:""}
-    else{
-      el.className="bd-card cv"+(c?" tint":"")+(x.type==="text"?"":" "+x.type);
-      el.innerHTML=x.type==="text"?`<div class="md">${x.html}</div>${x.src?`<div class="by">— ${esc(x.src)}</div>`:""}`
-        :x.img?`<img src="${encodeURI(x.img)}" alt="" loading="lazy">`
-        :x.type==="link"?`<a href="${esc(x.url)}" target="_blank" rel="noopener"><small>${esc(x.url.replace(/^https?:\/\/(www\.)?/,"").split("/")[0])}</small>${esc(x.url)}</a>`
-        :x.note?`<a href="#note" data-note="${x.note}"><small>нотатка</small>${esc(x.title)}</a>`:`<span><small>файл</small>${esc(x.title)}</span>`;
-      el.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")focus(x.id)});
-      el.addEventListener("pointerleave",()=>focus(null));
-      if(x.type==="text")el.addEventListener("click",e=>{if(!e.target.closest("a"))select(x.id)});
-    }
-    bd.appendChild(el);els[x.id]=el;
-    W=Math.max(W,x.x+x.w+CV_PAD*2);H=Math.max(H,x.y+x.h+CV_PAD*2);
-  }
-  // links to other notes open beside, like everywhere else
-  host.addEventListener("click",e=>{const a=e.target.closest("[data-note]");if(!a)return;e.preventDefault();e.stopPropagation();noteStack.openFrom(0,a.dataset.note)},true);
-  requestAnimationFrame(()=>Object.values(els).forEach(el=>{const m=el.querySelector(".md");if(m&&m.scrollHeight>m.clientHeight+2)el.classList.add("over")}));
+function makeQuotes(pane,n){
+  const B=n.board,NODES={},BYQ={},col=c=>c?(CV_COLORS[c]||c):"var(--rule)";
+  B.nodes.forEach(x=>{NODES[x.id]=x;if(x.qid)BYQ[x.qid]=x.id});
+  const q=s=>pane.querySelector(s),essay=q(".essay"),prose=essay.querySelector(".prose"),margin=q(".sn-col"),wide=pane.classList.contains("wide");
+  const byPos=(a,b)=>a.y-b.y||a.x-b.x;
+  const groups=B.nodes.filter(x=>x.type==="group").sort(byPos),cards=B.nodes.filter(x=>x.type!=="group").sort(byPos);
+  // a card belongs to the smallest group around its middle
+  const home=c=>groups.filter(g=>{const cx=c.x+c.w/2,cy=c.y+c.h/2;return cx>g.x&&cx<g.x+g.w&&cy>g.y&&cy<g.y+g.h}).sort((a,b)=>a.w*a.h-b.w*b.h)[0];
+  const themes=groups.map(g=>({g,cards:[]})),loose=[];
+  cards.forEach(c=>{const g=home(c);g?themes.find(t=>t.g===g).cards.push(c):loose.push(c)});
+  if(loose.length)themes.push({g:{label:"Поза темами"},cards:loose});
+  const isSrc=t=>/^(джерела|sources?)$/i.test(t.g.label);
+  const list=[...themes.filter(t=>t.cards.length&&!isSrc(t)),...themes.filter(t=>t.cards.length&&isSrc(t))];
+  const who=x=>x.type==="group"?x.label:x.src?x.src.split("·")[0].trim():x.type==="text"?(x.plain.length>48?x.plain.slice(0,48)+"…":x.plain):x.title||x.url||x.img||"";
+  const body=x=>x.type==="text"?`<div class="md">${x.html}</div>${x.src?`<p class="by">— ${esc(x.src)}</p>`:""}`
+    :x.img?`<img src="${encodeURI(x.img)}" alt="" loading="lazy">`
+    :x.type==="link"?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.url.replace(/^https?:\/\/(www\.)?/,""))}</a>`
+    :x.note?`<a href="#note" data-note="${x.note}">${esc(x.title)}</a>`:`<span>${esc(x.title)}</span>`;
+  const rels=x=>{const r=B.edges.filter(e=>e.a===x.id||e.b===x.id);
+    return r.length?`<div class="rel">${r.map(e=>{const o=NODES[e.a===x.id?e.b:e.a];return`<button data-to="${esc(o.id)}">${e.a===x.id?"→":"←"} ${esc(e.label||"зв'язок")} · ${esc(who(o))}</button>`}).join("")}</div>`:""};
+  q(".themes").innerHTML=`<h2 class="label">Цитати за темами</h2>`+list.map(t=>{
+    const names=[...new Set(t.cards.filter(c=>c.src).map(who))];
+    return`<details class="th${isSrc(t)?" srcs":""}"${t.g.id?` id="th-${esc(t.g.id)}"`:""}><summary><span>${esc(t.g.label||"Без назви")}</span><small>${t.cards.length}</small>${names.length?`<em>${esc(names.join(", "))}</em>`:""}</summary>
+      <ol>${t.cards.map(c=>`<li class="qt" id="qt-${esc(c.id)}" style="--c:${col(c.color)}">${body(c)}${rels(c)}</li>`).join("")}</ol></details>`}).join("");
+  q(".themes").addEventListener("click",e=>{const b=e.target.closest("[data-to]");if(b)show(b.dataset.to)});
+  // to a card or a theme: open it, bring it into view, let it blink
+  function show(id){const el=pane.querySelector("#qt-"+CSS.escape(id))||pane.querySelector("#th-"+CSS.escape(id));if(!el)return;
+    const d=el.closest("details");if(d)d.open=true;
+    el.scrollIntoView({block:"center",behavior:REDUCED?"auto":"smooth"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}
 
-  // arrows: from the middle of a side, curving out along it, as Obsidian draws them
-  const side=(x,s)=>{const X=x.x+CV_PAD,Y=x.y+CV_PAD;return s==="top"?[X+x.w/2,Y,0,-1]:s==="bottom"?[X+x.w/2,Y+x.h,0,1]:s==="left"?[X,Y+x.h/2,-1,0]:[X+x.w,Y+x.h/2,1,0]};
-  function guess(a,b){const dx=(b.x+b.w/2)-(a.x+a.w/2),dy=(b.y+b.h/2)-(a.y+a.h/2);
-    return Math.abs(dx)>Math.abs(dy)?(dx>0?["right","left"]:["left","right"]):(dy>0?["bottom","top"]:["top","bottom"])}
-  B.edges.forEach((e,i)=>{
-    const a=NODES[e.a],b=NODES[e.b],g=guess(a,b),[x1,y1,nx1,ny1]=side(a,e.fs||g[0]),[x2,y2,nx2,ny2]=side(b,e.ts||g[1]);
-    const k=Math.max(40,Math.hypot(x2-x1,y2-y1)*.35),c1=[x1+nx1*k,y1+ny1*k],c2=[x2+nx2*k,y2+ny2*k];
-    const c=col(e.color)||col(a.color)||"var(--muted)";
-    const p=document.createElementNS("http://www.w3.org/2000/svg","path");
-    p.setAttribute("d",`M${x1},${y1} C${c1} ${c2} ${x2},${y2}`);p.style.stroke=c;p.dataset.i=i;svg.appendChild(p);
-    if(e.label){const l=document.createElement("span");l.className="bd-lbl";l.textContent=e.label;l.dataset.i=i;l.style.setProperty("--c",c.startsWith("var")?"var(--surface)":c);
-      l.style.left=(x1+3*c1[0]+3*c2[0]+x2)/8+"px";l.style.top=(y1+3*c1[1]+3*c2[1]+y2)/8+"px";bd.appendChild(l)}
-  });
-
-  function size(){Object.assign(bd.style,{width:W+"px",height:H+"px",transform:`scale(${scale})`});svg.setAttribute("width",W);svg.setAttribute("height",H);
-    sizer.style.width=W*scale+(read.hidden?0:read.offsetWidth)+"px";sizer.style.height=H*scale+"px";q(".bd-zv").textContent=Math.round(scale*100)+"%"}
-  const zoom=s=>{scale=Math.min(1.5,Math.max(.15,s));size()};
-  const fit=()=>zoom(Math.min(1,(vp.clientWidth-4)/W,Math.max(.45,(vp.clientHeight-4)/H)));
-
-  function focus(id){focused=id;paint();document.querySelectorAll(".prose a[data-q]").forEach(a=>a.classList.toggle("on",BYQ[a.dataset.q]===(id||selected)))}
-  function paint(){
-    const f=focused||selected,near=new Set();
-    if(f){near.add(f);B.edges.forEach(e=>{if(e.a===f||e.b===f){near.add(e.a);near.add(e.b)}})}
-    for(const[id,el]of Object.entries(els)){if(NODES[id].type==="group")continue;
-      el.classList.toggle("bd-faded",!!f&&!near.has(id));el.classList.toggle("hot",!!f&&near.has(id)&&id!==f);el.classList.toggle("sel",id===selected)}
-    B.edges.forEach((e,i)=>{const off=!!f&&e.a!==f&&e.b!==f;
-      svg.querySelector(`path[data-i="${i}"]`)?.classList.toggle("bd-faded",off);bd.querySelector(`.bd-lbl[data-i="${i}"]`)?.classList.toggle("bd-faded",off)});
-  }
-  const short=x=>x.type==="text"?(x.plain.length>110?x.plain.slice(0,110)+"…":x.plain):x.label||x.title||x.url||x.img||"";
-  function select(id,reveal){
-    selected=id;focus(null);
-    if(!id){read.hidden=true;size();return}
-    const x=NODES[id],rel=B.edges.filter(e=>e.a===id||e.b===id),c=col(x.color)||"var(--rule)";
-    read.style.setProperty("--c",c);read.hidden=false;
-    read.innerHTML=`<button class="x" aria-label="Закрити">×</button>${x.src?`<span class="chip">${esc(x.src)}</span>`:""}
-      <blockquote class="prose">${x.html}</blockquote>
-      ${rel.length?`<h4 class="label">Зв'язки</h4><ul>${rel.map(e=>{const o=NODES[e.a===id?e.b:e.a];
-        return`<li><button data-go="${esc(o.id)}" style="--c:${col(o.color)||"var(--rule)"}"><small>${esc(e.label||"зв'язок")}${o.src?" · "+esc(o.src):""}</small>${esc(short(o))}</button></li>`}).join("")}</ul>`:""}`;
-    read.querySelector(".x").onclick=()=>select(null);
-    read.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const o=NODES[b.dataset.go];o.type==="text"?select(o.id,true):reveal_(o.id)});
-    size();if(reveal)reveal_(id);
-  }
-  function reveal_(id){const x=NODES[id];vp.scrollTo({left:(x.x+CV_PAD+x.w/2)*scale-(vp.clientWidth-(read.hidden?0:read.offsetWidth))/2,top:(x.y+CV_PAD)*scale-vp.clientHeight/4,behavior:REDUCED?"auto":"smooth"})}
-  vp.addEventListener("click",e=>{if(!e.target.closest(".bd-card,.bd-lbl")&&selected)select(null)});
-  host.querySelector(".bd-tools").addEventListener("click",e=>{const b=e.target.closest("[data-z]");if(b)b.dataset.z==="fit"?fit():zoom(scale+ +b.dataset.z*.1)});
-  vp.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();zoom(scale-e.deltaY*.002)}},{passive:false});
-  // first look: readable cards, scroll for the rest; «уся дошка» shows everything
-  requestAnimationFrame(()=>{if(host.isConnected)zoom(Math.min(1,Math.max(.45,(vp.clientWidth-4)/W)))});
-  board={select:qid=>{const id=BYQ[qid]||(NODES[qid]&&qid);if(id&&NODES[id].type==="text")select(id,true)},focus:qid=>focus(qid?BYQ[qid]||null:null),host};
+  // the margin: one note per quote, in the order the text first points to them
+  const refs=[],seen=new Set();
+  prose.querySelectorAll("a[data-q]").forEach(a=>{const id=BYQ[a.dataset.q];if(id&&!seen.has(id)){seen.add(id);refs.push([a,NODES[id]])}});
+  const note=(x,cls)=>{const el=document.createElement("aside");el.className="sn "+cls;el.style.setProperty("--c",col(x.color));el.dataset.q=x.qid;
+    el.innerHTML=body(x)+`<button class="to" data-to="${esc(x.id)}">у темі ↓</button>`;
+    el.addEventListener("click",e=>{const b=e.target.closest("[data-to]");if(b){show(b.dataset.to);return}if(!e.target.closest("a")){el.classList.toggle("open");layout()}});
+    return el};
+  const notes=wide?refs.map(([a,x])=>[a,margin.appendChild(note(x,""))]):[];
+  // each note as high as its line, pushed down when the one above still takes the place
+  function layout(){if(!wide)return;const top=essay.getBoundingClientRect().top;let y=0;
+    notes.forEach(([a,el])=>{const m=el.querySelector(".md");if(m)el.classList.toggle("over",m.scrollHeight>m.clientHeight+2);const t=Math.max(a.getBoundingClientRect().top-top,y);el.style.top=t+"px";y=t+el.offsetHeight+18});
+    margin.style.minHeight=y+"px"}
+  if(wide){layout();new ResizeObserver(layout).observe(prose);document.fonts&&document.fonts.ready.then(layout)}
+  function select(qid){const id=BYQ[qid];if(!id)return;
+    if(wide){const el=notes.find(([,el])=>el.dataset.q===qid)?.[1];if(!el){show(id);return}
+      el.classList.add("open");layout();el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");return}
+    // narrow: the quote opens under the paragraph, a second click closes it
+    const a=prose.querySelector(`a[data-q="${CSS.escape(qid)}"]`),at=a.closest("li,p,blockquote,h2,h3,h4")||a,next=at.nextElementSibling;
+    if(next&&next.matches(".sn.inline")&&next.dataset.q===qid){next.remove();return}
+    at.after(note(NODES[id],"inline open"))}
+  function focus(qid){margin.querySelectorAll(".sn").forEach(el=>el.classList.toggle("hot",!!qid&&el.dataset.q===qid));
+    prose.querySelectorAll("a[data-q]").forEach(a=>a.classList.toggle("on",!!qid&&a.dataset.q===qid))}
+  board={select,focus,host:pane};
   return board;
 }
 function makeBoard(host,n){
-  if(n.board.canvas)return makeCanvas(host,n);
   const B=n.board,key="board:"+n.id,NODES={};
   B.sources.forEach((s,i)=>{s.c=BD_COLORS[i%BD_COLORS.length];s.head=true;s.src=s;s.plain=s.title.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'");NODES[s.id]=s});
   B.quotes.forEach(q=>{q.src=NODES[q.src];NODES[q.id]=q});
