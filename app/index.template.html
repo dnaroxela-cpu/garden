@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sasha's Garden</title>
+<title>Alexandra Maiboroda</title>
 <meta name="description" content="Цифровий сад Саші: живі нотатки з Obsidian про цікавість, освіту, подив та дизайн.">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
 <style>html{color-scheme:light;-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -289,15 +290,15 @@ body{padding-bottom:32px}
 :root[data-dir="index"] .head h1::before{content:"/ "}
 :root[data-dir="index"] .head p{color:var(--muted);max-width:70ch}
 :root[data-dir="index"] .cards{grid-template-columns:1fr;gap:0}
-:root[data-dir="index"] .card{display:grid;grid-template-columns:120px minmax(0,1fr) minmax(0,220px) 80px;gap:16px;align-items:baseline;padding-block:9px;border-top:1px solid var(--rule)}
+:root[data-dir="index"] .card{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,220px) 80px;gap:16px;align-items:baseline;padding-block:9px;border-top:1px solid var(--rule)}
 :root[data-dir="index"] .card .top{display:contents}
-:root[data-dir="index"] .card .top .g{grid-column:1;grid-row:1}
+:root[data-dir="index"] .card .top .g{grid-column:1;grid-row:1;white-space:nowrap}
 :root[data-dir="index"] .card .top .mono{grid-column:4;grid-row:1;text-align:right}
 :root[data-dir="index"] .card h3{grid-column:2;grid-row:1;font-size:15px;font-weight:400}
 :root[data-dir="index"] .card p{display:none}
 :root[data-dir="index"] .card>.mono{grid-column:3;grid-row:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 :root[data-dir="index"] .card:hover{background:linear-gradient(90deg,#ff00801a,#ffe0001a,#7b6cf01a)}
-@media (max-width:640px){:root[data-dir="index"] .card{grid-template-columns:90px minmax(0,1fr) 60px}:root[data-dir="index"] .card>.mono{display:none}:root[data-dir="index"] .card .top .mono{grid-column:3}}
+@media (max-width:640px){:root[data-dir="index"] .card .top .g{white-space:normal}:root[data-dir="index"] .card{grid-template-columns:90px minmax(0,1fr) 60px}:root[data-dir="index"] .card>.mono{display:none}:root[data-dir="index"] .card .top .mono{grid-column:3}}
 :root[data-dir="index"] .note h1{font-size:24px;font-weight:500;letter-spacing:0}
 :root[data-dir="index"] .row .t,:root[data-dir="index"] .sec b{font-size:15px}
 :root[data-dir="index"] .quote{font-size:16px;font-style:normal}
@@ -746,7 +747,7 @@ footer.site-foot{margin-top:72px;display:grid;grid-template-columns:minmax(0,1fr
 .foot-links a:hover{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .foot-meta{margin-top:auto;padding-top:24px;font-size:12px;color:var(--muted)}
 body.on-note footer.site-foot{margin-top:0}
-body.on-home footer.site-foot{margin-top:0}
+body.on-home footer.site-foot{display:none}
 @media (max-width:900px){footer.site-foot{grid-template-columns:1fr}.site-foot .home-quote{padding-right:0}.foot-links{padding-left:0;border-left:0;border-top:1px solid var(--rule)}}
 /* garden journal + trails */
 .journal{margin-top:14px}
@@ -800,10 +801,9 @@ body.on-home footer.site-foot{margin-top:0}
 <div class="progress" aria-hidden="true"></div>
 <div class="wrap">
   <header class="bar">
-    <a class="logo" href="#home" data-go="home"><span class="rb">Sasha's Garden</span></a>
+    <a class="logo" href="#home" data-go="home"><span class="rb">Alexandra Maiboroda</span></a>
     <nav aria-label="Розділи">
       <button data-go="garden">Сад</button>
-      <button data-go="blog">Есеї</button>
       <button data-go="shelf">Полиця</button>
       <button data-go="map">Мапа</button>
       <span class="nav-ind" aria-hidden="true"></span>
@@ -838,11 +838,11 @@ body.on-home footer.site-foot{margin-top:0}
       </div>
       </div>
     </div>
-    <section class="home-shelf" aria-label="Полиця">
+    <section class="home-shelf" aria-label="Полиця" hidden>
       <div class="hs-h"><span class="label">Полиця книжок</span><a href="#shelf" data-go="shelf" class="mono">усі конспекти →</a></div>
       <div class="hs-row" id="home-shelf"></div>
     </section>
-    <div class="home-below solo">
+    <div class="home-below solo" hidden>
       <div><div class="label">Стежки</div><div class="trails" id="trails"></div></div>
     </div>
   </section>
@@ -858,19 +858,11 @@ body.on-home footer.site-foot{margin-top:0}
   <section class="view" id="v-garden" hidden>
     <div class="head">
       <h1>Сад</h1>
-      <p>Живі нотатки з мого Obsidian-сховища: від перших ескізів до завершених текстів. Обери тему або просто блукай.</p>
+      <p>Живі нотатки з мого Obsidian-сховища: fleeting notes — швидкі думки й начерки, permanent notes — те, що вже дозріло. Обери тему або просто блукай.</p>
     </div>
     <div class="chips" id="chips"></div>
     <div class="legend" id="legend"></div>
     <div class="cards" id="cards"></div>
-  </section>
-
-  <section class="view" id="v-blog" hidden>
-    <div class="head">
-      <h1>Есеї</h1>
-      <p>Тексти, які вже дозріли до читання від початку до кінця. Зараз це розділ Blog Notes.</p>
-    </div>
-    <ul class="list" id="essays"></ul>
   </section>
 
   <section class="view" id="v-journal" hidden>
@@ -911,7 +903,7 @@ body.on-home footer.site-foot{margin-top:0}
       <span class="label">Де ще мене знайти</span>
       <a href="https://www.instagram.com/dnaroxela/" target="_blank" rel="noopener">Instagram <span>↗</span></a>
       <a href="https://t.me/curiositytechnique" target="_blank" rel="noopener">Telegram-канал <span>↗</span></a>
-      <p class="mono foot-meta">Sasha's Garden · <span id="foot"></span> · <a href="#journal" data-go="journal">журнал саду →</a></p>
+      <p class="mono foot-meta">Alexandra Maiboroda · <span id="foot"></span> · <a href="#journal" data-go="journal">журнал саду →</a></p>
     </div>
   </footer>
 </div>
@@ -924,10 +916,11 @@ body.on-home footer.site-foot{margin-top:0}
 <script>
 const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>b.date-a.date);
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
-const STATUS={"Seeds":"seedling","Book Reviews":"budding","Blog Notes":"evergreen"};
-const STL={seedling:"ескіз",budding:"в роботі",evergreen:"завершене"};
-const FOLDER_UA={"Seeds":"Чернетки","Book Reviews":"Книжки","Blog Notes":"Есеї","Videos + podcasts":"Посилання","Links":"Посилання"};
-NOTES.forEach(n=>{n.status=STATUS[n.folder]||"seedling";n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
+const MEDIA_RE=/^(links|посилання|videos \+ podcasts)$/i;
+const STATUS={"Seeds":"seedling","Blog Notes":"evergreen"};
+const STL={seedling:"флітінг ноутс",evergreen:"перманент ноутс"};
+const FOLDER_UA={"Seeds":"Флітінг ноутс","Book Reviews":"Книжки","Blog Notes":"Перманент ноутс","Videos + podcasts":"Посилання","Links":"Посилання"};
+NOTES.forEach(n=>{n.status=STATUS[n.folder]||(n.folder==="Book Reviews"||MEDIA_RE.test(n.folder)?null:"seedling");n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
 NOTES.forEach(n=>n.links.forEach(l=>BY[l]&&BY[l].back.push(n.id)));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -948,7 +941,8 @@ function statusSvg(st,size=14,v=VAR){const l=LV[st],s=size;
  if(v==="signal"){return`<svg class="si" width="${s}" height="${s}" viewBox="0 0 14 14" aria-hidden="true">${[0,1,2].map(i=>`<rect x="${i*4.6+.5}" y="${10-i*4}" width="3.4" height="${3+i*4}" fill="currentColor" opacity="${i<=l?1:.2}"/>`).join("")}</svg>`}
  if(v==="line"){const d=["1 3","4 2.5","none"][l];return`<svg class="si" width="${s*1.6}" height="${s}" viewBox="0 0 22 14" aria-hidden="true"><defs><linearGradient id="lg${l}${s}" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="21" y2="0"><stop offset="0" stop-color="#ff0080"/><stop offset=".5" stop-color="#ffe000"/><stop offset="1" stop-color="#7b6cf0"/></linearGradient></defs><line x1="1" y1="7" x2="21" y2="7" stroke="${l===2?`url(#lg${l}${s})`:"currentColor"}" stroke-width="2" stroke-linecap="round" stroke-dasharray="${d}"/></svg>`}
  return`<svg class="si" width="${s*1.4}" height="${s}" viewBox="0 0 20 14" aria-hidden="true">${[0,1,2].map(i=>`<circle cx="${3+i*7}" cy="7" r="2.6" fill="${i<=l?RBC[[0,2,4][i]]:"none"}" stroke="${i<=l?RBC[[0,2,4][i]]:"currentColor"}" stroke-width="1" opacity="${i<=l?1:.35}"/>`).join("")}</svg>`}
-const glyph=(st,size=14)=>statusSvg(st,size);
+const glyph=(st,size=14)=>st?statusSvg(st,size):"";
+const stl=n=>STL[n.status]||FOLDER_UA[n.folder]||n.folder||"";
 const fmt=(ms,y)=>new Date(ms).toLocaleDateString("uk-UA",y?{day:"numeric",month:"short",year:"numeric"}:{day:"numeric",month:"short"});
 const short=t=>t.replace(/^Book\s+/,"").replace(/[«»]/g,"");
 const hash=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)};
@@ -956,7 +950,7 @@ const words=n=>n.html.replace(/<[^>]+>/g," ").split(/\s+/).filter(Boolean).lengt
 const noteRow=n=>`<li><a class="row" href="#note" data-note="${n.id}"><span class="g">${glyph(n.status)}</span><span class="t">${esc(short(n.title))}</span><span class="lead"></span><span class="d">${fmt(n.date)}</span></a></li>`;
 
 // home
-const recentRow=n=>`<li><a class="rrow" href="#note" data-note="${n.id}"><span class="rd">${fmt(n.date)}</span><span class="rt"><span class="t">${esc(short(n.title))}</span><span class="rm">${glyph(n.status,11)}${STL[n.status]}${n.tags[0]?` · #${esc(n.tags[0])}`:""}</span></span></a></li>`;
+const recentRow=n=>`<li><a class="rrow" href="#note" data-note="${n.id}"><span class="rd">${fmt(n.date)}</span><span class="rt"><span class="t">${esc(short(n.title))}</span><span class="rm">${glyph(n.status,11)}${stl(n)}${n.tags[0]?` · #${esc(n.tags[0])}`:""}</span></span></a></li>`;
 if($("#recent"))$("#recent").innerHTML=NOTES.slice(0,5).map(recentRow).join("");
 const count=f=>NOTES.filter(n=>n.folder===f).length;
 $("#foot").textContent="оновлено "+fmt(NOTES[0].date,true);
@@ -1061,27 +1055,29 @@ showQ();$("#qbtn").onclick=showQ;
 const TAGS=Object.entries(NOTES.flatMap(n=>n.tags).reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]);
 let tagF="Усі",statusF=null;
 function renderVariants(){}
-function rerenderAll(){renderVariants();renderGarden();if($("#recent"))$("#recent").innerHTML=NOTES.slice(0,5).map(recentRow).join("");$("#essays").innerHTML=NOTES.filter(n=>n.folder==="Blog Notes").map(noteRow).join("");if(!$("#v-note").hidden)renderNote()}
+function rerenderAll(){renderVariants();renderGarden();if($("#recent"))$("#recent").innerHTML=NOTES.slice(0,5).map(recentRow).join("");if(!$("#v-note").hidden)renderNote()}
 function renderGarden(){
-  const chips=[["Усі",NOTES.length],...TAGS.filter(([t,c])=>c>1||t===tagF)];
+  const GARDEN=NOTES.filter(n=>n.status);
+  const GT=Object.entries(GARDEN.flatMap(n=>n.tags).reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]);
+  const chips=[["Усі",GARDEN.length],...GT.filter(([t,c])=>c>1||t===tagF)];
   $("#chips").innerHTML=chips.map(([t,c])=>`<button class="chip" aria-pressed="${t===tagF}" data-tagf="${esc(t)}">${t==="Усі"?t:"#"+esc(t)}<i>${c}</i></button>`).join("");
   $("#legend").innerHTML=Object.entries(STL).map(([k,v])=>`<button class="g" data-st="${k}" aria-pressed="${statusF===k}">${glyph(k)}${v} · ${NOTES.filter(n=>n.status===k).length}</button>`).join("");
-  const list=NOTES.filter(n=>(tagF==="Усі"||n.tags.includes(tagF))&&(!statusF||n.status===statusF));
-  $("#cards").innerHTML=list.map(n=>`<button class="card" data-note="${n.id}"><div class="top"><span class="g">${glyph(n.status)}${STL[n.status]}</span><span class="mono">${fmt(n.date)}</span></div><h3>${esc(short(n.title))}</h3><p>${esc(n.excerpt)}</p><span class="mono">${n.tags.map(t=>"#"+t).join(" ")||FOLDER_UA[n.folder]}</span></button>`).join("")||`<p class="empty">Тут поки нічого не росте.</p>`;
+  const list=GARDEN.filter(n=>(tagF==="Усі"||n.tags.includes(tagF))&&(!statusF||n.status===statusF));
+  $("#cards").innerHTML=list.map(n=>`<button class="card" data-note="${n.id}"><div class="top"><span class="g">${glyph(n.status)}${stl(n)}</span><span class="mono">${fmt(n.date)}</span></div><h3>${esc(short(n.title))}</h3><p>${esc(n.excerpt)}</p><span class="mono">${n.tags.map(t=>"#"+t).join(" ")||FOLDER_UA[n.folder]}</span></button>`).join("")||`<p class="empty">Тут поки нічого не росте.</p>`;
 }
 
 $("#chips").addEventListener("click",e=>{const b=e.target.closest("[data-tagf]");if(b){tagF=b.dataset.tagf;renderGarden()}});
 $("#legend").addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(b){statusF=statusF===b.dataset.st?null:b.dataset.st;renderGarden()}});
 renderVariants();renderGarden();
 
-$("#essays").innerHTML=NOTES.filter(n=>n.folder==="Blog Notes").map(noteRow).join("");
+
 
 // note
 let current=(NOTES.find(n=>n.title==="Цифровий сад")||NOTES[0]).id;
 function related(n){
   return NOTES.filter(m=>m.id!==n.id).map(m=>[m,m.tags.filter(t=>n.tags.includes(t)).length]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]||b[0].date-a[0].date).slice(0,5).map(x=>x[0]);
 }
-const linkItem=m=>`<a href="#note" data-note="${m.id}">${esc(short(m.title))}<small>${STL[m.status]} · ${fmt(m.date)}</small></a>`;
+const linkItem=m=>`<a href="#note" data-note="${m.id}">${esc(short(m.title))}<small>${stl(m)} · ${fmt(m.date)}</small></a>`;
 const PANE_W=()=>innerWidth<720?innerWidth:600, SPINE=40;
 const narrow=()=>innerWidth<720;
 function paneHTML(n,i,closable){
@@ -1089,7 +1085,7 @@ function paneHTML(n,i,closable){
     <button class="pane-spine" data-focus="${i}" aria-label="Повернутися до «${esc(short(n.title))}»"><span>${esc(short(n.title))}</span></button>
     <div class="pane-in">
       <div class="pane-top"><div class="crumbs"><a href="#garden" data-go="garden">Сад</a> › ${FOLDER_UA[n.folder]||n.folder}</div>${closable?`<button class="pane-x" data-close="${i}" aria-label="Закрити панель">×</button>`:""}</div>
-      <div class="meta"><span class="g">${glyph(n.status,14)}${STL[n.status]}</span><span class="mt">оновлено ${fmt(n.date,true)} · ${Math.max(1,Math.round(words(n)/200))} хв читання</span></div>
+      <div class="meta"><span class="g">${glyph(n.status,14)}${stl(n)}</span><span class="mt">оновлено ${fmt(n.date,true)} · ${Math.max(1,Math.round(words(n)/200))} хв читання</span></div>
       <h1>${esc(short(n.title))}</h1>${n.book?`<p class="byline">${esc(n.book.split("·")[0].trim())}${/·\s*\d{4}/.test(n.book)?` <span>· ${n.book.match(/(\d{4})/)[1]}</span>`:""}</p>`:""}
       <div class="tags">${n.tags.map(t=>`<a href="#garden" data-tag="${esc(t)}">#${esc(t)}</a>`).join("")}</div>
       ${n.board&&n.board.canvas?`<div class="essay"><div class="prose">${n.html}</div><div class="sn-col" aria-label="На полях"></div></div><section class="themes" data-quotes="${n.id}"></section>`
@@ -1790,7 +1786,7 @@ function hovercard(){const hc=$("#hovercard");const n=bigSim&&bigSim.hover;
   if(!n){hc.hidden=true;return}
   const v=bigSim.view,x=n.x*v.s+v.x,y=n.y*v.s+v.y;
   if(n.kind==="tag"){const c=NOTES.filter(m=>m.tags.includes(n.id.slice(1))).length;hc.innerHTML=`<b>${esc(n.t)}</b><small>${c} нотаток · натисни, щоб відфільтрувати сад</small>`}
-  else{const m=BY[n.id];hc.innerHTML=`<span class="g">${glyph(m.status)}${STL[m.status]} · ${fmt(m.date)}</span><b>${esc(short(m.title))}</b><p>${esc(m.excerpt)}</p><button class="linkbtn hint-touch hc-open">відкрити нотатку →</button>`}
+  else{const m=BY[n.id];hc.innerHTML=`<span class="g">${glyph(m.status)}${stl(m)} · ${fmt(m.date)}</span><b>${esc(short(m.title))}</b><p>${esc(m.excerpt)}</p><button class="linkbtn hint-touch hc-open">відкрити нотатку →</button>`}
   hc.hidden=false;const W=bigSim.w,H=bigSim.h;hc.style.left=Math.max(8,Math.min(x+16,W-hc.offsetWidth-8))+"px";
   // keep the card clear of the map tools at the bottom: below the dot if it fits, otherwise above it
   const ch=hc.offsetHeight,tools=$("#stage .maptools"),top=tools&&tools.offsetTop<H/2;
@@ -1851,7 +1847,7 @@ document.addEventListener("click",e=>{
   const n=e.target.closest("[data-note]");if(n){e.preventDefault();openNote(n.dataset.note);return}
   const t=e.target.closest("[data-tag]");if(t){e.preventDefault();tagF=t.dataset.tag;statusF=null;renderGarden();go("garden");return}
   const a=e.target.closest("[data-go]");if(a){e.preventDefault();if(a.dataset.go==="note")renderNote();go(a.dataset.go)}});
-function fromHash(){let v=(location.hash||"#home").slice(1);if(v.startsWith("n=")){const id=decodeURIComponent(v.slice(2));if(BY[id]){openNote(id);return}v="home"}if(v==="note")renderNote();go(document.getElementById("v-"+v)?v:"home")}
+function fromHash(){let v=(location.hash||"#home").slice(1);if(v==="blog")v="garden";if(v.startsWith("n=")){const id=decodeURIComponent(v.slice(2));if(BY[id]){openNote(id);return}v="home"}if(v==="note")renderNote();go(document.getElementById("v-"+v)?v:"home")}
 fromHash();addEventListener("hashchange",fromHash);
 
 
@@ -1916,7 +1912,7 @@ function isDark(){const r=document.documentElement;return r.dataset.dir==="negat
 function syncDark(){document.documentElement.classList.toggle("is-dark",isDark())}
 syncDark();matchMedia("(prefers-color-scheme: dark)").addEventListener("change",syncDark);
 $("#mode").onclick=e=>{
-  const flip=()=>{const r=document.documentElement;r.dataset.theme=isDark()?"light":"dark";syncDark();drawAll()};
+  const flip=()=>{const r=document.documentElement;r.dataset.theme=isDark()?"light":"dark";try{localStorage.setItem("theme",r.dataset.theme)}catch(err){}syncDark();drawAll()};
   if(!document.startViewTransition||REDUCED){flip();return}
   const b=e.currentTarget.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2,R=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
   document.startViewTransition(flip).ready.then(()=>document.documentElement.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${R}px at ${x}px ${y}px)`]},{duration:750,easing:"cubic-bezier(.2,.8,.2,1)",pseudoElement:"::view-transition-new(root)"})).catch(()=>{});

@@ -43,6 +43,22 @@ function fmTags(fm) {
   return (Array.isArray(v) ? v : String(v).split(/[,\s]+/)).map(t => String(t).trim().replace(/^#/, '')).filter(Boolean);
 }
 
+// Розділи сайту ← папки сховища. Шлях порівнюється за початком, перший збіг виграє,
+// регістр не важливий. Нотатки з інших папок потрапляють у Сад під назвою своєї верхньої папки.
+const SECTIONS = [
+  ['Literature Notes/Books', 'Book Reviews'], // Полиця → книжки
+  ['Literature Notes/Links', 'Links'],        // Полиця → посилання
+  ['Permanent notes', 'Blog Notes'],          // Есеї
+  ['Fleeting Notes', 'Seeds'],                // Сад → чернетки
+  ['Book Reviews', 'Book Reviews'], ['Blog Notes', 'Blog Notes'], ['Seeds', 'Seeds'], // старі назви
+];
+function section(file) {
+  if (!file.folder) return null;
+  const p = file.folder.split(path.sep).join('/'), low = p.toLowerCase();
+  const hit = SECTIONS.find(([dir]) => { const d = dir.toLowerCase(); return low === d || low.startsWith(d + '/'); });
+  return hit ? hit[1] : p.split('/')[0];
+}
+
 function readFiles(dir, base = dir) {
   const results = [];
   const items = fs.readdirSync(dir);
@@ -244,7 +260,7 @@ body.hero-page .quote-refresh:hover { border-color:rgba(255,255,255,.75); }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${title} — Sasha's Garden</title>
+<title>${title} — Alexandra Maiboroda</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -994,7 +1010,7 @@ function renderResearchPage(files, graphData) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Map of Inquiry — Sasha's Garden</title>
+<title>Map of Inquiry — Alexandra Maiboroda</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -1134,7 +1150,7 @@ async function build() {
   const files = readFiles(VAULT);
   const treeHtml = renderTree(files);
   const graphData = buildGraphData(files);
-  const bookFiles = files.filter(f => f.folder && f.folder.startsWith('Book Reviews'));
+  const bookFiles = files.filter(f => section(f) === 'Book Reviews');
   const coversCache = await resolveCovers(bookFiles);
 
   // Homepage — Map of Inquiry (full-viewport graph, floating blurred menu) is now the site's index.html
@@ -1393,7 +1409,7 @@ const { wikiLookup, tidyGenres } = require('./wiki');
 
 function redirectPage(target, title) {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><title>${esc(title)} — Sasha's Garden</title>
+  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><title>${esc(title)} — Alexandra Maiboroda</title>
 <meta http-equiv="refresh" content="0; url=${esc(target)}"><link rel="canonical" href="${esc(target)}">
 <script>location.replace(${JSON.stringify(target)})</script></head>
 <body><p><a href="${esc(target)}">${esc(title)}</a></p></body></html>`;
@@ -1608,9 +1624,9 @@ async function buildApp(files, coversCache) {
     const block = s => noteLinks(resolveMdLinks(marked(convertEmbeds(convertWikilinks(s, files), file)), files))
       .replace(/==([^=]+)==/g, '<mark>$1</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
     const noteId = t => { const f = files.find(x => x.title.trim().toLowerCase() === t.trim().toLowerCase()); const s = f && path.basename(f.slug); return s && ids.has(s) ? s : null; };
-    const isBook = file.folder.startsWith('Book Reviews');
+    const isBook = section(file) === 'Book Reviews';
     return {
-      id, title: file.title, folder: file.folder.split(path.sep)[0], tags: file.tags,
+      id, title: file.title, folder: section(file), tags: file.tags,
       excerpt: noteExcerpt(board ? board.intro : file.raw), date: file.dateMs, links: [...links],
       book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
       cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
@@ -1676,7 +1692,7 @@ async function buildApp(files, coversCache) {
   // old URLs → the app
   const put = (name, target, title) => { fs.writeFileSync(path.join(OUT, name), redirectPage(target, title)); written.add(name); };
   for (const n of data) put(`${n.id}.html`, `index.html#n=${encodeURIComponent(n.id)}`, n.title);
-  put('blog.html', 'index.html#blog', 'Есеї');
+  put('blog.html', 'index.html#garden', 'Сад');
   put('books.html', 'index.html#shelf', 'Полиця');
   put('seeds.html', 'index.html#garden', 'Сад');
   put('research.html', 'index.html#map', 'Мапа');
