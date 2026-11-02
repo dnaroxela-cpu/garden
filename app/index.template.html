@@ -297,7 +297,9 @@ body{padding-bottom:32px}
 :root[data-dir="index"] .card h3{grid-column:2;grid-row:1;font-size:15px;font-weight:400}
 :root[data-dir="index"] .card p{display:none}
 :root[data-dir="index"] .card>.mono{grid-column:3;grid-row:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-:root[data-dir="index"] .card:hover{background:linear-gradient(90deg,#ff00801a,#ffe0001a,#7b6cf01a)}
+:root[data-dir="index"] .card{position:relative;isolation:isolate}
+:root[data-dir="index"] .card::before{content:"";position:absolute;inset:0 calc(-1 * var(--g));z-index:-1;background:linear-gradient(90deg,#ff00801a,#ffe0001a,#7b6cf01a);opacity:0;transition:opacity .15s}
+:root[data-dir="index"] .card:hover::before,:root[data-dir="index"] .card:focus-visible::before{opacity:1}
 @media (max-width:640px){:root[data-dir="index"] .card .top .g{white-space:normal}:root[data-dir="index"] .card{grid-template-columns:90px minmax(0,1fr) 60px}:root[data-dir="index"] .card>.mono{display:none}:root[data-dir="index"] .card .top .mono{grid-column:3}}
 :root[data-dir="index"] .note h1{font-size:24px;font-weight:500;letter-spacing:0}
 :root[data-dir="index"] .row .t,:root[data-dir="index"] .sec b{font-size:15px}
@@ -648,6 +650,10 @@ body.on-note footer{margin-top:24px}
 .row-sp{display:flex;flex-wrap:wrap;align-items:flex-end;gap:28px 3px}
 .sp-cell{display:flex;flex-direction:column;align-items:center;gap:6px}
 .grp.full{flex:1 1 100%}
+.grp.now .row-sp{gap:28px 14px}
+.hcover.shelf-now{height:240px}
+.hcover.shelf-now[aria-expanded="true"]{outline:2px solid var(--ink);outline-offset:3px}
+@media (max-width:600px){.hcover.shelf-now{height:190px}}
 .yr-h{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:10px;margin-bottom:6px;border-bottom:1px dotted var(--muted)}
 .yr-h b{font-family:var(--f-display);font-weight:700;font-size:22px}
 .sp-y.exact{color:var(--ink)}
@@ -806,7 +812,7 @@ body.on-home footer.site-foot{display:none}
       <button data-go="garden">Сад</button>
       <button data-go="shelf">Полиця</button>
       <button data-go="map">Мапа</button>
-      <span class="nav-ind" aria-hidden="true"></span>
+      
     </nav>
     <span class="crumb" id="crumb" aria-hidden="true"></span>
     <button class="mode" id="mode" aria-label="Перемкнути світлу чи темну тему" title="Світла / темна тема">
@@ -858,7 +864,7 @@ body.on-home footer.site-foot{display:none}
   <section class="view" id="v-garden" hidden>
     <div class="head">
       <h1>Сад</h1>
-      <p>Живі нотатки з мого Obsidian-сховища: fleeting notes — швидкі думки й начерки, permanent notes — те, що вже дозріло. Обери тему або просто блукай.</p>
+      <p>Живі нотатки з мого Obsidian-сховища: fleeting notes — швидкі думки й начерки, literature notes — конспекти книжок і матеріалів, permanent notes — те, що вже дозріло. Обери тему або просто блукай.</p>
     </div>
     <div class="chips" id="chips"></div>
     <div class="legend" id="legend"></div>
@@ -917,10 +923,10 @@ body.on-home footer.site-foot{display:none}
 const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>b.date-a.date);
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
 const MEDIA_RE=/^(links|посилання|videos \+ podcasts)$/i;
-const STATUS={"Seeds":"seedling","Blog Notes":"evergreen"};
-const STL={seedling:"флітінг ноутс",evergreen:"перманент ноутс"};
+const STATUS={"Seeds":"seedling","Book Reviews":"budding","Blog Notes":"evergreen"};
+const STL={seedling:"флітінг ноутс",budding:"літрачер ноутс",evergreen:"перманент ноутс"};
 const FOLDER_UA={"Seeds":"Флітінг ноутс","Book Reviews":"Книжки","Blog Notes":"Перманент ноутс","Videos + podcasts":"Посилання","Links":"Посилання"};
-NOTES.forEach(n=>{n.status=STATUS[n.folder]||(n.folder==="Book Reviews"||MEDIA_RE.test(n.folder)?null:"seedling");n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
+NOTES.forEach(n=>{n.status=STATUS[n.folder]||(MEDIA_RE.test(n.folder)?"budding":"seedling");n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
 NOTES.forEach(n=>n.links.forEach(l=>BY[l]&&BY[l].back.push(n.id)));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1442,7 +1448,12 @@ BOOKS.forEach((b,i)=>{b.spine=SPINES[i%SPINES.length];b.w=Math.round(24+40*Math.
 const ARR={read:"коли прочитала",color:"кольором",year:"роком видання",topic:"темою",length:"товщиною",timeline:"на шкалі часу"};
 let arrange="year";try{arrange=localStorage.getItem("shelfArrange2")||arrange}catch(e){}if(!ARR[arrange])arrange="color";
 const spineHTML=(b,extra="")=>`<button class="spine" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${b.w}px;height:${b.h}px;${extra}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}${b.year?", "+b.year:""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`;
+const coverHTML=b=>`<button class="hcover shelf-now" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" style="background:${b.spine[0]}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}${b.year?", "+b.year:""}"><span class="ph" style="color:${b.spine[1]}">${esc(short(b.title).split(/[.:]/)[0])}</span>${b.cover?`<img src="${esc(b.cover)}" alt="${esc(short(b.title))}" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</button>`;
 function groups(){
+  const ALL=BOOKS,BOOKS_=BOOKS.filter(b=>!b.reading),now=ALL.filter(b=>b.reading);
+  return(now.length?[["%Читаю зараз",now]]:[]).concat(groupsOf(BOOKS_));
+}
+function groupsOf(BOOKS){
   if(arrange==="color")return[[null,[...BOOKS].sort((a,b)=>a.hue-b.hue)]];
   if(arrange==="length")return[[null,[...BOOKS].sort((a,b)=>words(b)-words(a))]];
   if(arrange==="read"){const g={};BOOKS.forEach(b=>(g[b.readYear]=g[b.readYear]||[]).push(b));
@@ -1515,7 +1526,7 @@ function renderBooks(){
   const years=BOOKS.filter(b=>b.year).map(b=>b.year);
   let h=`<div class="shelf-bar"><div class="arr" role="group" aria-label="Розставити книжки"><span class="label">Розставити</span>${Object.entries(ARR).map(([k,v])=>`<button data-arr="${k}" aria-pressed="${k===arrange}">${v}</button>`).join("")}</div>
     <span class="mono">${BOOKS.length} конспектів · ${BOOKS.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів · ${Math.min(...years)}–${Math.max(...years)}</span></div>`;
-  const shelfHTML=arrange==="timeline"?`<div class="tl-wrap">${timelineHTML()}</div>`:`<div class="shelf">${groups().map(([label,list])=>`${label&&label[0]==="@"?`<div class="grp full"><div class="yr-h"><b>${label.slice(1)}</b><span class="mono">${list.length} ${list.length===1?"книжка":list.length<5?"книжки":"книжок"} · ${list.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів конспекту</span></div>`:`<div class="grp">${label?`<div class="grp-l">${esc(label)} <i>${list.length}</i></div>`:""}`}<div class="row-sp">${list.map(b=>`<div class="sp-cell">${spineHTML(b)}${arrange==="year"?`<span class="sp-y">${b.year||"—"}</span>`:arrange==="read"?`<span class="sp-y${b.readExact?" exact":""}" title="${b.reading?"читаю зараз":b.readExact?"коли прочитала":"дата конспекту"}">${b.readLabel}</span>`:""}</div>`).join("")}</div></div>`).join("")}</div>`;
+  const shelfHTML=arrange==="timeline"?`<div class="tl-wrap">${timelineHTML()}</div>`:`<div class="shelf">${groups().map(([label,list])=>`${label&&label[0]==="@"?`<div class="grp full"><div class="yr-h"><b>${label.slice(1)}</b><span class="mono">${list.length} ${list.length===1?"книжка":list.length<5?"книжки":"книжок"} · ${list.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів конспекту</span></div>`:`<div class="grp${label&&label[0]==="%"?" now":""}">${label?`<div class="grp-l">${esc(label[0]==="%"?label.slice(1):label)} <i>${list.length}</i></div>`:""}`}<div class="row-sp">${list.map(b=>`<div class="sp-cell">${label&&label[0]==="%"?coverHTML(b):spineHTML(b)}${arrange==="year"?`<span class="sp-y">${b.year||"—"}</span>`:arrange==="read"?`<span class="sp-y${b.readExact?" exact":""}" title="${b.reading?"читаю зараз":b.readExact?"коли прочитала":"дата конспекту"}">${b.readLabel}</span>`:""}</div>`).join("")}</div></div>`).join("")}</div>`;
   h+=`<div class="shelf-area${arrange==="timeline"?" tl-mode":""}"><div class="shelf-main">${shelfHTML}</div>${pileHTML()}</div>`;
   h+=threadStripHTML();
   h+=`<svg class="threads" aria-hidden="true"></svg>`;
@@ -1524,7 +1535,7 @@ function renderBooks(){
   if(before.size&&!REDUCED)box.querySelectorAll(".spine").forEach(s=>{const a=before.get(s.dataset.book);if(!a)return;const b=s.getBoundingClientRect();const dx=a.left-b.left,dy=a.bottom-b.bottom;if(!dx&&!dy)return;
     s.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:"none"}],{duration:650+Math.random()*250,easing:"cubic-bezier(.2,.8,.2,1)"})});
 }
-const shelfStack=new Stack($("#shelf-panes"),{closeFirst:true,onEmpty:()=>{document.body.classList.remove("book-open");renderBooks()},onChange:()=>{document.querySelectorAll("#t-books .spine").forEach(s=>s.setAttribute("aria-expanded",shelfStack.ids[0]===s.dataset.book))}});
+const shelfStack=new Stack($("#shelf-panes"),{closeFirst:true,onEmpty:()=>{document.body.classList.remove("book-open");renderBooks()},onChange:()=>{document.querySelectorAll("#t-books [data-book]").forEach(s=>s.setAttribute("aria-expanded",shelfStack.ids[0]===s.dataset.book))}});
 $("#t-books").addEventListener("pointerover",e=>{const sp=e.target.closest(".spine");if(sp)drawThreads(sp)});
 $("#t-books").addEventListener("pointerout",e=>{const sp=e.target.closest(".spine");if(sp&&!sp.contains(e.relatedTarget))drawThreads(null)});
 $("#t-books").addEventListener("focusin",e=>{const sp=e.target.closest(".spine");if(sp)drawThreads(sp)});
@@ -1896,7 +1907,7 @@ setDir("index");
 // navigation: sliding indicator, path crumb, auto-hide in «Шлях»
 var VIEW_UA={home:"",garden:"сад",blog:"есеї",shelf:"полиця",note:"сад"};
 function moveInd(){const nav=document.querySelector(".bar nav"),ind=document.querySelector(".nav-ind"),a=nav&&nav.querySelector('[aria-current="page"]');
-  if(!a){ind.style.width="0px";return}ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px"}
+  if(!ind)return;if(!a){ind.style.width="0px";return}ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px"}
 let lastY=0;addEventListener("scroll",()=>{const y=scrollY,bar=document.querySelector(".bar");bar.classList.toggle("hide",y>lastY&&y>120);lastY=y},{passive:true});
 document.addEventListener("scroll",e=>{const t=e.target;if(t&&t.classList&&t.classList.contains("pane-in")){const bar=document.querySelector(".bar");const y=t.scrollTop;bar.classList.toggle("hide",y>(t._ly||0)&&y>120);t._ly=y}},{capture:true,passive:true});
 const NAVS={bar:"Смуга",pill:"Пігулка",path:"Шлях",line:"Лінія",split:"Розділене",dock:"Док"};
