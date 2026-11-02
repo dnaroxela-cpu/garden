@@ -260,7 +260,7 @@ body.hero-page .quote-refresh:hover { border-color:rgba(255,255,255,.75); }
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${title} — Sasha's Garden</title>
+<title>${title} — Alexandra Maiboroda</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1010,7 +1010,7 @@ function renderResearchPage(files, graphData) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Map of Inquiry — Sasha's Garden</title>
+<title>Map of Inquiry — Alexandra Maiboroda</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -1409,7 +1409,7 @@ const { wikiLookup, tidyGenres } = require('./wiki');
 
 function redirectPage(target, title) {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><title>${esc(title)} — Sasha's Garden</title>
+  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><title>${esc(title)} — Alexandra Maiboroda</title>
 <meta http-equiv="refresh" content="0; url=${esc(target)}"><link rel="canonical" href="${esc(target)}">
 <script>location.replace(${JSON.stringify(target)})</script></head>
 <body><p><a href="${esc(target)}">${esc(title)}</a></p></body></html>`;
@@ -1692,7 +1692,7 @@ async function buildApp(files, coversCache) {
   // old URLs → the app
   const put = (name, target, title) => { fs.writeFileSync(path.join(OUT, name), redirectPage(target, title)); written.add(name); };
   for (const n of data) put(`${n.id}.html`, `index.html#n=${encodeURIComponent(n.id)}`, n.title);
-  put('blog.html', 'index.html#blog', 'Есеї');
+  put('blog.html', 'index.html#garden', 'Сад');
   put('books.html', 'index.html#shelf', 'Полиця');
   put('seeds.html', 'index.html#garden', 'Сад');
   put('research.html', 'index.html#map', 'Мапа');
