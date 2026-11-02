@@ -297,7 +297,9 @@ body{padding-bottom:32px}
 :root[data-dir="index"] .card h3{grid-column:2;grid-row:1;font-size:15px;font-weight:400}
 :root[data-dir="index"] .card p{display:none}
 :root[data-dir="index"] .card>.mono{grid-column:3;grid-row:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-:root[data-dir="index"] .card:hover{background:linear-gradient(90deg,#ff00801a,#ffe0001a,#7b6cf01a)}
+:root[data-dir="index"] .card{position:relative;isolation:isolate}
+:root[data-dir="index"] .card::before{content:"";position:absolute;inset:0 calc(-1 * var(--g));z-index:-1;background:linear-gradient(90deg,#ff00801a,#ffe0001a,#7b6cf01a);opacity:0;transition:opacity .15s}
+:root[data-dir="index"] .card:hover::before,:root[data-dir="index"] .card:focus-visible::before{opacity:1}
 @media (max-width:640px){:root[data-dir="index"] .card .top .g{white-space:normal}:root[data-dir="index"] .card{grid-template-columns:90px minmax(0,1fr) 60px}:root[data-dir="index"] .card>.mono{display:none}:root[data-dir="index"] .card .top .mono{grid-column:3}}
 :root[data-dir="index"] .note h1{font-size:24px;font-weight:500;letter-spacing:0}
 :root[data-dir="index"] .row .t,:root[data-dir="index"] .sec b{font-size:15px}
@@ -806,7 +808,7 @@ body.on-home footer.site-foot{display:none}
       <button data-go="garden">Сад</button>
       <button data-go="shelf">Полиця</button>
       <button data-go="map">Мапа</button>
-      <span class="nav-ind" aria-hidden="true"></span>
+      
     </nav>
     <span class="crumb" id="crumb" aria-hidden="true"></span>
     <button class="mode" id="mode" aria-label="Перемкнути світлу чи темну тему" title="Світла / темна тема">
@@ -858,7 +860,7 @@ body.on-home footer.site-foot{display:none}
   <section class="view" id="v-garden" hidden>
     <div class="head">
       <h1>Сад</h1>
-      <p>Живі нотатки з мого Obsidian-сховища: fleeting notes — швидкі думки й начерки, permanent notes — те, що вже дозріло. Обери тему або просто блукай.</p>
+      <p>Живі нотатки з мого Obsidian-сховища: fleeting notes — швидкі думки й начерки, literature notes — конспекти книжок і матеріалів, permanent notes — те, що вже дозріло. Обери тему або просто блукай.</p>
     </div>
     <div class="chips" id="chips"></div>
     <div class="legend" id="legend"></div>
@@ -917,10 +919,10 @@ body.on-home footer.site-foot{display:none}
 const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>b.date-a.date);
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
 const MEDIA_RE=/^(links|посилання|videos \+ podcasts)$/i;
-const STATUS={"Seeds":"seedling","Blog Notes":"evergreen"};
-const STL={seedling:"флітінг ноутс",evergreen:"перманент ноутс"};
+const STATUS={"Seeds":"seedling","Book Reviews":"budding","Blog Notes":"evergreen"};
+const STL={seedling:"флітінг ноутс",budding:"літрачер ноутс",evergreen:"перманент ноутс"};
 const FOLDER_UA={"Seeds":"Флітінг ноутс","Book Reviews":"Книжки","Blog Notes":"Перманент ноутс","Videos + podcasts":"Посилання","Links":"Посилання"};
-NOTES.forEach(n=>{n.status=STATUS[n.folder]||(n.folder==="Book Reviews"||MEDIA_RE.test(n.folder)?null:"seedling");n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
+NOTES.forEach(n=>{n.status=STATUS[n.folder]||(MEDIA_RE.test(n.folder)?"budding":"seedling");n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
 NOTES.forEach(n=>n.links.forEach(l=>BY[l]&&BY[l].back.push(n.id)));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1896,7 +1898,7 @@ setDir("index");
 // navigation: sliding indicator, path crumb, auto-hide in «Шлях»
 var VIEW_UA={home:"",garden:"сад",blog:"есеї",shelf:"полиця",note:"сад"};
 function moveInd(){const nav=document.querySelector(".bar nav"),ind=document.querySelector(".nav-ind"),a=nav&&nav.querySelector('[aria-current="page"]');
-  if(!a){ind.style.width="0px";return}ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px"}
+  if(!ind)return;if(!a){ind.style.width="0px";return}ind.style.left=a.offsetLeft+"px";ind.style.width=a.offsetWidth+"px"}
 let lastY=0;addEventListener("scroll",()=>{const y=scrollY,bar=document.querySelector(".bar");bar.classList.toggle("hide",y>lastY&&y>120);lastY=y},{passive:true});
 document.addEventListener("scroll",e=>{const t=e.target;if(t&&t.classList&&t.classList.contains("pane-in")){const bar=document.querySelector(".bar");const y=t.scrollTop;bar.classList.toggle("hide",y>(t._ly||0)&&y>120);t._ly=y}},{capture:true,passive:true});
 const NAVS={bar:"Смуга",pill:"Пігулка",path:"Шлях",line:"Лінія",split:"Розділене",dock:"Док"};
