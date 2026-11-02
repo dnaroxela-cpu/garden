@@ -734,27 +734,45 @@ function loadCoversCache() {
 function saveCoversCache(cache) {
   fs.writeFileSync(COVERS_CACHE_FILE, JSON.stringify(cache, null, 2));
 }
+// Обкладинка книжки: Open Library (повна назва, потім назва без підзаголовка; з автором і без),
+// далі iTunes Books. Не знайдені (null) шукаються знову при кожній збірці.
 async function fetchBookCover(title, author) {
-  const trySearch = async (t, a) => {
-    const params = new URLSearchParams({ limit: '1' });
+  const main = title.split(/[.:?](?:\s|$)/)[0].trim();
+  const titles = [...new Set([title, main])];
+  const ol = async (t, a) => {
+    const params = new URLSearchParams({ limit: '5', fields: 'cover_i' });
     params.set('title', t);
     if (a) params.set('author', a);
     const res = await fetch(`https://openlibrary.org/search.json?${params}`);
     const data = await res.json();
-    const coverId = data.docs?.[0]?.cover_i;
+    const coverId = (data.docs || []).map(d => d.cover_i).find(Boolean);
     return coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : null;
   };
-  try {
-    return await trySearch(title, author) || await trySearch(title, null);
-  } catch { return null; }
+  const itunes = async (t, a) => {
+    const res = await fetch(`https://itunes.apple.com/search?media=ebook&limit=5&term=${encodeURIComponent([t, a].filter(Boolean).join(' '))}`);
+    const data = await res.json();
+    const norm = x => String(x || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+    const hit = (data.results || []).find(r => norm(r.trackName).startsWith(norm(t).slice(0, 12)));
+    return hit && hit.artworkUrl100 ? hit.artworkUrl100.replace(/\/\d+x\d+bb\./, '/600x900bb.') : null;
+  };
+  const tries = [];
+  for (const t of titles) { if (author) tries.push(() => ol(t, author)); }
+  tries.push(() => ol(title, null)); // без автора — лише повна назва, щоб не схопити чужу книжку
+  for (const t of titles) tries.push(() => itunes(t, author));
+  for (const go of tries) {
+    try { const url = await go(); if (url) return url; } catch {}
+  }
+  return null;
 }
 async function resolveCovers(bookFiles) {
   const cache = loadCoversCache();
-  const toFetch = bookFiles.filter(f => !(f.title in cache));
+  const toFetch = bookFiles.filter(f => !cache[f.title]);
   if (toFetch.length) {
-    console.log(`Завантажую ${toFetch.length} обкладинок...`);
+    console.log(`Шукаю обкладинки: ${toFetch.length}...`);
     const results = await Promise.all(toFetch.map(f => fetchBookCover(f.title, f.author)));
     toFetch.forEach((f, i) => { cache[f.title] = results[i]; });
+    const miss = toFetch.filter((f, i) => !results[i]).map(f => f.title);
+    if (miss.length) console.log(`📕 Без обкладинки: ${miss.join('; ')} — можна додати властивість cover у нотатці`);
     saveCoversCache(cache);
   }
   return cache;
