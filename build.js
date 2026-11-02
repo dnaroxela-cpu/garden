@@ -43,6 +43,22 @@ function fmTags(fm) {
   return (Array.isArray(v) ? v : String(v).split(/[,\s]+/)).map(t => String(t).trim().replace(/^#/, '')).filter(Boolean);
 }
 
+// Розділи сайту ← папки сховища. Шлях порівнюється за початком, перший збіг виграє,
+// регістр не важливий. Нотатки з інших папок потрапляють у Сад під назвою своєї верхньої папки.
+const SECTIONS = [
+  ['Literature Notes/Books', 'Book Reviews'], // Полиця → книжки
+  ['Literature Notes/Links', 'Links'],        // Полиця → посилання
+  ['Permanent notes', 'Blog Notes'],          // Есеї
+  ['Fleeting Notes', 'Seeds'],                // Сад → чернетки
+  ['Book Reviews', 'Book Reviews'], ['Blog Notes', 'Blog Notes'], ['Seeds', 'Seeds'], // старі назви
+];
+function section(file) {
+  if (!file.folder) return null;
+  const p = file.folder.split(path.sep).join('/'), low = p.toLowerCase();
+  const hit = SECTIONS.find(([dir]) => { const d = dir.toLowerCase(); return low === d || low.startsWith(d + '/'); });
+  return hit ? hit[1] : p.split('/')[0];
+}
+
 function readFiles(dir, base = dir) {
   const results = [];
   const items = fs.readdirSync(dir);
@@ -1134,7 +1150,7 @@ async function build() {
   const files = readFiles(VAULT);
   const treeHtml = renderTree(files);
   const graphData = buildGraphData(files);
-  const bookFiles = files.filter(f => f.folder && f.folder.startsWith('Book Reviews'));
+  const bookFiles = files.filter(f => section(f) === 'Book Reviews');
   const coversCache = await resolveCovers(bookFiles);
 
   // Homepage — Map of Inquiry (full-viewport graph, floating blurred menu) is now the site's index.html
@@ -1608,9 +1624,9 @@ async function buildApp(files, coversCache) {
     const block = s => noteLinks(resolveMdLinks(marked(convertEmbeds(convertWikilinks(s, files), file)), files))
       .replace(/==([^=]+)==/g, '<mark>$1</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
     const noteId = t => { const f = files.find(x => x.title.trim().toLowerCase() === t.trim().toLowerCase()); const s = f && path.basename(f.slug); return s && ids.has(s) ? s : null; };
-    const isBook = file.folder.startsWith('Book Reviews');
+    const isBook = section(file) === 'Book Reviews';
     return {
-      id, title: file.title, folder: file.folder.split(path.sep)[0], tags: file.tags,
+      id, title: file.title, folder: section(file), tags: file.tags,
       excerpt: noteExcerpt(board ? board.intro : file.raw), date: file.dateMs, links: [...links],
       book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
       cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
