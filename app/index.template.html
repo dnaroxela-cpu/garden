@@ -200,6 +200,11 @@ nav button[aria-current="page"]{color:var(--ink)}
 .prose hr{border:0;border-top:1px solid var(--rule);margin:2em 0}
 .prose mark{background:var(--accent-soft);color:inherit;padding:0 3px}
 .prose sup a{text-decoration:none}
+/* сноски: номер у тексті — надрядковий, клік веде до сноски внизу нотатки й назад */
+.fn-ref{font-family:var(--f-mono);font-size:.62em;vertical-align:super;line-height:0;margin-left:1px;padding:0 2px;cursor:pointer;color:var(--ink);border-radius:2px;background:var(--accent-soft)}
+.fn-ref:hover,.fn-ref:focus-visible{background:var(--rainbow);color:#fff}
+.footnotes li.hl{background:var(--accent-soft);transition:background .6s}
+.footnotes .fn-back{font-family:var(--f-mono);font-size:12px;margin-left:6px;cursor:pointer;background:none}
 .prose .footnotes,.prose section.footnotes{font-size:14px;color:var(--muted);border-top:1px solid var(--rule);padding-top:12px;margin-top:2em}
 .prose .callout{margin:1.4em 0;padding:14px 16px;background:var(--surface);border-radius:4px}
 .prose .callout-stripe{display:none}
@@ -892,6 +897,7 @@ body.on-home footer.site-foot{display:none}
       <button data-tab="films">Фільми</button>
       <button data-tab="series">Серіали</button>
       <button data-tab="quotes">Цитати</button>
+      <button data-tab="articles">Статті</button>
       <button data-tab="media">Посилання</button>
     </div>
     <div id="t-books"></div>
@@ -899,6 +905,7 @@ body.on-home footer.site-foot{display:none}
     <div id="t-films" hidden></div>
     <div id="t-series" hidden></div>
     <div id="t-quotes" hidden><div class="qcloud" id="qcloud" aria-label="Слова, що повторюються"></div><div class="qdeck" id="qdeck" aria-live="polite"></div><div class="qnav"><span id="qcount"></span><button id="qprev" aria-label="Попередня цитата">← назад</button><button id="qnext" aria-label="Наступна цитата">далі →</button></div></div>
+    <div id="t-articles" hidden></div>
     <div id="t-media" hidden></div>
   </section>
 
@@ -922,10 +929,10 @@ body.on-home footer.site-foot{display:none}
 <script>
 const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>b.date-a.date);
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
-const MEDIA_RE=/^(links|посилання|videos \+ podcasts)$/i;
+const MEDIA_RE=/^(links|посилання|videos \+ podcasts|articles)$/i;
 const STATUS={"Seeds":"seedling","Book Reviews":"budding","Blog Notes":"evergreen"};
 const STL={seedling:"флітінг ноутс",budding:"літрачер ноутс",evergreen:"перманент ноутс"};
-const FOLDER_UA={"Seeds":"Флітінг ноутс","Book Reviews":"Книжки","Blog Notes":"Перманент ноутс","Videos + podcasts":"Посилання","Links":"Посилання"};
+const FOLDER_UA={"Seeds":"Флітінг ноутс","Book Reviews":"Книжки","Blog Notes":"Перманент ноутс","Videos + podcasts":"Посилання","Links":"Посилання","Articles":"Статті"};
 NOTES.forEach(n=>{n.status=STATUS[n.folder]||(MEDIA_RE.test(n.folder)?"budding":"seedling");n.back=[];n.excerpt=n.excerpt.replace(/^(\s*(?:[-–•>]|\[?!\w+\]?)\s*)+/,"").trim()});
 NOTES.forEach(n=>n.links.forEach(l=>BY[l]&&BY[l].back.push(n.id)));
 const $=s=>document.querySelector(s);
@@ -1139,6 +1146,11 @@ const noteStack=new Stack($("#panes"),{onChange:ids=>{current=ids[ids.length-1];
 noteStack.mapSide=true;
 noteStack.ids=[current];
 function renderNote(scrollTo){noteStack.render(scrollTo)}
+// сноски: клік на номер — до сноски (в тій самій панелі), «↩» — назад до тексту
+document.addEventListener("click",e=>{const r=e.target.closest(".fn-ref"),b=e.target.closest(".fn-back");if(!r&&!b)return;
+  const root=(r||b).closest(".pane,.prose,body")||document,id=r?r.dataset.fn:b.dataset.back,el=root.querySelector(r?`[id="${CSS.escape(id)}"]`:`[id="fnref-${CSS.escape(id)}"]`);
+  if(!el)return;e.preventDefault();el.scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"center"});if(r){el.classList.add("hl");setTimeout(()=>el.classList.remove("hl"),1600)}});
+document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest(".fn-ref");if(r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 function updateCollapsed(){noteStack.collapse();shelfStack&&shelfStack.collapse()}
 
 // note-board: a note with «layout: board» keeps its text in the pane; its quotes (### sources, list items) sit on a board beside it,
@@ -1641,24 +1653,28 @@ addEventListener("keydown",e=>{if(!$("#qdeck").offsetParent||/INPUT|TEXTAREA/.te
 {let x0=null;$("#qdeck").addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});$("#qdeck").addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>50){e.preventDefault();qStep(dx<0?1:-1)}})}
 // посилання: нотатки з папки «Посилання» (раніше «Videos + podcasts») — сітка карток з обкладинками;
 // фільтри за типом (відео, подкаст, стаття…) і тегом; відкриваються збоку, як конспекти книжок
-const MEDIA=NOTES.filter(n=>/^(links|посилання|videos \+ podcasts)$/i.test(n.folder));
+// статті: нотатки з папки «Literature Notes/Articles» — та сама сітка карток, окрема вкладка
+function mediaTab(box,MEDIA,empty){
 const mf={kind:"",tag:""};
 function renderMedia(){
-  if(!MEDIA.length){$("#t-media").innerHTML=`<p class="mono series-empty">Тут з'являться нотатки з папки «Links» в Obsidian.</p>`;return}
+  if(!MEDIA.length){box.innerHTML=`<p class="mono series-empty">${empty}</p>`;return}
   const kindOf=n=>(n.media&&n.media.kind)||"інше",ok=(n,skip)=>(skip==="kind"||!mf.kind||kindOf(n)===mf.kind)&&(skip==="tag"||!mf.tag||n.tags.includes(mf.tag));
   const count=(k,vals)=>{const c={};MEDIA.filter(n=>ok(n,k)).forEach(n=>vals(n).forEach(v=>c[v]=(c[v]||0)+1));if(mf[k]&&!c[mf[k]])c[mf[k]]=0;return Object.entries(c).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))};
   const chips=(k,list,label)=>`<button class="chip" aria-pressed="${!mf[k]}" data-mf="${k}" data-v="">${label}<i>${MEDIA.filter(n=>ok(n,k)).length}</i></button>`+list.map(([v,c])=>`<button class="chip" aria-pressed="${mf[k]===v}" data-mf="${k}" data-v="${esc(v)}">${k==="tag"?"#":""}${esc(v)}<i>${c}</i></button>`).join("");
   const kinds=count("kind",n=>[kindOf(n)]),tags=count("tag",n=>n.tags),list=MEDIA.filter(n=>ok(n));
-  $("#t-media").innerHTML=`<div class="mfilters">${kinds.length>1||mf.kind?`<div class="chips">${chips("kind",kinds,"усі типи")}</div>`:""}${tags.length?`<div class="chips tags">${chips("tag",tags,"усі теги")}</div>`:""}</div>
+  box.innerHTML=`<div class="mfilters">${kinds.length>1||mf.kind?`<div class="chips">${chips("kind",kinds,"усі типи")}</div>`:""}${tags.length?`<div class="chips tags">${chips("tag",tags,"усі теги")}</div>`:""}</div>
   <div class="mgrid">${list.map(n=>{const m=n.media||{},c=SPINES[hash(n.id)%SPINES.length];
   return `<button class="mcard" data-media="${n.id}"><span class="im" style="background:${c[0]}"><span class="ph" style="color:${c[1]}">${esc(n.title)}</span>${m.cover?`<img class="loading" src="${esc(m.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="this.classList.remove('loading')" onerror="this.remove()">`:""}</span>
     <span class="mm">${m.kind?`<b>${esc(m.kind)}</b> · `:""}${fmt(n.date,1)}</span><h3>${esc(n.title)}</h3>${n.excerpt?`<p>${esc(n.excerpt)}</p>`:""}</button>`}).join("")}</div>`}
 renderMedia();
-$("#t-media").addEventListener("click",e=>{const f=e.target.closest("[data-mf]");if(f){mf[f.dataset.mf]=f.dataset.v;renderMedia();return}
+box.addEventListener("click",e=>{const f=e.target.closest("[data-mf]");if(f){mf[f.dataset.mf]=f.dataset.v;renderMedia();return}
   const r=e.target.closest("[data-media]");if(r){document.body.classList.add("book-open");shelfStack.set([r.dataset.media])}});
+}
+mediaTab($("#t-media"),NOTES.filter(n=>/^(links|посилання|videos \+ podcasts)$/i.test(n.folder)),"Тут з'являться нотатки з папки «Links» в Obsidian.");
+mediaTab($("#t-articles"),NOTES.filter(n=>n.folder==="Articles"),"Тут з'являться нотатки з папки «Literature Notes/Articles» в Obsidian.");
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-current",x===b));
-  hideCover();["books","films","series","quotes","media"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
+  hideCover();["books","films","series","quotes","articles","media"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
 
 
 // living map: a continuous gentle force simulation; colour = theme on the rainbow, size = note length, pulses travel along [[links]]

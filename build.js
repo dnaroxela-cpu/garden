@@ -48,6 +48,7 @@ function fmTags(fm) {
 const SECTIONS = [
   ['Literature Notes/Books', 'Book Reviews'], // Полиця → книжки
   ['Literature Notes/Links', 'Links'],        // Полиця → посилання
+  ['Literature Notes/Articles', 'Articles'],  // Полиця → статті
   ['Permanent notes', 'Blog Notes'],          // Есеї
   ['Fleeting Notes', 'Seeds'],                // Сад → чернетки
   ['Book Reviews', 'Book Reviews'], ['Blog Notes', 'Blog Notes'], ['Seeds', 'Seeds'], // старі назви
@@ -672,12 +673,23 @@ function resolveMdLinks(html, files) {
 // Replaces each with a small in-text marker + a hidden content span the client-side script
 // picks up to build the right-margin note. Numbering is sequential by order of appearance,
 // regardless of what label was used in the source.
-function extractFootnotes(raw, fileKey) {
+// Сноски: [^1] у тексті й «[^1]: текст» будь-де в нотатці (з відступом теж; текст може починатися
+// з наступного рядка з відступом), а також ^[вбудована сноска]. extraDefs — визначення, що стоять
+// поза показаним текстом (напр. після ### у нотатці-дошці).
+function footnoteDefs(raw) {
   const defs = {};
-  raw = raw.replace(/^\[\^([^\]\s]+)\]:[ \t]*(.+(?:\n[ \t]+\S.*)*)/gm, (m, label, text) => {
-    defs[label] = text.replace(/\n[ \t]+/g, ' ').trim();
+  const rest = raw.replace(/^[ \t]{0,3}\[\^([^\]\s]+)\]:[ \t]*(.*(?:\n(?:[ \t]+\S.*|[ \t]*(?=\n[ \t]+\S)))*)/gm, (m, label, text) => {
+    const t = text.replace(/\n[ \t]*/g, ' ').trim();
+    if (!t) return m;
+    defs[label] = t;
     return '';
   });
+  return { defs, rest };
+}
+function extractFootnotes(raw, fileKey, extraDefs = {}) {
+  const found = footnoteDefs(raw);
+  const defs = { ...extraDefs, ...found.defs };
+  raw = found.rest;
   let inlineIdx = 0;
   raw = raw.replace(/\^\[([^\]]+)\]/g, (m, text) => {
     inlineIdx++;
@@ -692,7 +704,7 @@ function extractFootnotes(raw, fileKey) {
     n++;
     const id = 'fn-' + fileKey + '-' + n;
     footnotes.push({ id, html: marked(defs[label]) });
-    return `<span class="fn-ref" id="fnref-${id}" data-fn="${id}">${n}</span>`;
+    return `<span class="fn-ref" id="fnref-${id}" data-fn="${id}" role="link" tabindex="0" aria-label="Сноска ${n}">${n}</span>`;
   });
   return { raw, footnotes };
 }
@@ -1555,7 +1567,7 @@ function canvasBoard(json, { block, noteId }) {
 // посилання (колишні «відео й подкасти»): обкладинка картки і тип (відео, подкаст, стаття…)
 // обкладинка: властивість cover → app/covers → перша картинка в нотатці
 // → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
-const MEDIA_FOLDER = /^(links|посилання|videos \+ podcasts)$/i;
+const MEDIA_FOLDER = /^(links|посилання|videos \+ podcasts|articles)$/i;
 const MEDIA_TYPES = { video: 'відео', відео: 'відео', podcast: 'подкаст', подкаст: 'подкаст', article: 'стаття', стаття: 'стаття', essay: 'есей', есей: 'есей',
   book: 'книжка', книжка: 'книжка', course: 'курс', курс: 'курс', newsletter: 'розсилка', розсилка: 'розсилка', website: 'сайт', site: 'сайт', сайт: 'сайт', tool: 'інструмент', інструмент: 'інструмент' };
 async function ogImage(url, cache) {
@@ -1627,9 +1639,9 @@ async function buildApp(files, coversCache) {
     const withWikilinks = convertWikilinks(qrefs(board ? board.intro : file.body), files);
     const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
     const rawClean = rawFixed.replace(/(?<![#\n]) *#([\p{L}_][\p{L}\p{N}_-]*)/gu, '').replace(/^\s*#([\p{L}_][\p{L}\p{N}_-]*)(\s|$)/gmu, '');
-    const { raw: withFn, footnotes } = extractFootnotes(rawClean, id);
+    const { raw: withFn, footnotes } = extractFootnotes(rawClean, id, board ? footnoteDefs(file.body).defs : {});
     let html = resolveMdLinks(marked(withFn), files);
-    if (footnotes.length) html += `<section class="footnotes"><ol>${footnotes.map(f => `<li id="${f.id}">${f.html}</li>`).join('')}</ol></section>`;
+    if (footnotes.length) html += `<section class="footnotes"><ol>${footnotes.map(f => { const back = `<span class="fn-back" data-back="${f.id}" role="link" tabindex="0" aria-label="Назад до тексту">↩</span>`; return `<li id="${f.id}">${/<\/p>\s*$/.test(f.html) ? f.html.replace(/<\/p>\s*$/, back + '</p>') : f.html + back}</li>`; }).join('')}</ol></section>`;
     const links = new Set();
     const noteLinks = h => h.replace(/<a href="([^"#?]+)\.html"/g, (m, slug) => {
       let s; try { s = decodeURIComponent(slug); } catch (e) { s = slug; }
