@@ -48,6 +48,7 @@ function fmTags(fm) {
 const SECTIONS = [
   ['Literature Notes/Books', 'Book Reviews'], // Полиця → книжки
   ['Literature Notes/Links', 'Links'],        // Полиця → посилання
+  ['Literature Notes/Articles', 'Articles'],  // Полиця → статті
   ['Permanent notes', 'Blog Notes'],          // Есеї
   ['Fleeting Notes', 'Seeds'],                // Сад → чернетки
   ['Book Reviews', 'Book Reviews'], ['Blog Notes', 'Blog Notes'], ['Seeds', 'Seeds'], // старі назви
@@ -1555,7 +1556,7 @@ function canvasBoard(json, { block, noteId }) {
 // посилання (колишні «відео й подкасти»): обкладинка картки і тип (відео, подкаст, стаття…)
 // обкладинка: властивість cover → app/covers → перша картинка в нотатці
 // → кадр YouTube → og:image першого посилання (кешується в covers-cache.json як og:<адреса>)
-const MEDIA_FOLDER = /^(links|посилання|videos \+ podcasts)$/i;
+const MEDIA_FOLDER = /^(links|посилання|videos \+ podcasts|articles)$/i;
 const MEDIA_TYPES = { video: 'відео', відео: 'відео', podcast: 'подкаст', подкаст: 'подкаст', article: 'стаття', стаття: 'стаття', essay: 'есей', есей: 'есей',
   book: 'книжка', книжка: 'книжка', course: 'курс', курс: 'курс', newsletter: 'розсилка', розсилка: 'розсилка', website: 'сайт', site: 'сайт', сайт: 'сайт', tool: 'інструмент', інструмент: 'інструмент' };
 async function ogImage(url, cache) {
