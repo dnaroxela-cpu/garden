@@ -200,6 +200,11 @@ nav button[aria-current="page"]{color:var(--ink)}
 .prose hr{border:0;border-top:1px solid var(--rule);margin:2em 0}
 .prose mark{background:var(--accent-soft);color:inherit;padding:0 3px}
 .prose sup a{text-decoration:none}
+/* сноски: номер у тексті — надрядковий, клік веде до сноски внизу нотатки й назад */
+.fn-ref{font-family:var(--f-mono);font-size:.62em;vertical-align:super;line-height:0;margin-left:1px;padding:0 2px;cursor:pointer;color:var(--ink);border-radius:2px;background:var(--accent-soft)}
+.fn-ref:hover,.fn-ref:focus-visible{background:var(--rainbow);color:#fff}
+.footnotes li.hl{background:var(--accent-soft);transition:background .6s}
+.footnotes .fn-back{font-family:var(--f-mono);font-size:12px;margin-left:6px;cursor:pointer;background:none}
 .prose .footnotes,.prose section.footnotes{font-size:14px;color:var(--muted);border-top:1px solid var(--rule);padding-top:12px;margin-top:2em}
 .prose .callout{margin:1.4em 0;padding:14px 16px;background:var(--surface);border-radius:4px}
 .prose .callout-stripe{display:none}
@@ -1141,6 +1146,11 @@ const noteStack=new Stack($("#panes"),{onChange:ids=>{current=ids[ids.length-1];
 noteStack.mapSide=true;
 noteStack.ids=[current];
 function renderNote(scrollTo){noteStack.render(scrollTo)}
+// сноски: клік на номер — до сноски (в тій самій панелі), «↩» — назад до тексту
+document.addEventListener("click",e=>{const r=e.target.closest(".fn-ref"),b=e.target.closest(".fn-back");if(!r&&!b)return;
+  const root=(r||b).closest(".pane,.prose,body")||document,id=r?r.dataset.fn:b.dataset.back,el=root.querySelector(r?`[id="${CSS.escape(id)}"]`:`[id="fnref-${CSS.escape(id)}"]`);
+  if(!el)return;e.preventDefault();el.scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"center"});if(r){el.classList.add("hl");setTimeout(()=>el.classList.remove("hl"),1600)}});
+document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest(".fn-ref");if(r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
 function updateCollapsed(){noteStack.collapse();shelfStack&&shelfStack.collapse()}
 
 // note-board: a note with «layout: board» keeps its text in the pane; its quotes (### sources, list items) sit on a board beside it,
