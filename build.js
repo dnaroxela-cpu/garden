@@ -1626,6 +1626,24 @@ async function mediaInfo(file, id, html, cache) {
   return { cover, kind };
 }
 
+// Автор і рік статті: властивості author/year у нотатці, інакше OpenAlex — лише точний збіг назви,
+// з кількох збігів береться найраніший (оригінал, а не передрук). Кеш `art:<назва>` у covers-cache.json.
+async function articleMeta(title, cache) {
+  const key = 'art:' + title;
+  if (key in cache) return cache[key];
+  const norm = s => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  try {
+    const res = await fetch('https://api.openalex.org/works?per-page=10&select=title,publication_year,authorships&search=' + encodeURIComponent(title), { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return null;
+    const { results = [] } = await res.json();
+    const hits = results.filter(r => norm(r.title) === norm(title) && (r.authorships || []).length).sort((a, b) => (a.publication_year || 9999) - (b.publication_year || 9999));
+    const w = hits[0];
+    const meta = w ? { author: w.authorships.map(a => a.author && a.author.display_name).filter(Boolean).slice(0, 2).join(', ') + (w.authorships.length > 2 ? ' та ін.' : ''), year: w.publication_year || null } : null;
+    cache[key] = meta;
+    return meta;
+  } catch (e) { return null; } // збій мережі не кешуємо
+}
+
 async function buildApp(files, coversCache) {
   const notes = files.filter(f => f.folder && f.title.trim().toLowerCase() !== 'стежки');
   const ids = new Set(notes.map(f => path.basename(f.slug)));
@@ -1673,7 +1691,14 @@ async function buildApp(files, coversCache) {
   const mediaCache = loadCoversCache();
   for (const n of data) {
     if (!MEDIA_FOLDER.test(n.folder)) continue;
-    n.media = await mediaInfo(notes.find(f => path.basename(f.slug) === n.id), n.id, n.html, mediaCache);
+    const file = notes.find(f => path.basename(f.slug) === n.id);
+    n.media = await mediaInfo(file, n.id, n.html, mediaCache);
+    if (n.folder === 'Articles') {
+      const fmAuthor = [].concat(file.fm.authors || file.author || []).join(', ') || null;
+      const found = fmAuthor && file.year ? null : await articleMeta(file.title, mediaCache);
+      n.media.author = fmAuthor || (found && found.author) || null;
+      n.media.year = file.year || (found && found.year ? String(found.year) : null);
+    }
   }
   saveCoversCache(mediaCache);
 
