@@ -360,6 +360,22 @@ html,body{overflow-x:clip}
 .hovercard b{font-family:var(--f-display);font-weight:500;font-size:17px;line-height:1.25}
 .hovercard p{margin:0;font-size:14px;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .hovercard small{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+/* links inside notes: an outside link carries a small ↗ and opens in a new tab; a link to another note shows its preview on hover */
+.pane-in a[href^="http"]:not(:has(img))::after{content:"\202F↗";font-family:var(--f-mono);font-size:.85em;color:var(--muted);transition:color .15s}
+.pane-in a[href^="http"]:not(:has(img))::after{content:"\202F↗" / " (відкриється в новій вкладці)"}
+.pane-in a[href^="http"]:not(:has(img)):hover::after{color:var(--ink)}
+.npv{position:fixed;z-index:60;width:min(360px,calc(100vw - 24px));padding:14px 16px 0;background:var(--bg);border:1px solid var(--rule);border-radius:6px;box-shadow:0 14px 40px rgba(0,0,0,.14);cursor:pointer;animation:npvin .14s ease-out both}
+.npv[hidden]{display:none}
+@keyframes npvin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.npv .npv-m{display:flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.npv b{display:block;margin:6px 0 4px;font-family:var(--f-display);font-weight:500;font-size:19px;line-height:1.25}
+.npv .npv-t{max-height:180px;overflow:hidden;font-size:14.5px;line-height:1.55;color:var(--ink);-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.npv .npv-t>*{margin:0 0 .7em}.npv .npv-t :is(h1,h2,h3,h4){font-family:var(--f-display);font-weight:500;font-size:16px;margin:.6em 0 .3em}
+.npv .npv-t ul,.npv .npv-t ol{padding-left:1.2em}.npv .npv-t blockquote{margin-left:0;padding-left:12px;border-left:2px solid var(--rule);font-style:italic}
+.npv .npv-t a{pointer-events:none}.npv .npv-t a::after{content:none}
+.npv .npv-f{display:block;padding:8px 0 12px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.npv:hover .npv-f{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.npv{animation:none}}
 .linkbtn{font:inherit;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;text-decoration:underline;text-decoration-color:var(--acc)}
 .mapctl{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex:1 1 360px;min-width:0;max-width:720px}
 .mapctl .mlegend{justify-content:flex-end}
@@ -1164,6 +1180,41 @@ document.addEventListener("click",e=>{const r=e.target.closest(".fn-ref"),b=e.ta
   const root=(r||b).closest(".pane,.prose,body")||document,id=r?r.dataset.fn:b.dataset.back,el=root.querySelector(r?`[id="${CSS.escape(id)}"]`:`[id="fnref-${CSS.escape(id)}"]`);
   if(!el)return;e.preventDefault();el.scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"center"});if(r){el.classList.add("hl");setTimeout(()=>el.classList.remove("hl"),1600)}});
 document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest(".fn-ref");if(r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();r.click()}});
+// note links: hovering (or keyboard-focusing) a link to another note inside a note shows a preview; outside links open in a new tab
+{const pv=document.createElement("div");pv.className="npv";pv.hidden=true;pv.setAttribute("aria-hidden","true");document.body.appendChild(pv);
+  const SEL="a[data-note]:not(.row):not(.rrow)",cache={},fine=matchMedia("(hover:hover) and (pointer:fine)");
+  let link=null,showT=0,hideT=0,warm=0;
+  const okLink=a=>a&&!a.closest(".backlinks,.crumbs,.bar,nav")&&BY[a.dataset.note];
+  function body(n){if(cache[n.id]!=null)return cache[n.id];const t=document.createElement("template");t.innerHTML=n.html;
+    t.content.querySelectorAll("img,figure,iframe,video,audio,svg,canvas,table,.footnotes,sup,.fn-content,.imgph,script,style").forEach(e=>e.remove());
+    let out="",len=0;for(const el of t.content.children){const tx=el.textContent.trim();if(!tx)continue;out+=el.outerHTML;len+=tx.length;if(len>420)break}
+    return cache[n.id]=out||(n.excerpt?`<p>${esc(n.excerpt)}</p>`:"")}
+  function place(a,x){const rs=[...a.getClientRects()],r=rs.find(r=>x>=r.left&&x<=r.right)||rs[0]||a.getBoundingClientRect(),w=pv.offsetWidth,h=pv.offsetHeight,g=8;
+    let top=r.bottom+g;if(top+h>innerHeight-8&&r.top-g-h>8)top=r.top-g-h;
+    pv.style.left=Math.max(12,Math.min(r.left,innerWidth-w-12))+"px";pv.style.top=Math.max(8,top)+"px"}
+  function show(a,x){const n=BY[a.dataset.note];link=a;
+    pv.innerHTML=`<span class="npv-m">${glyph(n.status,12)}${esc(stl(n))} · ${fmt(n.date)}</span><b>${esc(short(n.title))}</b><div class="npv-t">${body(n)}</div><span class="npv-f">відкрити нотатку →</span>`;
+    pv.hidden=false;pv.style.animation="none";pv.offsetWidth;pv.style.animation="";place(a,x)}
+  function hide(){clearTimeout(showT);clearTimeout(hideT);if(!pv.hidden)warm=Date.now();pv.hidden=true;link=null}
+  const want=(a,x)=>{clearTimeout(hideT);if(a===link)return;clearTimeout(showT);
+    // the first preview waits for a short pause (no flicker while the mouse just crosses the text); moving on to the next link while one is open shows it right away
+    showT=setTimeout(()=>show(a,x),!pv.hidden||Date.now()-warm<400?0:350)};
+  const leave=()=>{clearTimeout(showT);clearTimeout(hideT);hideT=setTimeout(hide,180)};
+  document.addEventListener("pointerover",e=>{if(e.pointerType!=="mouse"||!fine.matches)return;
+    if(pv.contains(e.target)){clearTimeout(hideT);return}
+    const a=e.target.closest&&e.target.closest(SEL);if(okLink(a))want(a,e.clientX)});
+  document.addEventListener("pointerout",e=>{if(e.pointerType!=="mouse")return;const to=e.relatedTarget;
+    const from=e.target.closest&&(e.target.closest(SEL)||e.target.closest(".npv"));if(!from)return;
+    if(to&&(from.contains(to)||pv.contains(to)||(link&&link.contains(to))))return;leave()});
+  document.addEventListener("focusin",e=>{const a=e.target.closest&&e.target.closest(SEL);if(okLink(a)&&a.matches(":focus-visible"))want(a,a.getBoundingClientRect().left)});
+  document.addEventListener("focusout",e=>{if(link&&e.target===link)leave()});
+  pv.addEventListener("click",e=>{const a=link;hide();if(a&&a.isConnected)a.click()});
+  document.addEventListener("pointerdown",e=>{if(!pv.contains(e.target))hide()},true);
+  addEventListener("keydown",e=>{if(e.key==="Escape"&&!pv.hidden){e.stopImmediatePropagation();hide()}},true);
+  addEventListener("scroll",hide,{passive:true,capture:true});addEventListener("resize",hide);addEventListener("hashchange",hide);
+  // outside links in a note open in a new tab, so the stack of open notes stays where it was
+  document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('.pane-in a[href^="http"]');if(a&&!a.target){a.target="_blank";a.rel="noopener"}},true);
+}
 function updateCollapsed(){noteStack.collapse();shelfStack&&shelfStack.collapse()}
 
 // note-board: a note with «layout: board» keeps its text in the pane; its quotes (### sources, list items) sit on a board beside it,
