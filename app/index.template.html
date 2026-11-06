@@ -845,13 +845,9 @@ body.on-home footer.site-foot{display:none}
 @media (min-width:720px){.pane{flex-basis:50%;width:50%}} /* an open note takes exactly the left half, up to the centre line of the header */
 @media (min-width:901px){.map-holder .timeline-ctl{margin-left:-8px}}
 #qs:empty{display:none}
-/* the header has no name: its left half (up to the centre line) is a strip of the planet, a link to home (on a phone too: the bar is split in half there as well) */
-.bar .logo .rb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.bar .logo{background:#000 url(name-1.jpg) 0 60%/cover no-repeat}
-.bar .logo,:root[data-nav="split"] .bar .logo{position:absolute;grid-area:auto;justify-self:stretch;align-self:stretch;top:0;bottom:0;left:calc(-1*var(--g));right:50%;margin:0;padding:0;border-radius:0}
-@media (hover:hover){.bar .logo:hover{filter:brightness(1.12)}}
-@media (max-width:600px){:root[data-nav="split"] .bar{padding-left:calc(50% + 10px);gap:8px}:root[data-nav="split"] .bar nav{gap:0 10px;padding-left:0}:root[data-nav="split"] .bar nav button{padding-inline:0}:root[data-nav="split"] .mode{margin-left:auto}}
-@media (max-width:360px){:root[data-nav="split"] .bar{padding-left:calc(50% + 8px);gap:6px}:root[data-nav="split"] .bar nav{gap:0 7px}:root[data-nav="split"] .mode{width:24px;height:24px}}
+/* the header: a plain «на головну» link on the left (no gradient); hidden on the home page itself */
+.bar .logo{color:var(--ink);font-weight:400}.bar .logo:hover{color:var(--muted)}
+body.on-home .bar .logo{opacity:0;pointer-events:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -861,7 +857,7 @@ body.on-home footer.site-foot{display:none}
 <div class="progress" aria-hidden="true"></div>
 <div class="wrap">
   <header class="bar">
-    <a class="logo" href="#home" data-go="home" aria-label="Alexandra Maiboroda — на головну"><span class="rb">Alexandra Maiboroda</span></a>
+    <a class="logo" href="#home" data-go="home">на головну</a>
     <nav aria-label="Розділи">
       <button data-go="garden">Сад</button>
       <button data-go="shelf">Полиця</button>
