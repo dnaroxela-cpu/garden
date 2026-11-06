@@ -844,14 +844,12 @@ body.on-home footer.site-foot{display:none}
 .map-holder .maptools{padding-inline:var(--g)}
 @media (min-width:901px){.map-holder .timeline-ctl{margin-left:-8px}}
 #qs:empty{display:none}
-/* the name in the header: on a desktop, hovering it unfolds photos across the name's half of the bar, changing one into another */
-.hx{position:absolute;top:0;bottom:0;left:calc(-1*var(--g));right:50%;z-index:0;pointer-events:none;overflow:hidden;background:#111;clip-path:inset(0 100% 0 0);transition:clip-path .6s cubic-bezier(.7,0,.2,1)}
-.bar .logo{position:relative;z-index:1}
-:root.hx-open .bar .logo .rb{-webkit-text-fill-color:#fff;color:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
-.hx img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;opacity:0;transform:scale(1.08);transition:opacity .7s ease,transform 2.4s cubic-bezier(.2,.8,.2,1)}
-.hx img.on{opacity:1;transform:none}
-:root.hx-open .hx{clip-path:inset(0)}
-@media (hover:none),(max-width:900px){.hx{display:none}}
+/* the header has no name: its left half (up to the centre line) is a strip of the planet, a link to home; on a phone — a small planet chip */
+.bar .logo .rb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.bar .logo{background:#000 url(name-1.jpg) 0 60%/cover no-repeat}
+@media (min-width:601px){.bar .logo,:root[data-nav="split"] .bar .logo{position:absolute;grid-area:auto;justify-self:stretch;align-self:stretch;top:0;bottom:0;left:calc(-1*var(--g));right:50%;margin:0;padding:0;border-radius:0}
+  .bar .logo:hover{filter:brightness(1.12)}}
+@media (max-width:600px){.bar .logo,:root[data-nav="split"] .bar .logo{width:76px;height:24px;flex:none;border-radius:3px;background-position:0 62%}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -861,7 +859,7 @@ body.on-home footer.site-foot{display:none}
 <div class="progress" aria-hidden="true"></div>
 <div class="wrap">
   <header class="bar">
-    <a class="logo" href="#home" data-go="home"><span class="rb">Alexandra Maiboroda</span></a>
+    <a class="logo" href="#home" data-go="home" aria-label="Alexandra Maiboroda — на головну"><span class="rb">Alexandra Maiboroda</span></a>
     <nav aria-label="Розділи">
       <button data-go="garden">Сад</button>
       <button data-go="shelf">Полиця</button>
@@ -1978,15 +1976,6 @@ fromHash();addEventListener("hashchange",fromHash);
 
 const setVW=()=>document.documentElement.style.setProperty("--vw",document.documentElement.clientWidth+"px");setVW();addEventListener("resize",setVW);
 const _bar=document.querySelector(".bar");const setHH=()=>document.documentElement.style.setProperty("--hh",_bar.offsetHeight+"px");setHH();if(window.ResizeObserver)new ResizeObserver(setHH).observe(_bar);
-// the name in the header → photos unfold across the name's half of the bar, changing one into another while the cursor stays on the name (desktop only)
-(()=>{const IMGS=["name-1.jpg","name-2.jpg"],mq=matchMedia("(hover:hover) and (min-width:901px)"),logo=_bar.querySelector(".logo"),root=document.documentElement;let hx,t,i=0;
-  const build=()=>{if(hx)return;hx=document.createElement("div");hx.className="hx";hx.setAttribute("aria-hidden","true");hx.innerHTML=IMGS.map(s=>`<img src="${s}" alt="" decoding="async">`).join("");_bar.prepend(hx)};
-  const show=n=>[...hx.children].forEach((im,k)=>im.classList.toggle("on",k===n));
-  const close=()=>{root.classList.remove("hx-open");clearInterval(t)};
-  logo.addEventListener("mouseenter",()=>{if(!mq.matches)return;build();i=0;show(0);root.classList.add("hx-open");clearInterval(t);if(IMGS.length>1)t=setInterval(()=>show(i=(i+1)%IMGS.length),1400)});
-  logo.addEventListener("mouseleave",close);logo.addEventListener("click",close);
-  if(mq.matches)build();else if(mq.addEventListener)mq.addEventListener("change",e=>{if(e.matches)build()});
-})();
 // pin on Mriya: dog's head in image coordinates, mapped through object-fit:cover
 const PIN_AT=[.79,.62];
 function placePin(){const img=document.querySelector(".portrait img"),pin=$("#pin"),card=$("#pin-card");if(!img||!img.naturalWidth||!img.offsetWidth)return;
