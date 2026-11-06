@@ -468,7 +468,7 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 .map-holder .stage{position:absolute;inset:0;height:auto}
 .map-side{flex:1 0 360px;position:relative;border-left:1px solid var(--rule);display:flex;flex-direction:column;min-width:360px}
 .map-side canvas{flex:1;width:100%;min-height:0;touch-action:none}
-.map-side .ms-h{position:absolute;left:20px;top:18px;right:20px;display:flex;justify-content:space-between;gap:12px;pointer-events:none}
+.map-side .ms-h{position:absolute;left:24px;top:18px;right:var(--g);display:flex;justify-content:space-between;gap:12px;pointer-events:none}
 .map-side .ms-h b{font-family:var(--f-mono);font-weight:400;font-size:12px;color:var(--ink)}
 .maptools{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;gap:12px 32px;padding:0 20px 18px;pointer-events:none}
 .maptools>*{pointer-events:auto}
@@ -842,6 +842,7 @@ body.on-home footer.site-foot{display:none}
 .shelf{border-image:linear-gradient(var(--ink),var(--ink)) 1/0 0 1px/0 var(--g)}
 .map-holder,.panes{width:calc(100% + var(--g)*2);margin-inline:calc(var(--g)*-1)}
 .map-holder .maptools{padding-inline:var(--g)}
+@media (min-width:720px){.pane{flex-basis:50%;width:50%}} /* an open note takes exactly the left half, up to the centre line of the header */
 @media (min-width:901px){.map-holder .timeline-ctl{margin-left:-8px}}
 #qs:empty{display:none}
 /* the header has no name: its left half (up to the centre line) is a strip of the planet, a link to home (on a phone too: the bar is split in half there as well) */
