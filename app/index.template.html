@@ -348,7 +348,7 @@ body{padding-bottom:32px}
 /* scroll-reactive accent + reading progress */
 :root{--acc:#ffe000;--prog:0;--hh:86px;--g:clamp(16px,2.4vw,32px)}
 ::selection{background:var(--acc);color:#111}
-.progress{position:fixed;left:0;top:env(safe-area-inset-top,0px);height:3px;width:calc(var(--prog)*100%);background:var(--rainbow);z-index:60;pointer-events:none}
+.progress{position:fixed;left:0;top:env(safe-area-inset-top,0px);height:5px;width:calc(var(--prog)*100%);background:var(--rainbow);z-index:60;pointer-events:none}
 .rb-static{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 
 /* home = living map, text floats over it */
@@ -528,7 +528,7 @@ body.on-home .dirnote{display:none}
 .panes{display:flex;overflow-x:auto;overflow-y:hidden;height:calc(100vh - var(--hh));height:calc(100dvh - var(--hh));width:100%;margin-left:0;border-bottom:1px solid var(--rule);scroll-snap-type:x proximity}
 .pane{position:sticky;flex:0 0 600px;width:600px;height:100%;background:var(--bg);border-left:1px solid var(--rule);box-shadow:-8px 0 24px rgba(0,0,0,.05);display:flex;scroll-snap-align:start}
 .pane:first-child{border-left:0;box-shadow:none}
-.pane-in{flex:1;overflow-y:auto;padding:28px 36px 64px 28px;min-width:0}
+.pane-in{flex:1;overflow-y:auto;padding:28px var(--g) 64px;min-width:0}
 .pane h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,3.4vw,42px);line-height:1.1;letter-spacing:-.015em;margin:0 0 18px;text-wrap:balance}
 .pane .meta{margin-bottom:22px}
 .pane-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
@@ -832,6 +832,24 @@ body.on-home footer.site-foot{display:none}
 .stop span{font-family:var(--f-mono);font-size:11px;line-height:1.35;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .stop:hover i{transform:scale(1.35)}
 .stop:hover span{color:var(--ink)}
+/* one left line: every block starts where the name in the header starts (--g), and horizontal rules run to the screen edges */
+.bar{border-bottom:0}
+.bar::before{content:"";position:absolute;left:calc(-1*var(--g));right:calc(-1*var(--g));bottom:0;height:1px;background:var(--rule);pointer-events:none}
+:root[data-nav="dock"] .bar::before,:root[data-nav="pill"] .bar::before{display:none}
+@media (max-width:900px){body.on-home .bar.over-photo-m::before{background:rgba(251,251,244,.28)}}
+#v-garden .row,.srow,.series .grp-h{border-image:linear-gradient(var(--rule),var(--rule)) 1/0 0 1px/0 var(--g)}
+:root[data-dir="index"] #v-garden .card,footer.site-foot{border-image:linear-gradient(var(--rule),var(--rule)) 1/1px 0 0/0 var(--g)}
+.shelf{border-image:linear-gradient(var(--ink),var(--ink)) 1/0 0 1px/0 var(--g)}
+.map-holder,.panes{width:calc(100% + var(--g)*2);margin-inline:calc(var(--g)*-1)}
+.map-holder .maptools{padding-inline:var(--g)}
+@media (min-width:901px){.map-holder .timeline-ctl{margin-left:-8px}}
+#qs:empty{display:none}
+/* the name in the header: on a desktop, hovering it opens a full-width strip of photos that change one into another */
+.hx{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + var(--hh));height:min(24vw,400px);z-index:29;pointer-events:none;overflow:hidden;background:#111;clip-path:inset(0 0 100% 0);transition:clip-path .6s cubic-bezier(.7,0,.2,1)}
+.hx img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;opacity:0;transform:scale(1.08);transition:opacity .7s ease,transform 2.4s cubic-bezier(.2,.8,.2,1)}
+.hx img.on{opacity:1;transform:none}
+:root.hx-open .hx{clip-path:inset(0)}
+@media (hover:none),(max-width:900px){.hx{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -1958,6 +1976,15 @@ fromHash();addEventListener("hashchange",fromHash);
 
 const setVW=()=>document.documentElement.style.setProperty("--vw",document.documentElement.clientWidth+"px");setVW();addEventListener("resize",setVW);
 const _bar=document.querySelector(".bar");const setHH=()=>document.documentElement.style.setProperty("--hh",_bar.offsetHeight+"px");setHH();if(window.ResizeObserver)new ResizeObserver(setHH).observe(_bar);
+// the name in the header → a full-width strip of photos under the bar, changing one into another while the cursor stays on the name (desktop only)
+(()=>{const IMGS=["name-1.jpg","name-2.jpg"],mq=matchMedia("(hover:hover) and (min-width:901px)"),logo=_bar.querySelector(".logo"),root=document.documentElement;let hx,t,i=0;
+  const build=()=>{if(hx)return;hx=document.createElement("div");hx.className="hx";hx.setAttribute("aria-hidden","true");hx.innerHTML=IMGS.map(s=>`<img src="${s}" alt="" decoding="async">`).join("");_bar.after(hx)};
+  const show=n=>[...hx.children].forEach((im,k)=>im.classList.toggle("on",k===n));
+  const close=()=>{root.classList.remove("hx-open");clearInterval(t)};
+  logo.addEventListener("mouseenter",()=>{if(!mq.matches)return;build();i=0;show(0);root.classList.add("hx-open");clearInterval(t);if(IMGS.length>1)t=setInterval(()=>show(i=(i+1)%IMGS.length),1400)});
+  logo.addEventListener("mouseleave",close);logo.addEventListener("click",close);
+  if(mq.matches)build();else if(mq.addEventListener)mq.addEventListener("change",e=>{if(e.matches)build()});
+})();
 // pin on Mriya: dog's head in image coordinates, mapped through object-fit:cover
 const PIN_AT=[.79,.62];
 function placePin(){const img=document.querySelector(".portrait img"),pin=$("#pin"),card=$("#pin-card");if(!img||!img.naturalWidth||!img.offsetWidth)return;
