@@ -691,7 +691,8 @@ body.on-note footer{margin-top:24px}
 .tl .yr{position:absolute;bottom:34px;transform:translate(-50%,0);font-family:var(--f-mono);font-size:10px;color:var(--muted);display:none}
 .shelf-drawer{position:fixed;top:0;right:0;bottom:0;width:min(680px,100vw);z-index:40;background:var(--bg);border-left:1px solid var(--rule);box-shadow:-24px 0 48px rgba(0,0,0,.12);transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.8,.2,1);padding-top:env(safe-area-inset-top,0px)}
 body.book-open .shelf-drawer{transform:none}
-.panes.in-drawer{width:100%;margin-left:0;height:100%;border-bottom:0}
+.panes.in-drawer{width:100%;margin-inline:0;height:100%;border-bottom:0}
+.in-drawer .pane{flex-basis:100%;width:100%}
 .in-drawer .pane:first-child{border-left:0}
 @media (min-width:1100px){body.book-open #v-shelf{padding-right:min(680px,100vw)}body.book-open #v-shelf .head{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.shelf-drawer{transition:none}}
