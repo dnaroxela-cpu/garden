@@ -849,13 +849,17 @@ body.on-home footer.site-foot{display:none}
 /* the header: a plain «на головну» link on the left (no gradient); hidden on the home page itself */
 .bar .logo{color:var(--ink);font-weight:400}.bar .logo:hover{color:var(--muted)}
 body.on-home .bar .logo{opacity:0;pointer-events:none}
-/* a quiet ending: a full-bleed photo strip above the footer, a different one from the collection on each visit */
-.foot-photo{margin:72px calc(var(--g)*-1) 0;height:clamp(180px,30vw,440px);overflow:hidden;background:#05070d}
-.foot-photo img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.2s ease,transform 3s cubic-bezier(.2,.8,.2,1)}
+/* a quiet ending: a photo from the collection (a different one on each visit) runs full-bleed under the footer — first alone, then with the footer's text and lines on top of it */
+footer.site-foot:has(.foot-photo){--ph:clamp(200px,30vw,440px);position:relative;isolation:isolate;margin-bottom:-64px;padding:var(--ph) 0 64px;
+  --ink:#f4f4ef;--muted:rgba(244,244,239,.72);--rule:rgba(244,244,239,.24);color:var(--ink);border-image:none;border-top:0}
+.foot-photo{position:absolute;z-index:-1;inset:0 calc(var(--g)*-1);margin:0;padding:0!important;overflow:hidden;background:#05070d}
+.foot-photo img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 30%;opacity:0;transform:scale(1.06);transition:opacity 1.2s ease,transform 3s cubic-bezier(.2,.8,.2,1)}
+.foot-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(3,5,10,0) 0,rgba(3,5,10,.25) var(--ph),rgba(3,5,10,.7) 100%)}
 .foot-photo.in img{opacity:1;transform:none}
-.foot-photo+footer.site-foot{margin-top:0}
-body.on-home .foot-photo{display:none}
-body.on-note .foot-photo{margin-top:0}
+footer.site-foot:has(.foot-photo) .foot-links{border-left:1px solid var(--rule)}
+footer.site-foot:has(.foot-photo)::before{content:"";position:absolute;left:calc(var(--g)*-1);right:calc(var(--g)*-1);top:var(--ph);height:1px;background:var(--rule)}
+footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
+@media (max-width:900px){footer.site-foot:has(.foot-photo) .foot-links{border-left:0;border-top:1px solid var(--rule)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -963,8 +967,8 @@ body.on-note .foot-photo{margin-top:0}
   </section>
 
 
-  <figure class="foot-photo" aria-hidden="true"><img alt="" loading="lazy" decoding="async"></figure>
   <footer class="site-foot">
+    <figure class="foot-photo" aria-hidden="true"><img alt="" loading="lazy" decoding="async"></figure>
     <figure class="home-quote"><span class="label">Цитата з полиці</span><blockquote id="q"></blockquote><figcaption><span id="qs"></span><button class="ghost" id="qbtn">інша цитата</button></figcaption></figure>
     <div class="foot-links">
       <span class="label">Де ще мене знайти</span>
