@@ -88,6 +88,7 @@ a{color:inherit}
 .layer>*{pointer-events:auto}
 svg.space{position:absolute;left:0;top:0;pointer-events:none;z-index:0;shape-rendering:crispEdges}
 svg.space text{shape-rendering:auto}
+canvas.sky{position:absolute;pointer-events:none;z-index:0;image-rendering:pixelated}
 svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:1}
 .edges path.o{stroke:var(--ink);stroke-width:4;fill:none}
 .edges path.i{stroke:var(--paper);stroke-width:1.5;fill:none}
@@ -222,6 +223,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
       <div class="axis" id="axis"><div class="corner">рік →<br>поруч у світі ◆</div></div>
       <div id="lanes"></div>
       <svg class="space" id="space" aria-hidden="true"></svg>
+      <canvas class="sky" id="sky" aria-hidden="true"></canvas>
       <svg class="edges" id="edges"></svg>
       <div class="layer" id="nodes"></div>
       <div class="cursor" id="cursor"><b></b></div>
@@ -462,7 +464,79 @@ function drawSpace(total,h){
     <text x="${tx}" y="${ty+28}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Мапа закінчується сьогоднішнім днем.</text>
     <text x="${tx}" y="${ty+48}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Наступний інструмент для думання ще не написаний.</text>`;
   sv.innerHTML=g;
+  sky.setup({x0:xs-bw*2,xs,total,top:AX,h,gx,gy,Rg,text:{x:xs+20,y:AX+40,w:420,h:110}});
 }
+// живе небо: падають зорі й народжуються галактики
+const sky=(()=>{
+  const cv=$("#sky"), ctx=cv.getContext("2d"), still=matchMedia("(prefers-reduced-motion: reduce)");
+  let S=null, stars=[], gals=[], nextStar=0, nextGal=0, raf=0, seen=false, started=false, r=Math.random;
+  const sc=$("#scroll");
+  const view=()=>{const L=Math.max(S.xs,sc.scrollLeft),T=Math.max(S.top,sc.scrollTop+S.top),R=Math.min(S.total,sc.scrollLeft+sc.clientWidth),B=Math.min(S.h,sc.scrollTop+sc.clientHeight);return R-L>60&&B-T>60?{L,T,R,B}:{L:S.xs,T:S.top,R:S.total,B:S.h}};
+  const ga=()=>(r()+r()+r()-1.5)/1.5;
+  function setup(o){
+    S=o; const dpr=Math.min(2,devicePixelRatio||1), w=o.total-o.x0, h=o.h-o.top;
+    Object.assign(cv.style,{left:o.x0+"px",top:o.top+"px",width:w+"px",height:h+"px"});
+    cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    stars=[]; gals=[]; nextStar=performance.now()+800; nextGal=performance.now()+1500;
+    if(!started)start();
+  }
+  function place(rad){
+    for(let k=0;k<30;k++){
+      const V=view(), x=V.L+rad+r()*Math.max(1,V.R-V.L-rad*2), y=V.T+rad+r()*Math.max(1,V.B-V.T-rad*2), T=S.text;
+      if(x+rad>T.x&&x-rad<T.x+T.w&&y+rad>T.y&&y-rad<T.y+T.h)continue;
+      if(Math.hypot(x-S.gx,(y-S.gy)*1.8)<S.Rg+rad)continue;
+      if(gals.some(g=>Math.hypot(g.x-x,g.y-y)<g.R+rad+20))continue;
+      return [x,y];
+    }
+  }
+  function newGal(now){
+    const R=24+r()*46, p=place(R); if(!p)return;
+    const arms=2+(r()<.35), wind=4+r()*5, tilt=.35+r()*.6, rot=r()*6.28, n=Math.round(R*7);
+    const pts=[];
+    for(let i=0;i<n*.3;i++){const th=r()*6.283;pts.push([th,R*.2*Math.abs(ga()),0,r(),r()<.5?2:1])}
+    for(let k=0;k<arms;k++)for(let i=0;i<n*.7/arms;i++){const t=Math.pow(r(),.8);pts.push([k*6.283/arms+t*wind,R*(.1+.9*t),t,r(),r()<.2*(1-t)+.05?2:1,ga()*R*(.03+.08*t),ga()*R*(.03+.08*t)])}
+    gals.push({x:p[0],y:p[1],R,tilt,rot,pts,born:now,grow:5000+r()*3000,life:16000+r()*12000,fade:3500,spin:(r()<.5?-1:1)*(.00004+r()*.00005)});
+  }
+  function newStar(now){
+    const V=view(), x=V.L+r()*(V.R-V.L), y=V.T+10+r()*(V.B-V.T)*.6, a=.35+r()*.5, dir=r()<.5?1:-1;
+    stars.push({x,y,dx:Math.cos(a)*dir,dy:Math.sin(a),len:140+r()*220,born:now,dur:600+r()*600});
+  }
+  const px=(x,y,z)=>ctx.fillRect(Math.round(x-S.x0),Math.round(y-S.top),z,z);
+  function frame(now){
+    raf=0; if(!S||!seen||document.hidden)return;
+    ctx.clearRect(0,0,cv.width,cv.height); ctx.fillStyle="#fff";
+    if(now>nextStar){newStar(now);nextStar=now+1800+r()*4200}
+    if(now>nextGal&&gals.length<4){newGal(now);nextGal=now+3000+r()*5000}
+    stars=stars.filter(s=>{
+      const t=(now-s.born)/s.dur; if(t>1.25)return false;
+      const head=Math.min(1,t)*s.len, tail=Math.max(0,head-70*(t>1?1-(t-1)*4:1));
+      for(let d=tail;d<head;d+=3)if(r()>(head-d)/90)px(s.x+s.dx*d,s.y+s.dy*d,1);
+      if(t<1){px(s.x+s.dx*head-1,s.y+s.dy*head-1,2)}
+      return true;
+    });
+    gals=gals.filter(g=>{
+      const age=now-g.born; if(age>g.life)return false;
+      const grow=Math.min(1,age/g.grow), out=Math.max(0,(age-(g.life-g.fade))/g.fade);
+      const ease=1-Math.pow(1-grow,3), c=Math.cos(g.rot+age*g.spin), sn=Math.sin(g.rot+age*g.spin);
+      for(const q of g.pts){
+        if(q[2]>ease||q[3]<out)continue;
+        const th=q[0]-(1-ease)*2.2, rr=q[1]*(.35+.65*ease);
+        let x=Math.cos(th)*rr+(q[5]||0), y=(Math.sin(th)*rr+(q[6]||0))*g.tilt;
+        px(g.x+x*c-y*sn,g.y+x*sn+y*c,q[4]);
+      }
+      if(age<900){const k=1-age/900, L=Math.round(4+k*10);ctx.fillRect(Math.round(g.x-S.x0-L),Math.round(g.y-S.top),L*2+1,1);ctx.fillRect(Math.round(g.x-S.x0),Math.round(g.y-S.top-L),1,L*2+1)}
+      return true;
+    });
+    raf=requestAnimationFrame(frame);
+  }
+  function start(){
+    started=true; if(still.matches)return;
+    new IntersectionObserver(es=>{seen=es[0].isIntersecting;if(seen&&!raf)raf=requestAnimationFrame(frame)},{root:$("#scroll")}).observe(cv);
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden&&seen&&!raf)raf=requestAnimationFrame(frame)});
+    seen=true;
+  }
+  return {setup};
+})();
 function drawEdges(){
   const W=NW(); let s="";
   N.forEach(b=>b.f.forEach(aid=>{
