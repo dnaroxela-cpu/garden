@@ -166,6 +166,14 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 .legend{display:flex;gap:10px;align-items:center;margin:6px 0 12px}
 .legend .node{position:relative;--w:120px;box-shadow:none}
 
+#phone{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:16px;background:var(--dither-lite)}
+#phone.open{display:grid}
+#phone .win{position:relative;width:100%;max-width:340px;box-shadow:4px 4px 0 var(--ink)}
+#phone .in{display:flex;gap:14px;padding:18px 16px 16px;font-size:15px;line-height:1.45}
+#phone .in svg{flex:none;width:36px;height:36px}
+#phone .in p{margin:0 0 10px}
+#phone .ok{display:block;margin:4px 16px 16px auto;font:600 15px var(--txt);border:2px solid var(--ink);border-radius:8px;outline:2px solid var(--ink);outline-offset:2px;padding:6px 22px;background:var(--paper)}
+#phone .ok:active{background:var(--ink);color:var(--paper)}
 @media (max-width:760px){
   body{overflow:hidden}
   .menubar .title{display:none}
@@ -238,6 +246,20 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
     <p>Рядки — теми: пам'ять, посилення інтелекту, навчання, мережа, нотатки і окремий трек кібернетики та ШІ — з фокусом на філософських ідеях, що зробили ШІ можливим, і на сумнівах щодо нього.</p>
   </div>
 </section>
+
+<div id="phone" role="alertdialog" aria-modal="true" aria-labelledby="phoneT">
+  <div class="win">
+    <div class="tbar"><span class="name" id="phoneT">Маленька порада</span></div>
+    <div class="in">
+      <svg viewBox="0 0 36 36" aria-hidden="true" shape-rendering="crispEdges"><rect x="5" y="4" width="26" height="18" fill="none" stroke="currentColor" stroke-width="2"/><rect x="9" y="8" width="18" height="10" fill="currentColor"/><path d="M14 22v5h8v-5M8 31h20" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <div>
+        <p>Привіт! Ця мапа велика, і по-справжньому вона розгортається на екрані комп'ютера: там видно, як ідеї тягнуться одна до одної крізь десятиліття.</p>
+        <p>Тут теж можна гуляти — гортай пальцем убік і вниз, торкайся карток. А коли буде нагода, загляни з десктопа ✦</p>
+      </div>
+    </div>
+    <button class="ok" id="phoneOk">Гаразд, гуляю</button>
+  </div>
+</div>
 
 <script>
 const LANES=[
@@ -538,6 +560,7 @@ $("#closeText").onclick=closeText;
 $("#aboutBtn").onclick=()=>$("#about").classList.toggle("open");
 $("#closeAbout").onclick=()=>$("#about").classList.remove("open");
 addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#about").classList.contains("open"))$("#about").classList.remove("open");else closeText()}});
+if(matchMedia("(pointer:coarse)").matches)status.textContent="Торкнися тексту чи програми, щоб побачити, з чого виросла ідея і що виросло з неї.";
 const defStatus=status.textContent;
 
 // time cursor: what happened nearby
@@ -591,6 +614,15 @@ $("#themeBtn").onclick=()=>{
   const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
   root.dataset.theme=dark?"light":"dark";try{localStorage.setItem("theme",root.dataset.theme)}catch(e){}
 };
+
+// турботлива порада лише для телефонів, один раз
+(()=>{
+  const phone=matchMedia("(max-width:760px)").matches&&matchMedia("(pointer:coarse)").matches;
+  let seen=false;try{seen=localStorage.getItem("ideas-phone-note")==="1"}catch(e){}
+  if(!phone||seen)return;
+  const el=$("#phone");el.classList.add("open");setTimeout(()=>$("#phoneOk").focus(),50);
+  $("#phoneOk").onclick=()=>{el.classList.remove("open");try{localStorage.setItem("ideas-phone-note","1")}catch(e){}};
+})();
 
 let rw;addEventListener("resize",()=>{clearTimeout(rw);rw=setTimeout(layout,150)});
 layout();
