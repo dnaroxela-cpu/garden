@@ -198,7 +198,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 <body>
 
 <nav class="menubar">
-  <span class="mark" aria-hidden="true">✱</span>
+  <button class="mark" id="markBtn" title="As We May Think — звідки все почалося" aria-label="Відкрити As We May Think">✱</button>
   <span class="title">Як ми можемо думати</span>
   <button id="aboutBtn">Про мапу</button>
   <button id="themeBtn">Тема</button>
@@ -212,7 +212,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
     <button data-t="text" aria-pressed="true" title="Показувати тексти"><svg viewBox="0 0 26 26"><path d="M8 4h12v2h-2v16h-2V6h-2v16h-2v-9a5 5 0 0 1 0-9z" fill="currentColor"/></svg></button>
     <button data-t="prog" aria-pressed="true" title="Показувати програми"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="20" height="16"/><path d="M3 10h20M5 7.5h16" stroke-width="1"/><rect x="6" y="13" width="6" height="5"/></svg></button>
     <button data-t="edges" aria-pressed="true" title="Показувати впливи"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M2 13l6-6v4h10V7l6 6-6 6v-4H8v4z"/></svg></button>
-    <button data-t="clear" title="Зняти виділення"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M12 3h2v8l6-4 1 2-6 4 6 4-1 2-6-4v8h-2v-8l-6 4-1-2 6-4-6-4 1-2 6 4z"/></svg></button>
+    <button data-t="bush" title="As We May Think — звідки все почалося"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M12 3h2v8l6-4 1 2-6 4 6 4-1 2-6-4v8h-2v-8l-6 4-1-2 6-4-6-4 1-2 6 4z"/></svg></button>
     <button data-t="out" title="Віддалити"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16 16l7 7M7 11h8"/></svg></button>
     <button data-t="in" title="Наблизити"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16 16l7 7M7 11h8M11 7v8"/></svg></button>
     <button data-t="find" class="wide" title="Показати вибране на мапі"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M13 1l5 6h-3v4h4V8l6 5-6 5v-3h-4v4h3l-5 6-5-6h3v-4H7v3l-6-5 6-5v3h4V7H8z"/></svg></button>
@@ -649,6 +649,7 @@ nodesEl.addEventListener("focusin",e=>{const b=e.target.closest(".node");if(b){h
 nodesEl.addEventListener("focusout",()=>{hover=null;paint()});
 $("#textBody").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)open(b.dataset.go,{center:true})});
 $("#closeText").onclick=closeText;
+$("#markBtn").onclick=()=>open("bush",{center:true});
 $("#aboutBtn").onclick=()=>$("#about").classList.toggle("open");
 $("#closeAbout").onclick=()=>$("#about").classList.remove("open");
 addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#about").classList.contains("open"))$("#about").classList.remove("open");else closeText()}});
@@ -679,7 +680,7 @@ $("#tools").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;const t=b.dataset.t;
   if(t in show){show[t]=!show[t];b.setAttribute("aria-pressed",show[t]);
     if(t==="edges")edgesEl.classList.toggle("hide",!show.edges);else{const keep=scroll.scrollLeft/canvas.offsetWidth;layout();scroll.scrollLeft=keep*canvas.offsetWidth}}
-  if(t==="clear"){hover=null;closeText();scroll.scrollTo({left:0,top:0,behavior:"smooth"})}
+  if(t==="bush")open("bush",{center:true});
   if(t==="in"||t==="out"){
     const mid=yearAt(scroll.scrollLeft+scroll.clientWidth/2)??Y0;
     PX=Math.max(16,Math.min(70,PX+(t==="in"?12:-12)));layout();
