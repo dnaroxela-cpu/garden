@@ -80,7 +80,7 @@ a{color:inherit}
 .axis .ev.near{background:var(--ink);color:var(--paper)}
 .axis .ev.near::before{background:var(--paper)}
 .axis .corner{position:sticky;left:0;top:0;width:150px;height:72px;background:var(--paper);border-right:2px solid var(--ink);z-index:2;font:12px/1.3 var(--txt);padding:6px 8px;color:var(--ink)}
-.axis .oldzone{position:absolute;top:0;height:22px;font:600 11px/22px var(--txt);padding-left:8px;letter-spacing:.03em;color:var(--ink);border-bottom:1px dashed var(--ink);white-space:nowrap;overflow:hidden}
+.axis .oldzone{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font:600 12px/1.3 var(--txt);text-align:center;padding:0 8px;letter-spacing:.03em;color:var(--ink)}
 .brk{position:absolute;top:0;width:14px;z-index:4;pointer-events:none;background:var(--paper)}
 .brk::after{content:"";position:absolute;inset:0;background:var(--ink);--z:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16'%3E%3Cpath d='M3 0l4 4-4 4 4 4-4 4M9 0l4 4-4 4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");-webkit-mask:var(--z) 0 0/14px 16px repeat-y;mask:var(--z) 0 0/14px 16px repeat-y}
 .lane{position:relative;border-bottom:1px dashed var(--ink)}
@@ -393,7 +393,9 @@ function layout(){
   // axis
   let ah=`<div class="corner">рік →<br>поруч у світі ◆</div><div class="future" style="left:${X(NOW)}px">✦ сьогодні → далі</div>`;
   const zx=GUT()+12, bx=X(Y0)-12;
-  ah+=`<div class="oldzone" style="left:${GUT()}px;width:${bx-GUT()}px">XVI ст. — ${Y0} · шкала стиснута</div>`;
+  const k=Math.round((Y0-OLD0)*PX/(ZONE()-44)), m10=k%10, m100=k%100;
+  const raz=m10===1&&m100!==11?"раз":m10>=2&&m10<=4&&(m100<12||m100>14)?"рази":"разів";
+  ah+=`<div class="oldzone" style="left:${GUT()}px;width:${bx-GUT()}px">XVI ст. — ${Y0} · шкала стиснута у ${k} ${raz}</div>`;
   for(let y=Y0;y<=Y1;y++){
     const f=y>NOW?" fut":"";
     if(y%10===0) ah+=`<div class="tick${f}" style="left:${X(y)}px">${y}</div>`;
