@@ -7,12 +7,12 @@
 <meta name="description" content="Інтерактивна мапа історії ідей про роботу з інформацією і знаннями: від «As We May Think» до Вікіпедії, Obsidian і Are.na.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#000; --paper:#fff; --mute:#777;
   --ui:"Pixelify Sans", "Chicago", "Charcoal", monospace;
-  --txt:Geneva, "Helvetica Neue", Arial, sans-serif;
+  --txt:"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
   --dither:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
   --dither-lite:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
 }
@@ -36,9 +36,9 @@ a{color:inherit}
 :focus-visible{outline:2px dashed var(--ink);outline-offset:2px}
 
 /* ── menu bar ── */
-.menubar{position:fixed;inset:0 0 auto 0;height:26px;background:var(--paper);border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:18px;padding:0 14px;font:15px/1 var(--ui);z-index:50;white-space:nowrap}
+.menubar{position:fixed;inset:0 0 auto 0;height:26px;background:var(--paper);border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:18px;padding:0 14px;font:600 13px/1 var(--txt);z-index:50;white-space:nowrap}
 .menubar .mark{font-size:18px}
-.menubar .title{font-weight:600}
+.menubar .title{font:600 16px/1 var(--ui)}
 .menubar .sp{flex:1}
 .menubar a{text-decoration:none}
 .menubar a:hover,.menubar button:hover{background:var(--ink);color:var(--paper)}
@@ -54,6 +54,11 @@ a{color:inherit}
 .tbar .box.zoom{right:8px}
 .tbar .box.zoom::after{content:"";position:absolute;left:1px;top:1px;width:6px;height:6px;border:2px solid var(--ink)}
 .tbar .box:active{background:var(--ink)}
+.tbar button.box.close::before,.tbar button.box.close::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:2px;background:var(--ink);transform:translate(-50%,-50%) rotate(45deg)}
+.tbar button.box.close::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.tbar button.box.close:hover{background:var(--ink)}
+.tbar button.box.close:hover::before,.tbar button.box.close:hover::after{background:var(--paper)}
+.tbar button.box.close{width:17px;height:17px;top:3px}
 .drag .tbar{cursor:move}
 
 /* ── map window ── */
@@ -65,19 +70,24 @@ a{color:inherit}
 .scroll::-webkit-scrollbar-corner{background:var(--paper)}
 .canvas{position:relative}
 .axis{position:sticky;top:0;z-index:6;height:74px;background:var(--paper);border-bottom:2px solid var(--ink)}
-.axis .tick{position:absolute;top:0;bottom:0;border-left:1px solid var(--ink);font:13px/1 var(--ui);padding:4px 0 0 4px}
+.axis .tick{position:absolute;top:0;bottom:0;border-left:1px solid var(--ink);font:600 12px/1 var(--txt);padding:5px 0 0 5px}
+.axis .tick.fut{color:#fff;border-color:#fff}
+.axis .tick.minor.fut{border-color:#888}
+.axis .future{position:absolute;top:0;bottom:0;right:0;background:#000;color:#fff;font:600 12px/1 var(--txt);padding:30px 0 0 10px;letter-spacing:.04em}
 .axis .tick.minor{border-left:1px dotted var(--mute);top:auto;height:8px}
-.axis .ev{position:absolute;font-size:11px;line-height:1.15;white-space:nowrap;padding-left:9px;color:var(--ink)}
+.axis .ev{position:absolute;font-size:12px;line-height:1.15;white-space:nowrap;padding-left:9px;color:var(--ink)}
 .axis .ev::before{content:"";position:absolute;left:0;top:3px;width:5px;height:5px;background:var(--ink);transform:rotate(45deg)}
 .axis .ev.near{background:var(--ink);color:var(--paper)}
 .axis .ev.near::before{background:var(--paper)}
-.axis .corner{position:sticky;left:0;top:0;width:150px;height:72px;background:var(--paper);border-right:2px solid var(--ink);z-index:2;font:12px/1.2 var(--ui);padding:6px 8px;color:var(--mute)}
+.axis .corner{position:sticky;left:0;top:0;width:150px;height:72px;background:var(--paper);border-right:2px solid var(--ink);z-index:2;font:12px/1.3 var(--txt);padding:6px 8px;color:var(--ink)}
 .lane{position:relative;border-bottom:1px dashed var(--ink)}
 .lane:nth-child(even){background:var(--dither-lite);background-color:transparent}
-.lane-label{position:sticky;left:0;z-index:5;display:block;width:150px;height:100%;background:var(--paper);border-right:2px solid var(--ink);padding:10px 10px;font:600 15px/1.15 var(--ui)}
-.lane-label small{display:block;font:11px/1.3 var(--txt);font-weight:400;color:var(--mute);margin-top:6px}
+.lane-label{position:sticky;left:0;z-index:5;display:block;width:150px;height:100%;background:var(--paper);border-right:2px solid var(--ink);padding:10px 10px;font:600 14px/1.2 var(--txt)}
+.lane-label small{display:block;font:12px/1.3 var(--txt);font-weight:400;color:var(--ink);margin-top:6px}
 .layer{position:absolute;left:0;top:0;pointer-events:none}
 .layer>*{pointer-events:auto}
+svg.space{position:absolute;left:0;top:0;pointer-events:none;z-index:0;shape-rendering:crispEdges}
+svg.space text{shape-rendering:auto}
 svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:1}
 .edges path.o{stroke:var(--ink);stroke-width:4;fill:none}
 .edges path.i{stroke:var(--paper);stroke-width:1.5;fill:none}
@@ -86,16 +96,18 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 .edges g.dim path.i,.edges g.dim polygon{display:none}
 .edges.hide{display:none}
 .cursor{position:absolute;top:0;width:0;border-left:1px dashed var(--ink);pointer-events:none;z-index:4;display:none}
-.cursor b{position:sticky;top:78px;display:inline-block;background:var(--ink);color:var(--paper);font:12px/1 var(--ui);padding:3px 5px;margin-left:-1px;transform:translateY(78px)}
+.cursor.fut{border-color:#fff}
+.cursor.fut b{background:#fff;color:#000}
+.cursor b{position:sticky;top:78px;display:inline-block;background:var(--ink);color:var(--paper);font:600 12px/1 var(--txt);padding:3px 5px;margin-left:-1px;transform:translateY(78px)}
 
 /* ── nodes ── */
 .node{position:absolute;z-index:3;width:var(--w);height:58px;background:var(--paper);border:2px solid var(--ink);text-align:left;display:flex;flex-direction:column;box-shadow:2px 2px 0 var(--ink)}
-.node .h{height:20px;flex:none;border-bottom:2px solid var(--ink);font:600 13px/18px var(--ui);padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node .h{height:20px;flex:none;border-bottom:2px solid var(--ink);font:600 12px/18px var(--txt);padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .node.prog .h{text-align:center;padding:0 18px;background:repeating-linear-gradient(to bottom,var(--paper) 0 3px,var(--ink) 3px 4px) 0 3px/100% 12px no-repeat}
 .node.prog .h span{background:var(--paper);padding:0 4px}
 .node.prog .h::before{content:"";position:absolute;left:5px;top:4px;width:9px;height:9px;border:2px solid var(--ink);background:var(--paper)}
-.node .b{flex:1;display:flex;align-items:center;gap:6px;padding:0 5px;font-size:11px;line-height:1.15;overflow:hidden}
-.node .b .yr{font:13px/1 var(--ui)}
+.node .b{flex:1;display:flex;align-items:center;gap:6px;padding:0 5px;font-size:12px;line-height:1.15;overflow:hidden}
+.node .b .yr{font:600 12px/1 var(--txt)}
 .node .b .who{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--ink)}
 .node .kids{display:flex;gap:3px}
 .node .kids i{width:12px;height:8px;border:1.5px solid var(--ink);border-radius:2px}
@@ -129,24 +141,24 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 #text{left:120px;top:110px;width:430px;height:min(560px,calc(100vh - 140px));z-index:20;display:none}
 #text.open{display:flex}
 #text .scroll{padding:16px 18px 24px}
-#text .kind{font:13px/1 var(--ui);display:flex;gap:8px;align-items:center;margin-bottom:8px}
-#text .kind .tag{border:2px solid var(--ink);padding:2px 5px}
+#text .kind{font:600 12px/1 var(--txt);display:flex;gap:8px;align-items:center;margin-bottom:8px}
+#text .kind .tag{border:2px solid var(--ink);padding:3px 6px}
 #text h2{font:600 24px/1.1 var(--ui);margin:0 0 4px}
 #text .who{margin:0 0 14px;color:var(--ink)}
 #text p{margin:0 0 12px}
-#text h3{font:600 14px/1 var(--ui);margin:18px 0 8px;padding-top:10px;border-top:2px solid var(--ink)}
-.wf{display:inline-block;border:2px solid var(--ink);padding:1px 6px;margin:0 4px 6px 0;font:13px/1.3 var(--ui);text-align:left;background:var(--paper)}
+#text h3{font:600 12px/1 var(--txt);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px;padding-top:10px;border-top:2px solid var(--ink)}
+.wf{display:inline-block;border:2px solid var(--ink);padding:3px 8px;margin:0 4px 6px 0;font:600 13px/1.3 var(--txt);text-align:left;background:var(--paper)}
 .wf:hover{background:var(--ink);color:var(--paper)}
-.wf small{font:11px var(--txt);opacity:.8}
+.wf small{font:400 12px var(--txt);margin-left:2px}
 .wf.ev{border-style:dashed;cursor:default}
 .wf.ev:hover{background:var(--paper);color:var(--ink)}
-#text .go{display:inline-block;margin-top:6px;font:14px var(--ui);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:4px 10px;text-decoration:none}
+#text .go{display:inline-block;margin-top:6px;font:600 14px var(--txt);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:4px 10px;text-decoration:none}
 #text .go:hover{background:var(--ink);color:var(--paper)}
 .pic{border:2px solid var(--ink);background:var(--ink) var(--dither);height:96px;margin:4px 0 14px;display:grid;place-items:center}
-.pic span{background:var(--paper);border:2px solid var(--ink);font:600 20px/1 var(--ui);padding:6px 12px}
+.pic span{background:var(--paper);border:2px solid var(--ink);font:600 20px/1 var(--txt);padding:6px 12px}
 
 /* ── status / legend ── */
-.status{flex:none;height:24px;border-top:2px solid var(--ink);font:13px/20px var(--ui);padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status{flex:none;height:24px;border-top:2px solid var(--ink);font:13px/20px var(--txt);padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #about{right:44px;top:92px;width:330px;z-index:30;display:none}
 #about.open{display:flex}
 #about .in{padding:14px 16px;font-size:13px}
@@ -166,7 +178,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
   #text{left:8px !important;right:8px;top:auto !important;bottom:8px;width:auto;height:58vh}
   body.reading #map{bottom:calc(58vh + 16px)}
   #about{left:8px;right:8px;width:auto}
-  .lane-label,.axis .corner{width:96px;font-size:13px}
+  .lane-label,.axis .corner{width:96px;font-size:12px}
   .lane-label small{display:none}
 }
 </style>
@@ -196,11 +208,12 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 </section>
 
 <section id="map" class="win" aria-label="Мапа">
-  <div class="tbar"><span class="box close" aria-hidden="true"></span><span class="name">Мапа · 1934 — 2020</span><span class="box zoom" aria-hidden="true"></span></div>
+  <div class="tbar"><span class="box close" aria-hidden="true"></span><span class="name">Мапа · 1934 — ?</span><span class="box zoom" aria-hidden="true"></span></div>
   <div class="scroll" id="scroll">
     <div class="canvas" id="canvas">
       <div class="axis" id="axis"><div class="corner">рік →<br>поруч у світі ◆</div></div>
       <div id="lanes"></div>
+      <svg class="space" id="space" aria-hidden="true"></svg>
       <svg class="edges" id="edges"></svg>
       <div class="layer" id="nodes"></div>
       <div class="cursor" id="cursor"><b></b></div>
@@ -294,7 +307,7 @@ const EVENTS=[
 
 const byId={};N.forEach(n=>{byId[n.id]=n;n.f=n.f||[];n.kids=[]});
 N.forEach(n=>n.f.forEach(p=>byId[p]&&byId[p].kids.push(n.id)));
-const Y0=1930,Y1=2025,AX=74,H=58,ROW=76;
+const Y0=1930,Y1=2044,NOW=2026,AX=74,H=58,ROW=76;
 const mob=()=>innerWidth<=760;
 let PX=34, sel=null, hover=null, show={text:true,prog:true,edges:true};
 
@@ -308,10 +321,11 @@ function layout(){
   const W=NW(), total=X(Y1)+W;
   canvas.style.width=total+"px";
   // axis
-  let ah='<div class="corner">рік →<br>поруч у світі ◆</div>';
+  let ah=`<div class="corner">рік →<br>поруч у світі ◆</div><div class="future" style="left:${X(NOW)}px">✦ сьогодні → далі</div>`;
   for(let y=Y0;y<=Y1;y++){
-    if(y%10===0) ah+=`<div class="tick" style="left:${X(y)}px">${y}</div>`;
-    else if(y%5===0) ah+=`<div class="tick minor" style="left:${X(y)}px"></div>`;
+    const f=y>NOW?" fut":"";
+    if(y%10===0) ah+=`<div class="tick${f}" style="left:${X(y)}px">${y}</div>`;
+    else if(y%5===0) ah+=`<div class="tick minor${f}" style="left:${X(y)}px"></div>`;
   }
   EVENTS.forEach((e,i)=>{ah+=`<div class="ev" data-y="${e[0]}" style="left:${X(e[0])}px;top:${24+(i%3)*16}px" title="${e[0]}">${esc(e[1])}</div>`});
   axis.innerHTML=ah; axis.style.width=total+"px";
@@ -330,6 +344,7 @@ function layout(){
   });
   lanesEl.innerHTML=lh; canvas.style.height=top+"px";
   cursor.style.height=top+"px";
+  drawSpace(total,top);
   // nodes
   nodesEl.innerHTML=N.map(n=>{
     const k=Math.min(5,n.kids.length);
@@ -341,6 +356,58 @@ function layout(){
   drawEdges(); paint();
 }
 
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+// майбутнє: мапа розчиняється в 1-бітний космос
+function drawSpace(total,h){
+  const sv=$("#space"); sv.setAttribute("width",total); sv.setAttribute("height",h);
+  const xs=X(NOW), bw=PX*.9, x0=xs-bw*4, W2=total-xs, r=rng(1945);
+  const pat=(id,w,cells,fill="#000")=>`<pattern id="${id}" width="${w}" height="${w}" patternUnits="userSpaceOnUse">${cells.map(([x,y])=>`<rect x="${x}" y="${y}" width="1" height="1" fill="${fill}"/>`).join("")}</pattern>`;
+  let g=`<defs>${pat("d1",4,[[0,0]])}${pat("d2",4,[[0,0],[2,2]])}${pat("d3",2,[[0,0],[1,1]])}${pat("d4",2,[[0,0],[1,0],[0,1]])}
+    ${pat("w1",4,[[0,0],[2,2]],"#fff")}${pat("w2",2,[[0,0],[1,1]],"#fff")}${pat("w3",2,[[0,0],[1,0],[0,1]],"#fff")}
+    </defs>`;
+  ["d1","d2","d3","d4"].forEach((d,i)=>g+=`<rect x="${x0+i*bw}" y="${AX}" width="${bw+1}" height="${h-AX}" fill="url(#${d})"/>`);
+  g+=`<rect x="${xs}" y="${AX}" width="${W2}" height="${h-AX}" fill="#000"/>`;
+  // зорі
+  const n=Math.round((W2+bw*3)*(h-AX)/1400);
+  for(let i=0;i<n;i++){
+    const x=x0+bw*1.5+r()*(total-x0-bw*1.5), y=AX+4+r()*(h-AX-8);
+    if(x<xs&&r()>(x-x0)/(xs-x0))continue;
+    const k=r();
+    if(k<.05) g+=`<path d="M${x-5},${y}h11M${x},${y-5}v11" stroke="#fff" stroke-width="1"/><rect x="${x-1}" y="${y-1}" width="3" height="3" fill="#fff"/>`;
+    else g+=`<rect x="${x}" y="${y}" width="${k<.35?2:1}" height="${k<.35?2:1}" fill="#fff"/>`;
+  }
+  // поверхня-горизонт унизу з кратерами
+  const HR=Math.max(W2*1.1,700), hx=xs+W2*.55, hy=h+HR*.86;
+  g+=`<circle cx="${hx}" cy="${hy}" r="${HR}" fill="#000"/><circle cx="${hx}" cy="${hy}" r="${HR}" fill="url(#w1)"/>
+    <g clip-path="url(#ground)"><circle cx="${hx-HR*.25}" cy="${hy-HR*.3}" r="${HR*.75}" fill="url(#w2)"/></g>
+    <circle cx="${hx}" cy="${hy}" r="${HR}" fill="none" stroke="#fff" stroke-width="2"/>`;
+  [[-.18,.05,26],[.08,.09,16],[.25,.04,34],[-.32,.12,12],[.4,.11,20]].forEach(([dx,dy,cr])=>{
+    const x=hx+dx*W2, y=hy-Math.sqrt(HR*HR-(dx*W2)**2)+dy*h*.12+cr*.6;
+    if(x>xs+10&&x<total-10)g+=`<ellipse cx="${x}" cy="${y}" rx="${cr}" ry="${cr*.32}" fill="#000" stroke="#fff" stroke-width="2"/>`;
+  });
+  // планета з кільцем
+  const R=Math.max(46,Math.min(W2*.17,130)), cx=xs+W2*.68, cy=AX+300, rx=R*1.95, ry=R*.42;
+  const arc=(sw)=>`<path d="M${cx-rx},${cy} A${rx},${ry} 0 0 ${sw} ${cx+rx},${cy}" transform="rotate(-14 ${cx} ${cy})" fill="none"`;
+  const ring=sw=>`${arc(sw)} stroke="#fff" stroke-width="7"/>${arc(sw)} stroke="#000" stroke-width="2"/>`;
+  g+=ring(1)+`<circle cx="${cx}" cy="${cy}" r="${R}" fill="#000"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#w1)"/>
+    <g clip-path="url(#pl)"><circle cx="${cx-R*.35}" cy="${cy-R*.35}" r="${R*.75}" fill="url(#w2)"/><circle cx="${cx-R*.5}" cy="${cy-R*.5}" r="${R*.4}" fill="url(#w3)"/></g>
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#fff" stroke-width="2"/>`+ring(0);
+  // місяць з орбітою і супутником
+  const mx=xs+Math.max(110,W2*.3), my=AX+250;
+  g+=`<ellipse cx="${mx}" cy="${my}" rx="70" ry="20" fill="none" stroke="#fff" stroke-dasharray="2 4"/>
+    <circle cx="${mx}" cy="${my}" r="26" fill="#fff"/><circle cx="${mx+11}" cy="${my-7}" r="23" fill="#000"/><circle cx="${mx+11}" cy="${my-7}" r="23" fill="url(#d1)"/>
+    <g transform="translate(${mx+58},${my+10})" fill="#fff"><rect x="-3" y="-2" width="6" height="4"/><rect x="-13" y="-1" width="8" height="2"/><rect x="5" y="-1" width="8" height="2"/></g>`;
+  // падаюча зірка
+  const sx=xs+W2*.9, sy=AX+60;
+  g+=`<path d="M${sx-90},${sy-30}L${sx},${sy}" stroke="#fff" stroke-dasharray="1 3"/><path d="M${sx-30},${sy-10}L${sx},${sy}" stroke="#fff" stroke-width="2"/>`;
+  // напис
+  const tx=xs+28, ty=AX+80;
+  g+=`<text x="${tx}" y="${ty}" fill="#fff" style="font:600 30px 'Pixelify Sans',monospace">далі — ?</text>
+    <text x="${tx}" y="${ty+28}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Мапа закінчується сьогоднішнім днем.</text>
+    <text x="${tx}" y="${ty+48}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Наступний інструмент для думання ще не написаний.</text>`;
+  g+=`<defs><clipPath id="pl"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath><clipPath id="ground"><circle cx="${hx}" cy="${hy}" r="${HR}"/></clipPath></defs>`;
+  sv.innerHTML=g;
+}
 function drawEdges(){
   const W=NW(); let s="";
   N.forEach(b=>b.f.forEach(aid=>{
@@ -444,14 +511,14 @@ scroll.addEventListener("mousemove",e=>{
   const r=canvas.getBoundingClientRect(), x=e.clientX-r.left;
   if(x<GUT()){cursor.style.display="none";return}
   const y=Math.round(Y0+(x-GUT()-12)/PX);
-  cursor.style.display="block";cursor.style.left=x+"px";cursor.querySelector("b").textContent=y;
+  cursor.style.display="block";cursor.style.left=x+"px";cursor.querySelector("b").textContent=y;cursor.classList.toggle("fut",y>=NOW);
   nearEls.forEach(el=>el.classList.remove("near"));nearEls.clear();
   const nb=near(y);
   nb.nodes.forEach(n=>{const el=nodesEl.querySelector(`[data-id="${n.id}"]`);el&&(el.classList.add("near"),nearEls.add(el))});
   axis.querySelectorAll(".ev").forEach(el=>{if(Math.abs(+el.dataset.y-y)<=2){el.classList.add("near");nearEls.add(el)}});
   if(!hover){
     const names=nb.nodes.map(n=>n.n).slice(0,4).join(", ");
-    status.textContent=`${y-2}–${y+2}: `+(names||"тиша")+(nb.ev.length?" · ◆ "+nb.ev.map(e=>e[1]).join(", "):"");
+    status.textContent=y>NOW?`${y}: ще не написано ✦`:`${y-2}–${y+2}: `+(names||"тиша")+(nb.ev.length?" · ◆ "+nb.ev.map(e=>e[1]).join(", "):"");
   }
 });
 scroll.addEventListener("mouseleave",()=>{cursor.style.display="none";nearEls.forEach(el=>el.classList.remove("near"));if(!hover&&!sel)status.textContent=defStatus;else paint()});
