@@ -169,7 +169,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 #phone{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:16px;background:var(--dither-lite)}
 #phone.open{display:grid}
 #phone .win{position:relative;width:100%;max-width:340px;box-shadow:4px 4px 0 var(--ink)}
-#phone .art{display:block;width:100%;height:auto;border-bottom:2px solid var(--ink);color:var(--ink)}
+#phone .art{display:block;width:100%;height:auto;max-height:240px;object-fit:contain;background:#fff;border-bottom:2px solid var(--ink);image-rendering:pixelated}
 #phone .in{padding:16px 16px 6px;font-size:15px;line-height:1.45}
 #phone .in p{margin:0 0 10px}
 #phone .ok{display:block;margin:4px auto 16px 16px;font:600 15px var(--txt);border:2px solid var(--ink);border-radius:8px;outline:2px solid var(--ink);outline-offset:2px;padding:6px 22px;background:var(--paper)}
@@ -250,7 +250,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 <div id="phone" role="alertdialog" aria-modal="true" aria-labelledby="phoneT">
   <div class="win">
     <div class="tbar"><span class="name" id="phoneT">Маленька порада</span></div>
-    <svg class="art" id="phoneArt" viewBox="0 0 300 180" aria-hidden="true" shape-rendering="crispEdges"></svg>
+    <img class="art" src="https://d2w9rnfcy7mm78.cloudfront.net/1864078/original_a3da2cb4c1ebb09b81ab52b8eba04b11.gif?1520571297?bc=1" alt="" onerror="this.remove()">
     <div class="in">
       <div>
         <p>Привіт! Ця мапа велика, і по-справжньому вона розгортається на екрані комп'ютера: там видно, як ідеї тягнуться одна до одної крізь десятиліття.</p>
@@ -620,28 +620,6 @@ $("#themeBtn").onclick=()=>{
   const phone=matchMedia("(max-width:760px)").matches&&matchMedia("(pointer:coarse)").matches;
   let seen=false;try{seen=localStorage.getItem("ideas-phone-note")==="1"}catch(e){}
   if(!phone||seen)return;
-  // старий комп'ютер, з екрана якого вилазить галактика
-  const r=rng(1987), ga=()=>(r()+r()+r()-1.5)/1.5;
-  const B={x:112,y:84,w:76,h:88}, S={x:122,y:94,w:56,h:40};
-  const inS=(x,y)=>x>S.x&&x<S.x+S.w-2&&y>S.y&&y<S.y+S.h-2, inB=(x,y)=>x>B.x-2&&x<B.x+B.w&&y>B.y-2&&y<B.y+B.h;
-  let ink="",paper="";
-  const dot=(x,y,z)=>{x=Math.round(x);y=Math.round(y);if(y<0||y>178||x<0||x>298)return;
-    const d=`M${x},${y}h${z}v${z}h-${z}z`; if(inS(x,y))paper+=d; else if(!inB(x,y))ink+=d;};
-  const gx=150,gy=50,c=Math.cos(-.22),sn=Math.sin(-.22);
-  const put=(x,y,z)=>{y*=.42;dot(gx+x*c-y*sn,gy+x*sn+y*c,z)};
-  for(let i=0;i<260;i++){const th=r()*6.283,rr=22*Math.abs(ga());put(Math.cos(th)*rr,Math.sin(th)*rr,r()<.5?2:1)}
-  for(let k=0;k<2;k++)for(let i=0;i<520;i++){const t=Math.pow(r(),.85),th=k*Math.PI+t*7.5,rr=12+128*t,j=3+9*t;put(Math.cos(th)*rr+ga()*j,Math.sin(th)*rr+ga()*j,r()<.3*(1-t)+.06?2:1)}
-  // потік із екрана до ядра галактики
-  for(let i=0;i<220;i++){const t=r(),x=150+ga()*(4+t*18),y=S.y+S.h-6-t*(S.h+38);dot(x,y,r()<.4?2:1)}
-  for(let i=0;i<26;i++){const x=r()*298,y=r()*178;if(!inB(x,y))ink+=`M${x|0},${y|0}h1v1h-1z`}
-  $("#phoneArt").innerHTML=`<path d="${ink}" fill="currentColor"/>
-    <rect x="${B.x}" y="${B.y}" width="${B.w}" height="${B.h}" rx="6" fill="var(--paper)" stroke="currentColor" stroke-width="2"/>
-    <rect x="${S.x-4}" y="${S.y-4}" width="${S.w+8}" height="${S.h+8}" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
-    <rect x="${S.x}" y="${S.y}" width="${S.w}" height="${S.h}" fill="currentColor"/>
-    <path d="${paper}" fill="var(--paper)"/>
-    <path d="M${S.x+30},${B.y+B.h-24}h22" stroke="currentColor" stroke-width="3"/>
-    <rect x="${B.x+8}" y="${B.y+B.h-14}" width="6" height="3" fill="currentColor"/>
-    <path d="M${B.x+4},${B.y+B.h-6}h${B.w-8}" stroke="currentColor"/>`;
   const el=$("#phone");el.classList.add("open");setTimeout(()=>$("#phoneOk").focus(),50);
   $("#phoneOk").onclick=()=>{el.classList.remove("open");try{localStorage.setItem("ideas-phone-note","1")}catch(e){}};
 })();
