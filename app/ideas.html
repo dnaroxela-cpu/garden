@@ -392,7 +392,7 @@ function layout(){
   canvas.style.width=total+"px";
   // axis
   let ah=`<div class="corner">рік →<br>поруч у світі ◆</div><div class="future" style="left:${X(NOW)}px">✦ сьогодні → далі</div>`;
-  const zx=GUT()+12, bx=zx+ZONE()-22;
+  const zx=GUT()+12, bx=X(Y0)-12;
   ah+=`<div class="oldzone" style="left:${GUT()}px;width:${bx-GUT()}px">XVI ст. — ${Y0} · шкала стиснута</div>`;
   for(let y=Y0;y<=Y1;y++){
     const f=y>NOW?" fut":"";
@@ -421,7 +421,7 @@ function layout(){
     top+=h;
   });
   lanesEl.innerHTML=lh; canvas.style.height=top+"px";
-  const brk=$("#brk"); brk.style.left=(GUT()+12+ZONE()-22)+"px"; brk.style.height=top+"px";
+  const brk=$("#brk"); brk.style.left=(X(Y0)-8)+"px"; brk.style.height=top+"px";
   cursor.style.height=top+"px";
   drawSpace(total,top);
   // nodes
