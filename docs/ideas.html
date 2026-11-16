@@ -297,7 +297,7 @@ const N=[
  {id:"kay77",y:1977,t:"text",l:"learn",n:"Personal Dynamic Media",w:"Алан Кей, Адель Ґолдберґ",f:["kay72","smalltalk"],d:"Звіт про роботу з дітьми в PARC: «метамедіум», що може імітувати будь-який інший медіум. Тексти, музика, анімація — у руках того, хто вчиться.",u:"https://www.newmediareader.com/book_samples/nmr-26-kay.pdf"},
  {id:"mindstorms",y:1980,t:"text",l:"learn",n:"Mindstorms",w:"Сеймур Пейперт",f:["logo"],d:"Діти програмують комп'ютер, а не комп'ютер програмує дітей. «Об'єкти, щоб думати з ними», конструкціонізм і помилки як частина навчання.",u:"https://en.wikipedia.org/wiki/Mindstorms_(book)"},
  {id:"literary",y:1981,t:"text",l:"mem",n:"Literary Machines",w:"Тед Нельсон",f:["nelson74"],d:"Опис Xanadu як всесвітньої гіпертекстової бібліотеки «docuverse» з авторськими мікроплатежами за цитування.",u:"https://en.wikipedia.org/wiki/Literary_Machines"},
- {id:"commonplace",y:1930,yl:"XVI–XIX ст.",kind:"¶ явище",t:"text",l:"pkm",n:"Commonplace books",w:"Еразм, Бекон, Мільтон, Локк, Джефферсон, Вулф…",d:"Століттями читачі вели «книги загальних місць»: виписували цитати, афоризми, рецепти, спостереження і розкладали їх за рубриками, щоб потім із них думати й писати. Еразм вчив цього студентів, Джон Локк 1706 року видав «New Method of Making Common-Place-Books» з покажчиком на дві сторінки, а такі зошити тримали Мільтон, Джефферсон, Вірджинія Вулф. Це не один текст, а практика — читання як збирання, де пам'ять живе зовні, на папері. Пряма лінія до картотеки Лумана, Are.na і цифрових садів.",u:"https://en.wikipedia.org/wiki/Commonplace_book"},
+ {id:"commonplace",y:1830,yl:"XVI–XIX ст.",kind:"¶ явище",t:"text",l:"pkm",n:"Commonplace books",w:"Еразм, Бекон, Мільтон, Локк, Джефферсон, Вулф…",d:"Століттями читачі вели «книги загальних місць»: виписували цитати, афоризми, рецепти, спостереження і розкладали їх за рубриками, щоб потім із них думати й писати. Еразм вчив цього студентів, Джон Локк 1706 року видав «New Method of Making Common-Place-Books» з покажчиком на дві сторінки, а такі зошити тримали Мільтон, Джефферсон, Вірджинія Вулф. Це не один текст, а практика — читання як збирання, де пам'ять живе зовні, на папері. Пряма лінія до картотеки Лумана, Are.na і цифрових садів.",u:"https://en.wikipedia.org/wiki/Commonplace_book"},
  {id:"luhmann",y:1981,t:"text",l:"pkm",n:"Kommunikation mit Zettelkästen",w:"Ніклас Луман",f:["commonplace"],d:"Соціолог описує свою картотеку з ~90 000 карток як партнера в розмові: картки мають номери, посилаються одна на одну, і система сама підкидає несподівані зв'язки.",u:"https://luhmann.surge.sh/communicating-with-slip-boxes"},
  {id:"mac",y:1984,t:"prog",l:"aug",n:"Macintosh",w:"Apple",f:["alto"],d:"Графічний інтерфейс PARC іде в маси. Саме ця пластина 1-бітної графіки — стиль цієї мапи.",u:"https://en.wikipedia.org/wiki/Macintosh_128K"},
  {id:"medialab",y:1987,t:"text",l:"learn",n:"The Media Lab: Inventing the Future at MIT",w:"Стюарт Бренд",f:["wec","mindstorms","kay77"],d:"Бренд провів кілька місяців у Media Lab Ніколаса Негропонте і описав, як телебачення, друк і комп'ютер зливаються в одне цифрове медіа. Тут Пейперт вчить дітей з Logo і LEGO, Кей будує Vivarium, а сама лабораторія «демонструє або помирає». Книжка про те, як винаходять майбутнє, — і про його ризики.",u:"https://en.wikipedia.org/wiki/MIT_Media_Lab"},
@@ -361,7 +361,7 @@ const N=[
  {id:"obsidian",y:2020,t:"prog",l:"pkm",n:"Obsidian",w:"Шида Лі, Ерика Сюй",f:["roam","tiddly","ahrens","wiki"],d:"Звичайні Markdown-файли у твоїй папці, [[посилання]], граф і Canvas. Цей сад живе саме в ньому.",u:"https://obsidian.md"}
 ];
 const EVENTS=[
- [1844,"телеграф Морзе"],[1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен: «медіум — це повідомлення»"],
+ [1839,"фотоапарат: дагеротип"],[1844,"телеграф Морзе"],[1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен «Розуміння медіа»"],[1967,"відеокамера Portapak"],
  [1968,"травень 68"],[1969,"Аполлон-11"],[1971,"email, Intel 4004"],[1977,"Apple II"],[1981,"IBM PC"],[1983,"TCP/IP"],
  [1989,"падіння Берлінського муру"],[1991,"незалежність України"],[1995,"Windows 95, Amazon"],[1997,"Deep Blue обіграє Каспарова"],[2000,"доткомова криза"],
  [2004,"Facebook"],[2007,"iPhone"],[2010,"iPad"],[2016,"AlphaGo"],[2020,"пандемія"]
@@ -377,7 +377,10 @@ let PX=34, sel=null, hover=null, show={text:true,prog:true,edges:true};
 const $=s=>document.querySelector(s);
 const scroll=$("#scroll"),canvas=$("#canvas"),lanesEl=$("#lanes"),nodesEl=$("#nodes"),edgesEl=$("#edges"),axis=$("#axis"),cursor=$("#cursor"),status=$("#status");
 const GUT=()=>mob()?96:150, NW=()=>mob()?132:150;
-const X=y=>GUT()+(y-Y0)*PX+12;
+// до 1930 року шкала стиснута вдесятеро: давні події поміщаються, але не розтягують мапу
+const OLD0=1830, CF=.1, PRE=()=>(Y0-OLD0)*PX*CF;
+const X=y=>GUT()+12+(y>=Y0?PRE()+(y-Y0)*PX:(Math.max(y,OLD0)-OLD0)*PX*CF);
+const yearAt=x=>{const d=x-GUT()-12;return d<PRE()?OLD0+d/(PX*CF):Y0+(d-PRE())/PX};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function layout(){
@@ -385,12 +388,22 @@ function layout(){
   canvas.style.width=total+"px";
   // axis
   let ah=`<div class="corner">рік →<br>поруч у світі ◆</div><div class="future" style="left:${X(NOW)}px">✦ сьогодні → далі</div>`;
+  for(let y=OLD0+10;y<Y0;y+=10){
+    if(y%50===0) ah+=`<div class="tick" style="left:${X(y)}px">${y}</div>`;
+    else ah+=`<div class="tick minor" style="left:${X(y)}px"></div>`;
+  }
   for(let y=Y0;y<=Y1;y++){
     const f=y>NOW?" fut":"";
     if(y%10===0) ah+=`<div class="tick${f}" style="left:${X(y)}px">${y}</div>`;
     else if(y%5===0) ah+=`<div class="tick minor${f}" style="left:${X(y)}px"></div>`;
   }
-  EVENTS.forEach((e,i)=>{const old=e[0]<Y0;ah+=`<div class="ev" data-y="${e[0]}" style="left:${X(Math.max(e[0],Y0))}px;top:${24+(i%3)*16}px" title="${e[0]}">${old?e[0]+" · ":""}${esc(e[1])}</div>`});
+  const evEnd=[-1e9,-1e9,-1e9];
+  EVENTS.forEach(e=>{
+    const x=X(e[0]), w=e[1].length*6.6+16;
+    let row=evEnd.findIndex(end=>end+6<=x); if(row<0)row=evEnd.indexOf(Math.min(...evEnd));
+    evEnd[row]=x+w;
+    ah+=`<div class="ev" data-y="${e[0]}" style="left:${x}px;top:${24+row*16}px" title="${e[0]}">${esc(e[1])}</div>`;
+  });
   axis.innerHTML=ah; axis.style.width=total+"px";
   // lanes
   let top=AX, lh="";
@@ -644,7 +657,7 @@ const nearEls=new Set();
 scroll.addEventListener("mousemove",e=>{
   const r=canvas.getBoundingClientRect(), x=e.clientX-r.left;
   if(x<GUT()){cursor.style.display="none";return}
-  const y=Math.round(Y0+(x-GUT()-12)/PX);
+  const y=Math.round(yearAt(x));
   cursor.style.display="block";cursor.style.left=x+"px";cursor.querySelector("b").textContent=y;cursor.classList.toggle("fut",y>=NOW);
   nearEls.forEach(el=>el.classList.remove("near"));nearEls.clear();
   const nb=near(y);
@@ -664,9 +677,9 @@ $("#tools").addEventListener("click",e=>{
     if(t==="edges")edgesEl.classList.toggle("hide",!show.edges);else{const keep=scroll.scrollLeft/canvas.offsetWidth;layout();scroll.scrollLeft=keep*canvas.offsetWidth}}
   if(t==="clear"){hover=null;closeText();scroll.scrollTo({left:0,top:0,behavior:"smooth"})}
   if(t==="in"||t==="out"){
-    const mid=(scroll.scrollLeft+scroll.clientWidth/2-GUT())/PX;
+    const mid=yearAt(scroll.scrollLeft+scroll.clientWidth/2);
     PX=Math.max(16,Math.min(70,PX+(t==="in"?12:-12)));layout();
-    scroll.scrollLeft=mid*PX+GUT()-scroll.clientWidth/2;
+    scroll.scrollLeft=X(mid)-scroll.clientWidth/2;
   }
   if(t==="find"&&sel)focusNode(sel);
 });
