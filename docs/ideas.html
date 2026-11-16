@@ -235,7 +235,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
     <div class="legend"><div class="node prog"><div class="h"><span>Програма</span></div><div class="b"><span class="yr">1968</span><span class="who">система, мережа</span></div></div></div>
     <p>Стрілка — вплив: пряма цитата, спільні люди або ідея, що перейшла далі. Маленькі прямокутники на тексті — скільки речей на нього спиралися.</p>
     <p>Пунктир, що ходить за мишкою, — рік: усе, що сталося поруч, обводиться, а вгорі світяться події світу ◆.</p>
-    <p>Рядки — теми: пам'ять, посилення інтелекту, навчання, мережа, нотатки.</p>
+    <p>Рядки — теми: пам'ять, посилення інтелекту, навчання, мережа, нотатки і окремий трек кібернетики та ШІ — з фокусом на філософських ідеях, що зробили ШІ можливим, і на сумнівах щодо нього.</p>
   </div>
 </section>
 
@@ -245,20 +245,21 @@ const LANES=[
   {k:"aug",  t:"Посилення інтелекту", s:"людина + машина, інтерфейси"},
   {k:"learn",t:"Навчання і діти", s:"комп'ютер як матеріал для думання"},
   {k:"net",  t:"Мережа і спільне знання", s:"бібліотеки, веб, вікі"},
-  {k:"pkm",  t:"Нотатки і сади", s:"картки, вікі для себе, цифрові сади"}
+  {k:"pkm",  t:"Нотатки і сади", s:"картки, вікі для себе, цифрові сади"},
+  {k:"ai",   t:"Кібернетика і ШІ", s:"чи може машина думати: ідеї і сумніви"}
 ];
 // t: text | prog; from: що вплинуло
 const N=[
  {id:"otlet",y:1934,t:"text",l:"net",n:"Traité de documentation",w:"Поль Отле",d:"Бельгійський бібліограф мріяв про «Мундането» — всесвітню картотеку, де кожен факт записаний на окремій картці і пов'язаний з іншими. Описав «книгу-світ», яку можна читати на відстані через екран: мережу документів за десятиліття до комп'ютерів.",u:"https://en.wikipedia.org/wiki/Paul_Otlet"},
  {id:"wells",y:1938,t:"text",l:"net",n:"World Brain",w:"Герберт Веллс",f:["otlet"],d:"Збірка лекцій про «Світовий мозок» — постійну світову енциклопедію на мікрофільмах, доступну кожному. Знання як спільна пам'ять людства, яка має рости й виправлятися.",u:"https://en.wikipedia.org/wiki/World_Brain"},
  {id:"bush",y:1945,t:"text",l:"mem",n:"As We May Think",w:"Веннівер Буш",f:["otlet"],d:"Есей в The Atlantic наприкінці війни: наука вже вміє руйнувати, тепер їй варто допомогти людям пам'ятати. Memex — стіл із мікрофільмами, де читач прокладає «асоціативні стежки» між документами, бо мозок працює асоціаціями, а не алфавітом. З цього тексту виростає майже все праворуч.",u:"https://inigomedina.co/library/work/bush-as-we-may-think"},
- {id:"lick60",y:1960,t:"text",l:"aug",n:"Man-Computer Symbiosis",w:"Дж. К. Р. Ліклайдер",f:["bush"],d:"Комп'ютер не як калькулятор, а як партнер у думанні: людина ставить питання й цілі, машина робить рутину. Ліклайдер потім фінансував у ARPA тих, хто будував це на ділі.",u:"https://en.wikipedia.org/wiki/Man%E2%80%93Computer_Symbiosis"},
+ {id:"lick60",y:1960,t:"text",l:"aug",n:"Man-Computer Symbiosis",w:"Дж. К. Р. Ліклайдер",f:["bush","wiener48"],d:"Комп'ютер не як калькулятор, а як партнер у думанні: людина ставить питання й цілі, машина робить рутину. Ліклайдер потім фінансував у ARPA тих, хто будував це на ділі.",u:"https://en.wikipedia.org/wiki/Man%E2%80%93Computer_Symbiosis"},
  {id:"xanadu",y:1960,t:"prog",l:"mem",n:"Project Xanadu",w:"Тед Нельсон",f:["bush"],d:"Найдовший незавершений проєкт в історії софту. Двонаправлені посилання, які не ламаються, transclusion — вставка частини одного документа в інший із живим зв'язком, версії поруч. Майже все це пізніше частково повертається у вікі й Roam.",u:"https://xanadu.com"},
  {id:"plato",y:1960,t:"prog",l:"learn",n:"PLATO",w:"Дональд Бітцер, Університет Іллінойсу",d:"Навчальна система з терміналами і плазмовими екранами. Задумана для уроків, вона стала першою онлайн-спільнотою: форуми, чати, ігри, миттєві повідомлення.",u:"https://en.wikipedia.org/wiki/PLATO_(computer_system)"},
  {id:"engel62",y:1962,t:"text",l:"aug",n:"Augmenting Human Intellect",w:"Даґлас Енґельбарт",f:["bush","lick60"],d:"Концептуальна рамка: як збільшити здатність людини розуміти складні проблеми. Мова, артефакти, методи й навчання разом — система H-LAM/T. Енґельбарт прямо відштовхується від Memex.",u:"https://www.dougengelbart.org/content/view/138"},
  {id:"sketchpad",y:1963,t:"prog",l:"aug",n:"Sketchpad",w:"Айвен Сазерленд",f:["lick60"],d:"Малювання світловим пером прямо на екрані: об'єкти, обмеження, копії від зразка. Перший графічний інтерфейс і прабатько об'єктного програмування.",u:"https://en.wikipedia.org/wiki/Sketchpad"},
  {id:"nelson65",y:1965,t:"text",l:"mem",n:"A File Structure for the Complex, the Changing and the Indeterminate",w:"Тед Нельсон",f:["bush","xanadu"],d:"Доповідь, де вперше з'являється слово «гіпертекст»: текст, що розгалужується і дозволяє читачеві вибирати шлях. Нельсон цитує «As We May Think».",u:"https://en.wikipedia.org/wiki/Hypertext"},
- {id:"logo",y:1967,t:"prog",l:"learn",n:"Logo",w:"Сеймур Пейперт, Воллі Фойрцайґ, Синтія Соломон",f:["sketchpad"],d:"Мова програмування для дітей і черепашка, яку вони вчать ходити. За Піаже, діти найкраще вчаться, коли будують щось своє — комп'ютер стає матеріалом для думання.",u:"https://en.wikipedia.org/wiki/Logo_(programming_language)"},
+ {id:"logo",y:1967,t:"prog",l:"learn",n:"Logo",w:"Сеймур Пейперт, Воллі Фойрцайґ, Синтія Соломон",f:["sketchpad","minsky61"],d:"Мова програмування для дітей і черепашка, яку вони вчать ходити. За Піаже, діти найкраще вчаться, коли будують щось своє — комп'ютер стає матеріалом для думання.",u:"https://en.wikipedia.org/wiki/Logo_(programming_language)"},
  {id:"hes",y:1967,t:"prog",l:"mem",n:"HES / FRESS",w:"Андріс ван Дам, Тед Нельсон",f:["nelson65"],d:"Hypertext Editing System у Брауні — одна з перших гіпертекстових систем; її наступник FRESS запозичив ідеї з NLS. Використовувалися на справжніх курсах з поезії.",u:"https://en.wikipedia.org/wiki/Hypertext_Editing_System"},
  {id:"nls",y:1968,t:"prog",l:"aug",n:"NLS · «Мати всіх демо»",w:"Даґлас Енґельбарт, SRI",f:["engel62","sketchpad"],d:"За 90 хвилин на сцені в Сан-Франциско: миша, вікна, гіпертекстові посилання, спільне редагування на відстані, відеозв'язок. Усе для того, щоб групи людей думали разом.",u:"https://www.dougengelbart.org/content/view/209/"},
  {id:"lick68",y:1968,t:"text",l:"net",n:"The Computer as a Communication Device",w:"Ліклайдер і Роберт Тейлор",f:["lick60","nls"],d:"«Через кілька років люди зможуть спілкуватися через машину краще, ніж віч-на-віч». Онлайн-спільноти за інтересами, а не за місцем. Тейлор тоді ж запускав ARPANET.",u:"https://en.wikipedia.org/wiki/J._C._R._Licklider"},
@@ -284,7 +285,7 @@ const N=[
  {id:"landow",y:1992,t:"text",l:"mem",n:"Hypertext",w:"Джордж Лендоу",f:["intermedia","nelson74"],d:"Гіпертекст як втілення ідей Барта, Дерріди й Фуко: смерть автора, текст як мережа, читач-співавтор. Написано з досвіду курсів на Intermedia.",u:"https://en.wikipedia.org/wiki/George_Landow"},
  {id:"mosaic",y:1993,t:"prog",l:"net",n:"Mosaic",w:"Марк Андріссен, Ерік Біна, NCSA",f:["www"],d:"Браузер з картинками прямо в тексті. Веб стає масовим — і перетворюється з простору письма на простір читання.",u:"https://en.wikipedia.org/wiki/Mosaic_(web_browser)"},
  {id:"wiki",y:1995,t:"prog",l:"net",n:"WikiWikiWeb",w:"Ворд Каннінґем",f:["hypercard","www"],d:"Сторінка, яку може редагувати кожен, і посилання, що з'являється, коли пишеш назву ще не створеної сторінки. Каннінґем надихався HyperCard. Звідси [[подвійні дужки]].",u:"https://en.wikipedia.org/wiki/WikiWikiWeb"},
- {id:"extended",y:1998,t:"text",l:"aug",n:"The Extended Mind",w:"Енді Кларк, Девід Чалмерс",f:["engel62"],d:"Блокнот Отто, який втратив пам'ять, — частина його розуму так само, як пам'ять Інги. Думання не закінчується черепом: нотатки — продовження мислення.",u:"https://en.wikipedia.org/wiki/The_Extended_Mind"},
+ {id:"extended",y:1998,t:"text",l:"aug",n:"The Extended Mind",w:"Енді Кларк, Девід Чалмерс",f:["engel62","embodied91","bateson72"],d:"Блокнот Отто, який втратив пам'ять, — частина його розуму так само, як пам'ять Інги. Думання не закінчується черепом: нотатки — продовження мислення.",u:"https://en.wikipedia.org/wiki/The_Extended_Mind"},
  {id:"google",y:1998,t:"prog",l:"net",n:"Google",w:"Ларрі Пейдж, Сергій Брін",f:["www"],d:"PageRank рахує посилання як цитування в науці. Пошук замінює каталоги — і стежки Буша замінює рядок запиту.",u:"https://en.wikipedia.org/wiki/PageRank"},
  {id:"wikipedia",y:2001,t:"prog",l:"net",n:"Вікіпедія",w:"Джиммі Вейлз, Ларрі Сенґер",f:["wiki","wells"],d:"Найближче, що ми маємо до «Світового мозку» Веллса: енциклопедія, яку пишуть волонтери, відкрита історія правок і обговорень.",u:"https://uk.wikipedia.org"},
  {id:"delicious",y:2003,t:"prog",l:"net",n:"del.icio.us",w:"Джошуа Шахтер",f:["www"],d:"Соціальні закладки й теги: замість ієрархії папок — «фолксономія», колекції, що видно іншим.",u:"https://en.wikipedia.org/wiki/Delicious_(website)"},
@@ -296,13 +297,46 @@ const N=[
  {id:"matuschak",y:2019,t:"text",l:"aug",n:"How can we develop transformative tools for thought?",w:"Енді Матушак, Майкл Нільсен",f:["engel62","kay72","victor"],d:"Есей і мнемонічний медіум Quantum Country: чому інструменти для думання досі не стали «справжніми» і що з цим робити.",u:"https://numinous.productions/ttft/"},
  {id:"roam",y:2019,t:"prog",l:"pkm",n:"Roam Research",w:"Конор Вайт-Салліван",f:["xanadu","luhmann","nls","wiki"],d:"Блоки, бэклінки, транслюзія: ідеї Xanadu й NLS у браузері. Запустив хвилю «networked thought».",u:"https://roamresearch.com"},
  {id:"appleton",y:2020,t:"text",l:"pkm",n:"A Brief History & Ethos of the Digital Garden",w:"Меґі Еплтон",f:["caulfield","matuschak"],d:"Цифровий сад як жанр: незавершені нотатки, статуси «паросток / дерево», зв'язки замість хронології. Саме такий, як цей сайт.",u:"https://maggieappleton.com/garden-history"},
+ {id:"turing36",y:1936,t:"text",l:"ai",n:"On Computable Numbers",w:"Алан Тюрінг",d:"Уявна машина зі стрічкою і таблицею правил може виконати будь-яке обчислення, яке взагалі можна описати. Мислення-як-обчислення стає точним поняттям — і водночас видно його межі: є задачі, які жодна машина не розв'яже.",u:"https://en.wikipedia.org/wiki/Turing%27s_proof"},
+ {id:"mcculloch43",y:1943,t:"text",l:"ai",n:"A Logical Calculus of the Ideas Immanent in Nervous Activity",w:"Воррен Маккаллок, Волтер Піттс",f:["turing36"],d:"Нейрон як логічний вентиль: мережа простих клітин може обчислювати будь-що, що й машина Тюрінга. Мозок і комп'ютер уперше описано однією мовою — звідси і нейромережі, і кібернетика.",u:"https://en.wikipedia.org/wiki/Artificial_neuron"},
+ {id:"rosenblueth43",y:1943,t:"text",l:"ai",n:"Behavior, Purpose and Teleology",w:"Розенблют, Вінер, Бігелоу",d:"Мета — не таємнича властивість душі, а зворотний зв'язок: система порівнює, де вона є, з тим, де має бути, і виправляється. Цілеспрямованість стає інженерним поняттям — для гармати, організму і суспільства однаково.",u:"https://en.wikipedia.org/wiki/Arturo_Rosenblueth"},
+ {id:"wiener48",y:1948,t:"text",l:"ai",n:"Cybernetics",w:"Норберт Вінер",f:["rosenblueth43","mcculloch43"],d:"«Керування і зв'язок у тварині й машині». Інформація, зворотний зв'язок і гомеостаз як спільна мова для біології, техніки й суспільства. Книжка народилася з Мейсі-конференцій, де разом сиділи математики, нейрофізіологи, антропологи й психіатри.",u:"https://en.wikipedia.org/wiki/Cybernetics:_Or_Control_and_Communication_in_the_Animal_and_the_Machine"},
+ {id:"shannon48",y:1948,t:"text",l:"ai",n:"A Mathematical Theory of Communication",w:"Клод Шеннон",f:["turing36"],d:"Інформація вимірюється в бітах і не залежить від значення. Це відокремлення сигналу від сенсу зробило можливими і цифровий зв'язок, і статистичні моделі мови — і досі лишається головним філософським питанням до ШІ.",u:"https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication"},
+ {id:"homeostat",y:1948,t:"prog",l:"ai",n:"Гомеостат",w:"В. Росс Ешбі",f:["rosenblueth43"],d:"Машина з чотирьох блоків, що сама шукає стійкий стан, коли її збурюють. Ешбі показав адаптацію без задуму: поведінку, схожу на навчання, з простих правил. Потім — «Design for a Brain» (1952).",u:"https://en.wikipedia.org/wiki/Homeostat"},
+ {id:"hebb49",y:1949,t:"text",l:"ai",n:"The Organization of Behavior",w:"Дональд Гебб",f:["mcculloch43"],d:"«Нейрони, що спрацьовують разом, зв'язуються разом». Навчання — це зміна сили зв'язків, а не запис правил. Ця ідея живе в кожній нейромережі.",u:"https://en.wikipedia.org/wiki/Hebbian_theory"},
+ {id:"turing50",y:1950,t:"text",l:"ai",n:"Computing Machinery and Intelligence",w:"Алан Тюрінг",f:["turing36"],d:"Питання «чи може машина думати?» замінено грою в імітацію: якщо в розмові її не відрізнити від людини — що ще ми хочемо знати? Тюрінг розбирає заперечення від теологічного до «машина робить лише те, що їй сказали» і пропонує машину, що вчиться, як дитина.",u:"https://academic.oup.com/mind/article/LIX/236/433/986238"},
+ {id:"wiener50",y:1950,t:"text",l:"ai",n:"The Human Use of Human Beings",w:"Норберт Вінер",f:["wiener48"],d:"Популярна книжка-попередження: автоматизація змінить працю, а машини, яким ми доручимо рішення, виконуватимуть буквально те, що сказано, а не те, що ми мали на увазі. Перша етика ШІ.",u:"https://en.wikipedia.org/wiki/The_Human_Use_of_Human_Beings"},
+ {id:"wittgenstein53",y:1953,t:"text",l:"ai",n:"Philosophical Investigations",w:"Людвіг Вітгенштайн",d:"Значення слова — це його вживання в мові, а не річ, на яку воно вказує. Мовні ігри, родинні подібності замість точних визначень. Через десятиліття ця ідея стане основою статистичної семантики і великих мовних моделей.",u:"https://en.wikipedia.org/wiki/Philosophical_Investigations"},
+ {id:"heidegger54",y:1954,t:"text",l:"ai",n:"Питання про техніку",w:"Мартін Гайдеґґер",d:"Техніка — не просто інструмент, а спосіб, у який світ нам відкривається: як «запас», ресурс до використання. Через Дрейфуса і Віноґрада ця критика прийде і в ШІ, і в дизайн інтерфейсів.",u:"https://en.wikipedia.org/wiki/The_Question_Concerning_Technology"},
+ {id:"dartmouth",y:1955,t:"text",l:"ai",n:"Dartmouth Proposal",w:"Маккарті, Мінскі, Рочестер, Шеннон",f:["turing50","shannon48","mcculloch43"],d:"Заявка на літній семінар 1956 року, де вперше звучить «штучний інтелект»: «кожен аспект навчання чи інтелекту можна описати так точно, що машину можна змусити його імітувати». Сміливе припущення, з якого почалася дисципліна.",u:"https://en.wikipedia.org/wiki/Dartmouth_workshop"},
+ {id:"logictheorist",y:1956,t:"prog",l:"ai",n:"Logic Theorist",w:"Ньюелл, Саймон, Шоу",f:["dartmouth"],d:"Програма, що доводила теореми з «Principia Mathematica», — одне доведення елегантніше за Расселове. Початок символьного ШІ: мислення як пошук і маніпуляція символами.",u:"https://en.wikipedia.org/wiki/Logic_Theorist"},
+ {id:"firth57",y:1957,t:"text",l:"ai",n:"A Synopsis of Linguistic Theory",w:"Джон Ферт",f:["wittgenstein53"],d:"«Слово пізнається з товариства, яке воно тримає». Дистрибутивна гіпотеза: значення можна вивести зі статистики сусідніх слів. Пряма лінія до word2vec і GPT.",u:"https://en.wikipedia.org/wiki/Distributional_semantics"},
+ {id:"perceptron",y:1958,t:"prog",l:"ai",n:"Перцептрон",w:"Френк Розенблатт",f:["mcculloch43","hebb49"],d:"Машина, що вчиться розпізнавати картинки, змінюючи ваги зв'язків. Газети писали про комп'ютер, який «ходитиме, говоритиме і усвідомлюватиме себе». Альтернатива символьному ШІ: не правила, а навчання.",u:"https://en.wikipedia.org/wiki/Perceptron"},
+ {id:"minsky61",y:1961,t:"text",l:"ai",n:"Steps Toward Artificial Intelligence",w:"Марвін Мінскі",f:["dartmouth","turing50"],d:"Карта поля: пошук, розпізнавання образів, навчання, планування, індукція. Програма для символьного ШІ на десятиліття.",u:"https://en.wikipedia.org/wiki/Marvin_Minsky"},
+ {id:"eliza",y:1966,t:"prog",l:"ai",n:"ELIZA",w:"Джозеф Вейценбаум",f:["turing50"],d:"Кілька сотень рядків, що відзеркалюють репліки, як психотерапевт. Люди розповідали їй інтимне і просили лишити наодинці. Вейценбаума налякало саме це — «ефект ELIZA»: ми охоче приписуємо машині розуміння.",u:"https://en.wikipedia.org/wiki/ELIZA"},
+ {id:"perceptrons69",y:1969,t:"text",l:"ai",n:"Perceptrons",w:"Марвін Мінскі, Сеймур Пейперт",f:["perceptron"],d:"Математичний розбір меж одношарових мереж. Книжку прочитали як вирок нейромережам — і фінансування пішло до символьного ШІ на півтора десятиліття.",u:"https://en.wikipedia.org/wiki/Perceptrons_(book)"},
+ {id:"bateson72",y:1972,t:"text",l:"ai",n:"Steps to an Ecology of Mind",w:"Ґреґорі Бейтсон",f:["wiener48"],d:"Розум — не в голові, а в контурі: людина, сокира, дерево і зворотний зв'язок між ними. Інформація — «різниця, що робить різницю». Кібернетика стає філософією екології.",u:"https://en.wikipedia.org/wiki/Steps_to_an_Ecology_of_Mind"},
+ {id:"dreyfus72",y:1972,t:"text",l:"ai",n:"What Computers Can't Do",w:"Губерт Дрейфус",f:["heidegger54","wittgenstein53","minsky61"],d:"Феноменологічна критика: людське знання — це вміння, тіло і контекст, а не правила й символи. Дослідники ШІ сміялися, але символьний ШІ справді вперся саме сюди.",u:"https://en.wikipedia.org/wiki/Hubert_Dreyfus%27s_views_on_artificial_intelligence"},
+ {id:"weizenbaum76",y:1976,t:"text",l:"ai",n:"Computer Power and Human Reason",w:"Джозеф Вейценбаум",f:["eliza","wiener50"],d:"Автор ELIZA пояснює, чому деякі рішення не можна доручати машинам, навіть якщо вони можуть їх ухвалювати: обчислення — не судження, а судження вимагає мудрості й відповідальності.",u:"https://en.wikipedia.org/wiki/Computer_Power_and_Human_Reason"},
+ {id:"autopoiesis",y:1980,t:"text",l:"ai",n:"Autopoiesis and Cognition",w:"Умберто Матурана, Франсиско Варела",f:["wiener48"],d:"Живе — це те, що постійно створює саме себе. Пізнання — не відображення зовнішнього світу, а спосіб живої системи підтримувати себе. Кібернетика другого порядку: спостерігач — частина системи.",u:"https://en.wikipedia.org/wiki/Autopoiesis"},
+ {id:"searle80",y:1980,t:"text",l:"ai",n:"Minds, Brains, and Programs",w:"Джон Серл",f:["turing50"],d:"Китайська кімната: людина за інструкцією відповідає китайськими ієрогліфами, не розуміючи жодного. Синтаксис — не семантика. Найвідоміший аргумент проти того, що програма може розуміти.",u:"https://en.wikipedia.org/wiki/Chinese_room"},
+ {id:"pdp86",y:1986,t:"text",l:"ai",n:"Parallel Distributed Processing",w:"Румельгарт, Макклелланд, Гінтон та ін.",f:["perceptron","hebb49","perceptrons69"],d:"Повернення нейромереж: знання розподілене по зв'язках, а не записане в символах; зворотне поширення помилки дозволяє вчити багатошарові мережі. Відповідь на «Perceptrons».",u:"https://en.wikipedia.org/wiki/Connectionism"},
+ {id:"society86",y:1986,t:"text",l:"ai",n:"The Society of Mind",w:"Марвін Мінскі",f:["minsky61"],d:"Розум як суспільство дрібних агентів, жоден з яких сам не розумний. 270 односторінкових есеїв, кожен — як картка в картотеці.",u:"https://en.wikipedia.org/wiki/Society_of_Mind"},
+ {id:"winograd86",y:1986,t:"text",l:"ai",n:"Understanding Computers and Cognition",w:"Террі Віноґрад, Фернандо Флорес",f:["heidegger54","autopoiesis","dreyfus72"],d:"Дослідник ШІ розвертається: комп'ютер не розуміє, тож проєктувати треба не штучний розум, а інструменти для людської розмови і дії. Гайдеґґер і Матурана в основі дизайну взаємодії.",u:"https://en.wikipedia.org/wiki/Understanding_Computers_and_Cognition"},
+ {id:"embodied91",y:1991,t:"text",l:"ai",n:"The Embodied Mind",w:"Варела, Томпсон, Рош",f:["autopoiesis","dreyfus72"],d:"Пізнання втілене: воно виростає з тіла, дії і світу, а не з внутрішніх репрезентацій. Енактивізм, феноменологія і буддійська практика уважності.",u:"https://en.wikipedia.org/wiki/The_Embodied_Mind"},
+ {id:"hayles99",y:1999,t:"text",l:"ai",n:"How We Became Posthuman",w:"Н. Кетрін Гейлз",f:["wiener48","autopoiesis"],d:"Історія того, як у кібернетиці інформація «втратила тіло» — і чому думка, що розум можна завантажити в машину, є культурним вибором, а не фактом.",u:"https://en.wikipedia.org/wiki/How_We_Became_Posthuman"},
+ {id:"alexnet",y:2012,t:"prog",l:"ai",n:"AlexNet",w:"Крижевський, Суцкевер, Гінтон",f:["pdp86"],d:"Глибока нейромережа на відеокартах перемагає в ImageNet з відривом. Ідеї 1980-х нарешті отримують дані й обчислення — починається глибоке навчання.",u:"https://en.wikipedia.org/wiki/AlexNet"},
+ {id:"word2vec",y:2013,t:"prog",l:"ai",n:"word2vec",w:"Томаш Міколов та ін.",f:["firth57","pdp86"],d:"Слова як точки в просторі, де «король − чоловік + жінка ≈ королева». Дистрибутивна гіпотеза Ферта, перетворена на геометрію.",u:"https://en.wikipedia.org/wiki/Word2vec"},
+ {id:"attention17",y:2017,t:"text",l:"ai",n:"Attention Is All You Need",w:"Васвані та ін., Google",f:["word2vec","pdp86"],d:"Трансформер: кожне слово «дивиться» на всі інші і зважує, які важливі. Архітектура, на якій стоять усі сучасні мовні моделі.",u:"https://arxiv.org/abs/1706.03762"},
+ {id:"parrots21",y:2021,t:"text",l:"ai",n:"On the Dangers of Stochastic Parrots",w:"Бендер, Ґебру, Макміллан-Мейджор, Мітчелл",f:["attention17","searle80","weizenbaum76"],d:"Мовна модель зшиває форму без доступу до значення — «стохастичний папуга». Питання Серла і Вейценбаума, поставлені знову: про розуміння, упередження в даних і ціну масштабу.",u:"https://dl.acm.org/doi/10.1145/3442188.3445922"},
+ {id:"chatgpt",y:2022,t:"prog",l:"ai",n:"ChatGPT",w:"OpenAI",f:["attention17","eliza","turing50"],d:"Розмова з мовною моделлю стає масовою за кілька тижнів. Гра в імітацію Тюрінга — щоденна практика, ефект ELIZA — у мільйонів людей одночасно, а питання Дрейфуса й Серла знову відкриті."},
  {id:"obsidian",y:2020,t:"prog",l:"pkm",n:"Obsidian",w:"Шида Лі, Ерика Сюй",f:["roam","tiddly","ahrens","wiki"],d:"Звичайні Markdown-файли у твоїй папці, [[посилання]], граф і Canvas. Цей сад живе саме в ньому.",u:"https://obsidian.md"}
 ];
 const EVENTS=[
- [1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен: «медіум — це повідомлення»"],
+ [1939,"Друга світова"],[1945,"кінець війни"],[1946,"Мейсі-конференції з кібернетики"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен: «медіум — це повідомлення»"],
  [1968,"травень 68"],[1969,"Аполлон-11"],[1971,"email, Intel 4004"],[1977,"Apple II"],[1981,"IBM PC"],[1983,"TCP/IP"],
- [1989,"падіння Берлінського муру"],[1991,"незалежність України"],[1995,"Windows 95, Amazon"],[2000,"доткомова криза"],
- [2004,"Facebook"],[2007,"iPhone"],[2010,"iPad"],[2020,"пандемія"],[2022,"ChatGPT"]
+ [1989,"падіння Берлінського муру"],[1991,"незалежність України"],[1995,"Windows 95, Amazon"],[1997,"Deep Blue обіграє Каспарова"],[2000,"доткомова криза"],
+ [2004,"Facebook"],[2007,"iPhone"],[2010,"iPad"],[2016,"AlphaGo"],[2020,"пандемія"]
 ];
 
 const byId={};N.forEach(n=>{byId[n.id]=n;n.f=n.f||[];n.kids=[]});
@@ -357,7 +391,7 @@ function layout(){
 }
 
 function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-// майбутнє: мапа розчиняється в 1-бітний космос
+// майбутнє: мапа розчиняється в 1-бітний космос із галактикою
 function drawSpace(total,h){
   const sv=$("#space"); sv.setAttribute("width",total); sv.setAttribute("height",h);
   const xs=X(NOW), bw=PX*.9, x0=xs-bw*4, W2=total-xs, r=rng(1945);
@@ -376,27 +410,24 @@ function drawSpace(total,h){
     if(k<.05) g+=`<path d="M${x-5},${y}h11M${x},${y-5}v11" stroke="#fff" stroke-width="1"/><rect x="${x-1}" y="${y-1}" width="3" height="3" fill="#fff"/>`;
     else g+=`<rect x="${x}" y="${y}" width="${k<.35?2:1}" height="${k<.35?2:1}" fill="#fff"/>`;
   }
-  // поверхня-горизонт унизу з кратерами
-  const HR=Math.max(W2*1.1,700), hx=xs+W2*.55, hy=h+HR*.86;
-  g+=`<circle cx="${hx}" cy="${hy}" r="${HR}" fill="#000"/><circle cx="${hx}" cy="${hy}" r="${HR}" fill="url(#w1)"/>
-    <g clip-path="url(#ground)"><circle cx="${hx-HR*.25}" cy="${hy-HR*.3}" r="${HR*.75}" fill="url(#w2)"/></g>
-    <circle cx="${hx}" cy="${hy}" r="${HR}" fill="none" stroke="#fff" stroke-width="2"/>`;
-  [[-.18,.05,26],[.08,.09,16],[.25,.04,34],[-.32,.12,12],[.4,.11,20]].forEach(([dx,dy,cr])=>{
-    const x=hx+dx*W2, y=hy-Math.sqrt(HR*HR-(dx*W2)**2)+dy*h*.12+cr*.6;
-    if(x>xs+10&&x<total-10)g+=`<ellipse cx="${x}" cy="${y}" rx="${cr}" ry="${cr*.32}" fill="#000" stroke="#fff" stroke-width="2"/>`;
-  });
-  // планета з кільцем
-  const R=Math.max(46,Math.min(W2*.17,130)), cx=xs+W2*.68, cy=AX+300, rx=R*1.95, ry=R*.42;
-  const arc=(sw)=>`<path d="M${cx-rx},${cy} A${rx},${ry} 0 0 ${sw} ${cx+rx},${cy}" transform="rotate(-14 ${cx} ${cy})" fill="none"`;
-  const ring=sw=>`${arc(sw)} stroke="#fff" stroke-width="7"/>${arc(sw)} stroke="#000" stroke-width="2"/>`;
-  g+=ring(1)+`<circle cx="${cx}" cy="${cy}" r="${R}" fill="#000"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#w1)"/>
-    <g clip-path="url(#pl)"><circle cx="${cx-R*.35}" cy="${cy-R*.35}" r="${R*.75}" fill="url(#w2)"/><circle cx="${cx-R*.5}" cy="${cy-R*.5}" r="${R*.4}" fill="url(#w3)"/></g>
-    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#fff" stroke-width="2"/>`+ring(0);
-  // місяць з орбітою і супутником
-  const mx=xs+Math.max(110,W2*.3), my=AX+250;
-  g+=`<ellipse cx="${mx}" cy="${my}" rx="70" ry="20" fill="none" stroke="#fff" stroke-dasharray="2 4"/>
-    <circle cx="${mx}" cy="${my}" r="26" fill="#fff"/><circle cx="${mx+11}" cy="${my-7}" r="23" fill="#000"/><circle cx="${mx+11}" cy="${my-7}" r="23" fill="url(#d1)"/>
-    <g transform="translate(${mx+58},${my+10})" fill="#fff"><rect x="-3" y="-2" width="6" height="4"/><rect x="-13" y="-1" width="8" height="2"/><rect x="5" y="-1" width="8" height="2"/></g>`;
+  // галактика: спіральні рукави з пікселів, щільне ядро
+  const gauss=()=>(r()+r()+r()+r()-2)/2;
+  const galaxy=(gx,gy,Rg,arms,wind,tilt,rot,n)=>{
+    let d="";const c=Math.cos(rot),sn=Math.sin(rot);
+    const dot=(x,y,sz)=>{y*=tilt;const X=gx+x*c-y*sn,Y=gy+x*sn+y*c;if(X>xs-bw&&X<total&&Y>AX&&Y<h)d+=`M${X|0},${Y|0}h${sz}v${sz}h-${sz}z`};
+    for(let i=0;i<n*.35;i++){const th=r()*6.283,rr=Rg*.2*Math.abs(gauss());dot(Math.cos(th)*rr,Math.sin(th)*rr,r()<.5?2:1)}
+    for(let k=0;k<arms;k++)for(let i=0;i<n*.5/arms;i++){
+      const t=Math.pow(r(),.8), th=k*6.283/arms+t*wind, rr=Rg*(.1+.9*t), j=Rg*(.025+.07*t);
+      dot(Math.cos(th)*rr+gauss()*j,Math.sin(th)*rr+gauss()*j,r()<.25*(1-t)+.08?2:1);
+    }
+    for(let i=0;i<n*.15;i++){const th=r()*6.283,rr=Rg*Math.sqrt(r());dot(Math.cos(th)*rr,Math.sin(th)*rr,1)}
+    return `<path d="${d}" fill="#fff"/>`;
+  };
+  const Rg=Math.max(120,Math.min(W2*.4,290)), gx=xs+W2*.62, gy=AX+Rg*.62+150;
+  g+=galaxy(gx,gy,Rg,2,8.6,.48,-.38,2600);
+  g+=`<rect x="${gx-3}" y="${gy-3}" width="6" height="6" fill="#fff"/><path d="M${gx-12},${gy}h25M${gx},${gy-12}v25" stroke="#fff"/>`;
+  g+=galaxy(xs+Math.max(80,W2*.22),gy+Rg*.9+120,Rg*.28,3,5,.7,.5,420);
+  g+=galaxy(xs+W2*.88,gy+Rg*1.3+160,Rg*.18,2,6,.35,.9,220);
   // падаюча зірка
   const sx=xs+W2*.9, sy=AX+60;
   g+=`<path d="M${sx-90},${sy-30}L${sx},${sy}" stroke="#fff" stroke-dasharray="1 3"/><path d="M${sx-30},${sy-10}L${sx},${sy}" stroke="#fff" stroke-width="2"/>`;
@@ -405,7 +436,6 @@ function drawSpace(total,h){
   g+=`<text x="${tx}" y="${ty}" fill="#fff" style="font:600 30px 'Pixelify Sans',monospace">далі — ?</text>
     <text x="${tx}" y="${ty+28}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Мапа закінчується сьогоднішнім днем.</text>
     <text x="${tx}" y="${ty+48}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Наступний інструмент для думання ще не написаний.</text>`;
-  g+=`<defs><clipPath id="pl"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath><clipPath id="ground"><circle cx="${hx}" cy="${hy}" r="${HR}"/></clipPath></defs>`;
   sv.innerHTML=g;
 }
 function drawEdges(){
