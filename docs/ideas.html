@@ -361,7 +361,7 @@ const N=[
  {id:"obsidian",y:2020,t:"prog",l:"pkm",n:"Obsidian",w:"Шида Лі, Ерика Сюй",f:["roam","tiddly","ahrens","wiki"],d:"Звичайні Markdown-файли у твоїй папці, [[посилання]], граф і Canvas. Цей сад живе саме в ньому.",u:"https://obsidian.md"}
 ];
 const EVENTS=[
- [1939,"Друга світова"],[1945,"кінець війни"],[1946,"Мейсі-конференції з кібернетики"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен: «медіум — це повідомлення»"],
+ [1844,"телеграф Морзе"],[1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен: «медіум — це повідомлення»"],
  [1968,"травень 68"],[1969,"Аполлон-11"],[1971,"email, Intel 4004"],[1977,"Apple II"],[1981,"IBM PC"],[1983,"TCP/IP"],
  [1989,"падіння Берлінського муру"],[1991,"незалежність України"],[1995,"Windows 95, Amazon"],[1997,"Deep Blue обіграє Каспарова"],[2000,"доткомова криза"],
  [2004,"Facebook"],[2007,"iPhone"],[2010,"iPad"],[2016,"AlphaGo"],[2020,"пандемія"]
@@ -390,7 +390,7 @@ function layout(){
     if(y%10===0) ah+=`<div class="tick${f}" style="left:${X(y)}px">${y}</div>`;
     else if(y%5===0) ah+=`<div class="tick minor${f}" style="left:${X(y)}px"></div>`;
   }
-  EVENTS.forEach((e,i)=>{ah+=`<div class="ev" data-y="${e[0]}" style="left:${X(e[0])}px;top:${24+(i%3)*16}px" title="${e[0]}">${esc(e[1])}</div>`});
+  EVENTS.forEach((e,i)=>{const old=e[0]<Y0;ah+=`<div class="ev" data-y="${e[0]}" style="left:${X(Math.max(e[0],Y0))}px;top:${24+(i%3)*16}px" title="${e[0]}">${old?e[0]+" · ":""}${esc(e[1])}</div>`});
   axis.innerHTML=ah; axis.style.width=total+"px";
   // lanes
   let top=AX, lh="";
