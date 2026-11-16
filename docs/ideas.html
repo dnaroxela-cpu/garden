@@ -83,6 +83,10 @@ a{color:inherit}
 .axis .oldzone{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font:600 12px/1.3 var(--txt);text-align:center;padding:0 8px;letter-spacing:.03em;color:var(--ink)}
 .brk{position:absolute;top:0;width:14px;z-index:4;pointer-events:none;background:var(--paper)}
 .brk::after{content:"";position:absolute;inset:0;background:var(--ink);--z:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16'%3E%3Cpath d='M3 0l4 4-4 4 4 4-4 4M9 0l4 4-4 4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");-webkit-mask:var(--z) 0 0/14px 16px repeat-y;mask:var(--z) 0 0/14px 16px repeat-y}
+.warn{position:absolute;z-index:4;pointer-events:none;background:var(--paper);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font:600 12px/1 var(--txt);padding:5px 8px;white-space:nowrap;animation:warnfall var(--dur,40s) linear infinite}
+.warn b{background:var(--ink);color:var(--paper);padding:2px 4px;margin:-2px 4px -2px -3px;font-weight:600}
+@keyframes warnfall{from{transform:translateY(0)}to{transform:translateY(var(--travel,1000px))}}
+@media (prefers-reduced-motion: reduce){.warn{animation:none}}
 .lane{position:relative;border-bottom:1px dashed var(--ink)}
 .lane:nth-child(even){background:var(--dither-lite);background-color:transparent}
 .lane-label{position:sticky;left:0;z-index:5;display:block;width:150px;height:100%;background:var(--paper);border-right:2px solid var(--ink);padding:10px 10px;font:600 14px/1.2 var(--txt)}
@@ -231,6 +235,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
       <div class="layer" id="nodes"></div>
       <div class="cursor" id="cursor"><b></b></div>
       <div class="brk" id="brk" aria-hidden="true"></div>
+      <div class="warn" id="warn" role="note"><b>⚠ warning:</b> шкала стиснута</div>
     </div>
   </div>
   <div class="status" id="status">Наведи на текст чи програму, щоб побачити, з чого виросла ідея і що виросло з неї.</div>
@@ -424,6 +429,9 @@ function layout(){
   });
   lanesEl.innerHTML=lh; canvas.style.height=top+"px";
   const brk=$("#brk"); brk.style.left=(X(Y0)-8)+"px"; brk.style.height=top+"px";
+  const warn=$("#warn"), wW=warn.offsetWidth||170, travel=top-AX-40;
+  Object.assign(warn.style,{left:(X(Y0)-wW-18)+"px",top:(AX+10)+"px"});
+  warn.style.setProperty("--travel",travel+"px");warn.style.setProperty("--dur",Math.round(travel/35)+"s");
   cursor.style.height=top+"px";
   drawSpace(total,top);
   // nodes
