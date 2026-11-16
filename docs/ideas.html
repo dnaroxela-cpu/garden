@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Як ми можемо думати</title>
+<meta name="description" content="Інтерактивна мапа історії ідей про роботу з інформацією і знаннями: від «As We May Think» до Вікіпедії, Obsidian і Are.na.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#000; --paper:#fff; --mute:#777;
+  --ui:"Pixelify Sans", "Chicago", "Charcoal", monospace;
+  --txt:Geneva, "Helvetica Neue", Arial, sans-serif;
+  --dither:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
+  --dither-lite:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#eee; --paper:#111; --mute:#888;
+    --dither:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+    --dither-lite:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#eee; --paper:#111; --mute:#888;
+  --dither:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+  --dither-lite:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--paper) var(--dither-lite);color:var(--ink);font:14px/1.45 var(--txt);overflow:hidden;-webkit-font-smoothing:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px dashed var(--ink);outline-offset:2px}
+
+/* ── menu bar ── */
+.menubar{position:fixed;inset:0 0 auto 0;height:26px;background:var(--paper);border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:18px;padding:0 14px;font:15px/1 var(--ui);z-index:50;white-space:nowrap}
+.menubar .mark{font-size:18px}
+.menubar .title{font-weight:600}
+.menubar .sp{flex:1}
+.menubar a{text-decoration:none}
+.menubar a:hover,.menubar button:hover{background:var(--ink);color:var(--paper)}
+.menubar a,.menubar button{padding:4px 6px}
+
+/* ── window chrome (1984 style) ── */
+.win{position:absolute;background:var(--paper);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);display:flex;flex-direction:column}
+.tbar{height:24px;flex:none;border-bottom:2px solid var(--ink);display:flex;align-items:center;justify-content:center;position:relative;
+  background:repeating-linear-gradient(to bottom,var(--paper) 0 3px,var(--ink) 3px 4px) 0 4px/100% 16px no-repeat;user-select:none}
+.tbar .name{background:var(--paper);padding:0 10px;font:600 16px/24px var(--ui);max-width:72%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbar .box{position:absolute;top:4px;width:15px;height:15px;border:2px solid var(--ink);background:var(--paper)}
+.tbar .box.close{left:8px}
+.tbar .box.zoom{right:8px}
+.tbar .box.zoom::after{content:"";position:absolute;left:1px;top:1px;width:6px;height:6px;border:2px solid var(--ink)}
+.tbar .box:active{background:var(--ink)}
+.drag .tbar{cursor:move}
+
+/* ── map window ── */
+#map{left:96px;right:20px;top:46px;bottom:20px}
+.scroll{flex:1;overflow:auto;position:relative}
+.scroll::-webkit-scrollbar{width:16px;height:16px}
+.scroll::-webkit-scrollbar-track{background:var(--paper) var(--dither);border-left:2px solid var(--ink);border-top:2px solid var(--ink)}
+.scroll::-webkit-scrollbar-thumb{background:var(--paper);border:2px solid var(--ink)}
+.scroll::-webkit-scrollbar-corner{background:var(--paper)}
+.canvas{position:relative}
+.axis{position:sticky;top:0;z-index:6;height:74px;background:var(--paper);border-bottom:2px solid var(--ink)}
+.axis .tick{position:absolute;top:0;bottom:0;border-left:1px solid var(--ink);font:13px/1 var(--ui);padding:4px 0 0 4px}
+.axis .tick.minor{border-left:1px dotted var(--mute);top:auto;height:8px}
+.axis .ev{position:absolute;font-size:11px;line-height:1.15;white-space:nowrap;padding-left:9px;color:var(--ink)}
+.axis .ev::before{content:"";position:absolute;left:0;top:3px;width:5px;height:5px;background:var(--ink);transform:rotate(45deg)}
+.axis .ev.near{background:var(--ink);color:var(--paper)}
+.axis .ev.near::before{background:var(--paper)}
+.axis .corner{position:sticky;left:0;top:0;width:150px;height:72px;background:var(--paper);border-right:2px solid var(--ink);z-index:2;font:12px/1.2 var(--ui);padding:6px 8px;color:var(--mute)}
+.lane{position:relative;border-bottom:1px dashed var(--ink)}
+.lane:nth-child(even){background:var(--dither-lite);background-color:transparent}
+.lane-label{position:sticky;left:0;z-index:5;display:block;width:150px;height:100%;background:var(--paper);border-right:2px solid var(--ink);padding:10px 10px;font:600 15px/1.15 var(--ui)}
+.lane-label small{display:block;font:11px/1.3 var(--txt);font-weight:400;color:var(--mute);margin-top:6px}
+.layer{position:absolute;left:0;top:0;pointer-events:none}
+.layer>*{pointer-events:auto}
+svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:1}
+.edges path.o{stroke:var(--ink);stroke-width:4;fill:none}
+.edges path.i{stroke:var(--paper);stroke-width:1.5;fill:none}
+.edges polygon{fill:var(--ink)}
+.edges g.dim path.o{stroke-width:1;stroke-dasharray:2 3;stroke:var(--mute)}
+.edges g.dim path.i,.edges g.dim polygon{display:none}
+.edges.hide{display:none}
+.cursor{position:absolute;top:0;width:0;border-left:1px dashed var(--ink);pointer-events:none;z-index:4;display:none}
+.cursor b{position:sticky;top:78px;display:inline-block;background:var(--ink);color:var(--paper);font:12px/1 var(--ui);padding:3px 5px;margin-left:-1px;transform:translateY(78px)}
+
+/* ── nodes ── */
+.node{position:absolute;z-index:3;width:var(--w);height:58px;background:var(--paper);border:2px solid var(--ink);text-align:left;display:flex;flex-direction:column;box-shadow:2px 2px 0 var(--ink)}
+.node .h{height:20px;flex:none;border-bottom:2px solid var(--ink);font:600 13px/18px var(--ui);padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node.prog .h{text-align:center;padding:0 18px;background:repeating-linear-gradient(to bottom,var(--paper) 0 3px,var(--ink) 3px 4px) 0 3px/100% 12px no-repeat}
+.node.prog .h span{background:var(--paper);padding:0 4px}
+.node.prog .h::before{content:"";position:absolute;left:5px;top:4px;width:9px;height:9px;border:2px solid var(--ink);background:var(--paper)}
+.node .b{flex:1;display:flex;align-items:center;gap:6px;padding:0 5px;font-size:11px;line-height:1.15;overflow:hidden}
+.node .b .yr{font:13px/1 var(--ui)}
+.node .b .who{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--ink)}
+.node .kids{display:flex;gap:3px}
+.node .kids i{width:12px;height:8px;border:1.5px solid var(--ink);border-radius:2px}
+.node:hover,.node.self{background:var(--ink);color:var(--paper)}
+.node:hover .h,.node.self .h{border-color:var(--paper)}
+.node:hover .who,.node.self .who{color:var(--paper)}
+.node:hover .kids i,.node.self .kids i{border-color:var(--paper)}
+.node.prog:hover .h,.node.prog.self .h{background:repeating-linear-gradient(to bottom,var(--ink) 0 3px,var(--paper) 3px 4px) 0 3px/100% 12px no-repeat}
+.node.prog:hover .h span,.node.prog.self .h span{background:var(--ink)}
+.node.prog:hover .h::before,.node.prog.self .h::before{background:var(--ink);border-color:var(--paper)}
+.node.dim{background:var(--paper) var(--dither-lite);color:var(--mute);box-shadow:none;border-color:var(--mute)}
+.node.dim .h{border-color:var(--mute)}
+.node.dim .who{color:var(--mute)}
+.node.dim .kids i{border-color:var(--mute)}
+.node.near:not(.dim){outline:2px dashed var(--ink);outline-offset:3px}
+.node.off{display:none}
+
+/* ── palette ── */
+#tools{left:14px;top:46px;width:68px}
+#tools .grid{display:grid;grid-template-columns:1fr 1fr}
+#tools .grid button{height:44px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);display:grid;place-items:center}
+#tools .grid button:nth-child(2n){border-right:0}
+#tools .grid button.wide{grid-column:span 2;border-right:0}
+#tools .grid button:last-child{border-bottom:0}
+#tools .grid button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+#tools .grid button:hover{outline:2px solid var(--ink);outline-offset:-5px}
+#tools svg{width:26px;height:26px;shape-rendering:crispEdges}
+#tools .tbar{height:12px;background:repeating-linear-gradient(to bottom,var(--paper) 0 2px,var(--ink) 2px 3px) 0 1px/100% 9px no-repeat}
+
+/* ── text window ── */
+#text{left:120px;top:110px;width:430px;height:min(560px,calc(100vh - 140px));z-index:20;display:none}
+#text.open{display:flex}
+#text .scroll{padding:16px 18px 24px}
+#text .kind{font:13px/1 var(--ui);display:flex;gap:8px;align-items:center;margin-bottom:8px}
+#text .kind .tag{border:2px solid var(--ink);padding:2px 5px}
+#text h2{font:600 24px/1.1 var(--ui);margin:0 0 4px}
+#text .who{margin:0 0 14px;color:var(--ink)}
+#text p{margin:0 0 12px}
+#text h3{font:600 14px/1 var(--ui);margin:18px 0 8px;padding-top:10px;border-top:2px solid var(--ink)}
+.wf{display:inline-block;border:2px solid var(--ink);padding:1px 6px;margin:0 4px 6px 0;font:13px/1.3 var(--ui);text-align:left;background:var(--paper)}
+.wf:hover{background:var(--ink);color:var(--paper)}
+.wf small{font:11px var(--txt);opacity:.8}
+.wf.ev{border-style:dashed;cursor:default}
+.wf.ev:hover{background:var(--paper);color:var(--ink)}
+#text .go{display:inline-block;margin-top:6px;font:14px var(--ui);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:4px 10px;text-decoration:none}
+#text .go:hover{background:var(--ink);color:var(--paper)}
+.pic{border:2px solid var(--ink);background:var(--ink) var(--dither);height:96px;margin:4px 0 14px;display:grid;place-items:center}
+.pic span{background:var(--paper);border:2px solid var(--ink);font:600 20px/1 var(--ui);padding:6px 12px}
+
+/* ── status / legend ── */
+.status{flex:none;height:24px;border-top:2px solid var(--ink);font:13px/20px var(--ui);padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#about{right:44px;top:92px;width:330px;z-index:30;display:none}
+#about.open{display:flex}
+#about .in{padding:14px 16px;font-size:13px}
+#about .in p{margin:0 0 10px}
+.legend{display:flex;gap:10px;align-items:center;margin:6px 0 12px}
+.legend .node{position:relative;--w:120px;box-shadow:none}
+
+@media (max-width:760px){
+  body{overflow:hidden}
+  .menubar .title{display:none}
+  #tools{left:8px;right:8px;top:34px;width:auto}
+  #tools .tbar{display:none}
+  #tools .grid{grid-template-columns:repeat(7,1fr)}
+  #tools .grid button,#tools .grid button.wide{grid-column:auto;height:38px;border-bottom:0;border-right:2px solid var(--ink)}
+  #tools .grid button:last-child{border-right:0}
+  #map{left:8px;right:8px;top:90px;bottom:8px}
+  #text{left:8px !important;right:8px;top:auto !important;bottom:8px;width:auto;height:58vh}
+  body.reading #map{bottom:calc(58vh + 16px)}
+  #about{left:8px;right:8px;width:auto}
+  .lane-label,.axis .corner{width:96px;font-size:13px}
+  .lane-label small{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="menubar">
+  <span class="mark" aria-hidden="true">✱</span>
+  <span class="title">Як ми можемо думати</span>
+  <button id="aboutBtn">Про мапу</button>
+  <button id="themeBtn">Тема</button>
+  <span class="sp"></span>
+  <a href="./">← до саду</a>
+</nav>
+
+<section id="tools" class="win" aria-label="Інструменти">
+  <div class="tbar"></div>
+  <div class="grid">
+    <button data-t="text" aria-pressed="true" title="Показувати тексти"><svg viewBox="0 0 26 26"><path d="M8 4h12v2h-2v16h-2V6h-2v16h-2v-9a5 5 0 0 1 0-9z" fill="currentColor"/></svg></button>
+    <button data-t="prog" aria-pressed="true" title="Показувати програми"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="20" height="16"/><path d="M3 10h20M5 7.5h16" stroke-width="1"/><rect x="6" y="13" width="6" height="5"/></svg></button>
+    <button data-t="edges" aria-pressed="true" title="Показувати впливи"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M2 13l6-6v4h10V7l6 6-6 6v-4H8v4z"/></svg></button>
+    <button data-t="clear" title="Зняти виділення"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M12 3h2v8l6-4 1 2-6 4 6 4-1 2-6-4v8h-2v-8l-6 4-1-2 6-4-6-4 1-2 6 4z"/></svg></button>
+    <button data-t="out" title="Віддалити"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16 16l7 7M7 11h8"/></svg></button>
+    <button data-t="in" title="Наблизити"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16 16l7 7M7 11h8M11 7v8"/></svg></button>
+    <button data-t="find" class="wide" title="Показати вибране на мапі"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M13 1l5 6h-3v4h4V8l6 5-6 5v-3h-4v4h3l-5 6-5-6h3v-4H7v3l-6-5 6-5v3h4V7H8z"/></svg></button>
+  </div>
+</section>
+
+<section id="map" class="win" aria-label="Мапа">
+  <div class="tbar"><span class="box close" aria-hidden="true"></span><span class="name">Мапа · 1934 — 2020</span><span class="box zoom" aria-hidden="true"></span></div>
+  <div class="scroll" id="scroll">
+    <div class="canvas" id="canvas">
+      <div class="axis" id="axis"><div class="corner">рік →<br>поруч у світі ◆</div></div>
+      <div id="lanes"></div>
+      <svg class="edges" id="edges"></svg>
+      <div class="layer" id="nodes"></div>
+      <div class="cursor" id="cursor"><b></b></div>
+    </div>
+  </div>
+  <div class="status" id="status">Наведи на текст чи програму, щоб побачити, з чого виросла ідея і що виросло з неї.</div>
+</section>
+
+<section id="text" class="win drag" role="dialog" aria-label="Нотатка">
+  <div class="tbar"><button class="box close" id="closeText" aria-label="Закрити"></button><span class="name" id="textName"></span><span class="box zoom" aria-hidden="true"></span></div>
+  <div class="scroll" id="textBody"></div>
+</section>
+
+<section id="about" class="win drag" role="dialog" aria-label="Про мапу">
+  <div class="tbar"><button class="box close" id="closeAbout" aria-label="Закрити"></button><span class="name">Про мапу</span></div>
+  <div class="in">
+    <p>Історія ідей про те, як машини можуть допомагати пам'ятати, пов'язувати й думати — від Memex до Вікіпедії, Obsidian і Are.na.</p>
+    <div class="legend"><div class="node text"><div class="h">¶ Текст</div><div class="b"><span class="yr">1945</span><span class="who">есей, книжка</span></div></div></div>
+    <div class="legend"><div class="node prog"><div class="h"><span>Програма</span></div><div class="b"><span class="yr">1968</span><span class="who">система, мережа</span></div></div></div>
+    <p>Стрілка — вплив: пряма цитата, спільні люди або ідея, що перейшла далі. Маленькі прямокутники на тексті — скільки речей на нього спиралися.</p>
+    <p>Пунктир, що ходить за мишкою, — рік: усе, що сталося поруч, обводиться, а вгорі світяться події світу ◆.</p>
+    <p>Рядки — теми: пам'ять, посилення інтелекту, навчання, мережа, нотатки.</p>
+  </div>
+</section>
+
+<script>
+const LANES=[
+  {k:"mem",  t:"Пам'ять і асоціації", s:"memex, гіпертекст, посилання"},
+  {k:"aug",  t:"Посилення інтелекту", s:"людина + машина, інтерфейси"},
+  {k:"learn",t:"Навчання і діти", s:"комп'ютер як матеріал для думання"},
+  {k:"net",  t:"Мережа і спільне знання", s:"бібліотеки, веб, вікі"},
+  {k:"pkm",  t:"Нотатки і сади", s:"картки, вікі для себе, цифрові сади"}
+];
+// t: text | prog; from: що вплинуло
+const N=[
+ {id:"otlet",y:1934,t:"text",l:"net",n:"Traité de documentation",w:"Поль Отле",d:"Бельгійський бібліограф мріяв про «Мундането» — всесвітню картотеку, де кожен факт записаний на окремій картці і пов'язаний з іншими. Описав «книгу-світ», яку можна читати на відстані через екран: мережу документів за десятиліття до комп'ютерів.",u:"https://en.wikipedia.org/wiki/Paul_Otlet"},
+ {id:"wells",y:1938,t:"text",l:"net",n:"World Brain",w:"Герберт Веллс",f:["otlet"],d:"Збірка лекцій про «Світовий мозок» — постійну світову енциклопедію на мікрофільмах, доступну кожному. Знання як спільна пам'ять людства, яка має рости й виправлятися.",u:"https://en.wikipedia.org/wiki/World_Brain"},
+ {id:"bush",y:1945,t:"text",l:"mem",n:"As We May Think",w:"Веннівер Буш",f:["otlet"],d:"Есей в The Atlantic наприкінці війни: наука вже вміє руйнувати, тепер їй варто допомогти людям пам'ятати. Memex — стіл із мікрофільмами, де читач прокладає «асоціативні стежки» між документами, бо мозок працює асоціаціями, а не алфавітом. З цього тексту виростає майже все праворуч.",u:"https://inigomedina.co/library/work/bush-as-we-may-think"},
+ {id:"lick60",y:1960,t:"text",l:"aug",n:"Man-Computer Symbiosis",w:"Дж. К. Р. Ліклайдер",f:["bush"],d:"Комп'ютер не як калькулятор, а як партнер у думанні: людина ставить питання й цілі, машина робить рутину. Ліклайдер потім фінансував у ARPA тих, хто будував це на ділі.",u:"https://en.wikipedia.org/wiki/Man%E2%80%93Computer_Symbiosis"},
+ {id:"xanadu",y:1960,t:"prog",l:"mem",n:"Project Xanadu",w:"Тед Нельсон",f:["bush"],d:"Найдовший незавершений проєкт в історії софту. Двонаправлені посилання, які не ламаються, transclusion — вставка частини одного документа в інший із живим зв'язком, версії поруч. Майже все це пізніше частково повертається у вікі й Roam.",u:"https://xanadu.com"},
+ {id:"plato",y:1960,t:"prog",l:"learn",n:"PLATO",w:"Дональд Бітцер, Університет Іллінойсу",d:"Навчальна система з терміналами і плазмовими екранами. Задумана для уроків, вона стала першою онлайн-спільнотою: форуми, чати, ігри, миттєві повідомлення.",u:"https://en.wikipedia.org/wiki/PLATO_(computer_system)"},
+ {id:"engel62",y:1962,t:"text",l:"aug",n:"Augmenting Human Intellect",w:"Даґлас Енґельбарт",f:["bush","lick60"],d:"Концептуальна рамка: як збільшити здатність людини розуміти складні проблеми. Мова, артефакти, методи й навчання разом — система H-LAM/T. Енґельбарт прямо відштовхується від Memex.",u:"https://www.dougengelbart.org/content/view/138"},
+ {id:"sketchpad",y:1963,t:"prog",l:"aug",n:"Sketchpad",w:"Айвен Сазерленд",f:["lick60"],d:"Малювання світловим пером прямо на екрані: об'єкти, обмеження, копії від зразка. Перший графічний інтерфейс і прабатько об'єктного програмування.",u:"https://en.wikipedia.org/wiki/Sketchpad"},
+ {id:"nelson65",y:1965,t:"text",l:"mem",n:"A File Structure for the Complex, the Changing and the Indeterminate",w:"Тед Нельсон",f:["bush","xanadu"],d:"Доповідь, де вперше з'являється слово «гіпертекст»: текст, що розгалужується і дозволяє читачеві вибирати шлях. Нельсон цитує «As We May Think».",u:"https://en.wikipedia.org/wiki/Hypertext"},
+ {id:"logo",y:1967,t:"prog",l:"learn",n:"Logo",w:"Сеймур Пейперт, Воллі Фойрцайґ, Синтія Соломон",f:["sketchpad"],d:"Мова програмування для дітей і черепашка, яку вони вчать ходити. За Піаже, діти найкраще вчаться, коли будують щось своє — комп'ютер стає матеріалом для думання.",u:"https://en.wikipedia.org/wiki/Logo_(programming_language)"},
+ {id:"hes",y:1967,t:"prog",l:"mem",n:"HES / FRESS",w:"Андріс ван Дам, Тед Нельсон",f:["nelson65"],d:"Hypertext Editing System у Брауні — одна з перших гіпертекстових систем; її наступник FRESS запозичив ідеї з NLS. Використовувалися на справжніх курсах з поезії.",u:"https://en.wikipedia.org/wiki/Hypertext_Editing_System"},
+ {id:"nls",y:1968,t:"prog",l:"aug",n:"NLS · «Мати всіх демо»",w:"Даґлас Енґельбарт, SRI",f:["engel62","sketchpad"],d:"За 90 хвилин на сцені в Сан-Франциско: миша, вікна, гіпертекстові посилання, спільне редагування на відстані, відеозв'язок. Усе для того, щоб групи людей думали разом.",u:"https://www.dougengelbart.org/content/view/209/"},
+ {id:"lick68",y:1968,t:"text",l:"net",n:"The Computer as a Communication Device",w:"Ліклайдер і Роберт Тейлор",f:["lick60","nls"],d:"«Через кілька років люди зможуть спілкуватися через машину краще, ніж віч-на-віч». Онлайн-спільноти за інтересами, а не за місцем. Тейлор тоді ж запускав ARPANET.",u:"https://en.wikipedia.org/wiki/J._C._R._Licklider"},
+ {id:"arpanet",y:1969,t:"prog",l:"net",n:"ARPANET",w:"ARPA, BBN",f:["lick68"],d:"Мережа між університетськими комп'ютерами; з неї виросте інтернет. Найпопулярнішим застосуванням несподівано стала пошта — люди, а не обчислення.",u:"https://en.wikipedia.org/wiki/ARPANET"},
+ {id:"kay72",y:1972,t:"text",l:"learn",n:"A Personal Computer for Children of All Ages",w:"Алан Кей",f:["logo","sketchpad","nls"],d:"Dynabook — комп'ютер розміром із книжку для дітей, щоб вони вчилися, моделюючи світ. Кей побачив Logo Пейперта і зрозумів: комп'ютер — це медіум, як письмо, а не інструмент.",u:"https://www.vpri.org/pdf/hc_pers_comp_for_children.pdf"},
+ {id:"smalltalk",y:1972,t:"prog",l:"learn",n:"Smalltalk",w:"Алан Кей, Адель Ґолдберґ, Ден Інгаллс",f:["kay72"],d:"Мова й середовище в Xerox PARC, які діти використовували, щоб малювати й анімувати. Звідси вікна, що перекриваються, і об'єкти, що надсилають повідомлення.",u:"https://en.wikipedia.org/wiki/Smalltalk"},
+ {id:"alto",y:1973,t:"prog",l:"aug",n:"Xerox Alto",w:"Xerox PARC",f:["nls","smalltalk"],d:"Персональний комп'ютер із мишею, бітмап-екраном і мережею. Не продавався, але все, що буде на Mac, уже було тут.",u:"https://en.wikipedia.org/wiki/Xerox_Alto"},
+ {id:"notes73",y:1973,t:"prog",l:"net",n:"PLATO Notes",w:"Девід Вуллі",f:["plato"],d:"Задумано для скарг на баги, стало першим форумом із тредами й відповідями. Пряма лінія до Usenet, Lotus Notes і всіх обговорень.",u:"https://en.wikipedia.org/wiki/PLATO_Notes"},
+ {id:"nelson74",y:1974,t:"text",l:"mem",n:"Computer Lib / Dream Machines",w:"Тед Нельсон",f:["nelson65","xanadu","nls"],d:"Самвидавна книжка-маніфест, яку можна читати з обох боків: «ви можете і мусите зрозуміти комп'ютери ЗАРАЗ». Біблія першого покоління персональних комп'ютерників.",u:"https://en.wikipedia.org/wiki/Computer_Lib/Dream_Machines"},
+ {id:"kay77",y:1977,t:"text",l:"learn",n:"Personal Dynamic Media",w:"Алан Кей, Адель Ґолдберґ",f:["kay72","smalltalk"],d:"Звіт про роботу з дітьми в PARC: «метамедіум», що може імітувати будь-який інший медіум. Тексти, музика, анімація — у руках того, хто вчиться.",u:"https://www.newmediareader.com/book_samples/nmr-26-kay.pdf"},
+ {id:"mindstorms",y:1980,t:"text",l:"learn",n:"Mindstorms",w:"Сеймур Пейперт",f:["logo"],d:"Діти програмують комп'ютер, а не комп'ютер програмує дітей. «Об'єкти, щоб думати з ними», конструкціонізм і помилки як частина навчання.",u:"https://en.wikipedia.org/wiki/Mindstorms_(book)"},
+ {id:"literary",y:1981,t:"text",l:"mem",n:"Literary Machines",w:"Тед Нельсон",f:["nelson74"],d:"Опис Xanadu як всесвітньої гіпертекстової бібліотеки «docuverse» з авторськими мікроплатежами за цитування.",u:"https://en.wikipedia.org/wiki/Literary_Machines"},
+ {id:"luhmann",y:1981,t:"text",l:"pkm",n:"Kommunikation mit Zettelkästen",w:"Ніклас Луман",d:"Соціолог описує свою картотеку з ~90 000 карток як партнера в розмові: картки мають номери, посилаються одна на одну, і система сама підкидає несподівані зв'язки.",u:"https://luhmann.surge.sh/communicating-with-slip-boxes"},
+ {id:"mac",y:1984,t:"prog",l:"aug",n:"Macintosh",w:"Apple",f:["alto"],d:"Графічний інтерфейс PARC іде в маси. Саме ця пластина 1-бітної графіки — стиль цієї мапи.",u:"https://en.wikipedia.org/wiki/Macintosh_128K"},
+ {id:"notecards",y:1985,t:"prog",l:"pkm",n:"NoteCards",w:"Ренделл Тріґґ, Френк Галас, Том Моран",f:["alto","nelson74"],d:"Гіпертекст для думання в Xerox PARC: картки, типізовані посилання, «браузер» — мапа карток. Інструмент для аналітиків, які складають аргументи.",u:"https://en.wikipedia.org/wiki/NoteCards"},
+ {id:"intermedia",y:1985,t:"prog",l:"mem",n:"Intermedia",w:"Норман Мейровіц, Ніколь Янкелович, ван Дам",f:["hes","nelson74"],d:"Гіпертекстове середовище в Брауні для викладання літератури й біології: посилання між різними програмами, мапи зв'язків поточного документа.",u:"https://en.wikipedia.org/wiki/Intermedia_(hypertext)"},
+ {id:"hypercard",y:1987,t:"prog",l:"learn",n:"HyperCard",w:"Білл Аткінсон",f:["mac","smalltalk","notecards"],d:"Стоси карток з кнопками й скриптами на кожному Mac. Учителі, діти й художники робили свої енциклопедії та ігри без «справжнього» програмування. Надихнув і вікі, і веб.",u:"https://en.wikipedia.org/wiki/HyperCard"},
+ {id:"storyspace",y:1987,t:"prog",l:"mem",n:"Storyspace",w:"Джей Девід Болтер, Майкл Джойс",f:["intermedia","notecards","nelson74"],d:"Середовище для гіпертекстового письма: простори-картки, мапа зв'язків поруч із текстом, приховані посилання «wireframe». Саме з нього — вигляд цієї сторінки. На ньому вчили студентів писати нелінійно.",u:"https://en.wikipedia.org/wiki/Storyspace"},
+ {id:"afternoon",y:1987,t:"text",l:"mem",n:"afternoon, a story",w:"Майкл Джойс",f:["storyspace"],d:"Перший відомий гіпертекстовий роман: кожне прочитання — інше, читач обирає слова, що ведуть далі.",u:"https://en.wikipedia.org/wiki/Afternoon,_a_story"},
+ {id:"tbl89",y:1989,t:"text",l:"net",n:"Information Management: A Proposal",w:"Тім Бернерс-Лі, CERN",f:["nelson65","hypercard","arpanet"],d:"Записка начальнику про те, як не губити інформацію в CERN: розподілена гіпертекстова система поверх інтернету. На полях: «Vague but exciting».",u:"https://www.w3.org/History/1989/proposal.html"},
+ {id:"www",y:1991,t:"prog",l:"net",n:"WorldWideWeb",w:"Тім Бернерс-Лі",f:["tbl89"],d:"Перший браузер — і водночас редактор: веб задумувався як місце, де всі пишуть, а не лише читають. Посилання односпрямовані, зате працюють будь-де.",u:"https://en.wikipedia.org/wiki/WorldWideWeb"},
+ {id:"bolter",y:1991,t:"text",l:"mem",n:"Writing Space",w:"Джей Девід Болтер",f:["storyspace"],d:"Комп'ютер як новий простір письма після сувою, кодексу й друку. Гіпертекст повертає письму рухливість і мапи.",u:"https://en.wikipedia.org/wiki/Jay_David_Bolter"},
+ {id:"landow",y:1992,t:"text",l:"mem",n:"Hypertext",w:"Джордж Лендоу",f:["intermedia","nelson74"],d:"Гіпертекст як втілення ідей Барта, Дерріди й Фуко: смерть автора, текст як мережа, читач-співавтор. Написано з досвіду курсів на Intermedia.",u:"https://en.wikipedia.org/wiki/George_Landow"},
+ {id:"mosaic",y:1993,t:"prog",l:"net",n:"Mosaic",w:"Марк Андріссен, Ерік Біна, NCSA",f:["www"],d:"Браузер з картинками прямо в тексті. Веб стає масовим — і перетворюється з простору письма на простір читання.",u:"https://en.wikipedia.org/wiki/Mosaic_(web_browser)"},
+ {id:"wiki",y:1995,t:"prog",l:"net",n:"WikiWikiWeb",w:"Ворд Каннінґем",f:["hypercard","www"],d:"Сторінка, яку може редагувати кожен, і посилання, що з'являється, коли пишеш назву ще не створеної сторінки. Каннінґем надихався HyperCard. Звідси [[подвійні дужки]].",u:"https://en.wikipedia.org/wiki/WikiWikiWeb"},
+ {id:"extended",y:1998,t:"text",l:"aug",n:"The Extended Mind",w:"Енді Кларк, Девід Чалмерс",f:["engel62"],d:"Блокнот Отто, який втратив пам'ять, — частина його розуму так само, як пам'ять Інги. Думання не закінчується черепом: нотатки — продовження мислення.",u:"https://en.wikipedia.org/wiki/The_Extended_Mind"},
+ {id:"google",y:1998,t:"prog",l:"net",n:"Google",w:"Ларрі Пейдж, Сергій Брін",f:["www"],d:"PageRank рахує посилання як цитування в науці. Пошук замінює каталоги — і стежки Буша замінює рядок запиту.",u:"https://en.wikipedia.org/wiki/PageRank"},
+ {id:"wikipedia",y:2001,t:"prog",l:"net",n:"Вікіпедія",w:"Джиммі Вейлз, Ларрі Сенґер",f:["wiki","wells"],d:"Найближче, що ми маємо до «Світового мозку» Веллса: енциклопедія, яку пишуть волонтери, відкрита історія правок і обговорень.",u:"https://uk.wikipedia.org"},
+ {id:"delicious",y:2003,t:"prog",l:"net",n:"del.icio.us",w:"Джошуа Шахтер",f:["www"],d:"Соціальні закладки й теги: замість ієрархії папок — «фолксономія», колекції, що видно іншим.",u:"https://en.wikipedia.org/wiki/Delicious_(website)"},
+ {id:"tiddly",y:2004,t:"prog",l:"pkm",n:"TiddlyWiki",w:"Джеремі Растон",f:["wiki"],d:"Вікі в одному HTML-файлі для себе: маленькі «тидлери», транслюзія, нотатки, що відкриваються стосом. Прабатько персональних баз знань.",u:"https://tiddlywiki.com"},
+ {id:"victor",y:2013,t:"text",l:"aug",n:"Media for Thinking the Unthinkable",w:"Брет Віктор",f:["engel62","kay72","sketchpad"],d:"Лекція про динамічні представлення: які думки неможливі без правильного медіуму. Продовження лінії Енґельбарта й Кея до сьогодні.",u:"https://worrydream.com/MediaForThinkingTheUnthinkable/"},
+ {id:"arena",y:2014,t:"prog",l:"pkm",n:"Are.na",w:"Чарльз Бродскі та ін.",f:["delicious","nelson74","hypercard"],d:"Повільна, некомерційна альтернатива соцмережам: блоки й канали, де один блок може жити в багатьох каналах одночасно. Колекціонування як дослідження.",u:"https://www.are.na/about"},
+ {id:"caulfield",y:2015,t:"text",l:"pkm",n:"The Garden and the Stream",w:"Майк Колфілд",f:["bush","wiki"],d:"Технопастораль: стрічка — це потік подій, сад — мережа ідей, які постійно переписуються. Повернення до Memex і вікі як місць для думання, а не для виступу.",u:"https://hapgood.us/2015/10/17/the-garden-and-the-stream-a-technopastoral/"},
+ {id:"ahrens",y:2017,t:"text",l:"pkm",n:"How to Take Smart Notes",w:"Зьонке Аренс",f:["luhmann"],d:"Метод Лумана для всіх: fleeting, literature і permanent notes. Писати — не результат думання, а саме думання.",u:"https://www.soenkeahrens.de/en/takesmartnotes"},
+ {id:"matuschak",y:2019,t:"text",l:"aug",n:"How can we develop transformative tools for thought?",w:"Енді Матушак, Майкл Нільсен",f:["engel62","kay72","victor"],d:"Есей і мнемонічний медіум Quantum Country: чому інструменти для думання досі не стали «справжніми» і що з цим робити.",u:"https://numinous.productions/ttft/"},
+ {id:"roam",y:2019,t:"prog",l:"pkm",n:"Roam Research",w:"Конор Вайт-Салліван",f:["xanadu","luhmann","nls","wiki"],d:"Блоки, бэклінки, транслюзія: ідеї Xanadu й NLS у браузері. Запустив хвилю «networked thought».",u:"https://roamresearch.com"},
+ {id:"appleton",y:2020,t:"text",l:"pkm",n:"A Brief History & Ethos of the Digital Garden",w:"Меґі Еплтон",f:["caulfield","matuschak"],d:"Цифровий сад як жанр: незавершені нотатки, статуси «паросток / дерево», зв'язки замість хронології. Саме такий, як цей сайт.",u:"https://maggieappleton.com/garden-history"},
+ {id:"obsidian",y:2020,t:"prog",l:"pkm",n:"Obsidian",w:"Шида Лі, Ерика Сюй",f:["roam","tiddly","ahrens","wiki"],d:"Звичайні Markdown-файли у твоїй папці, [[посилання]], граф і Canvas. Цей сад живе саме в ньому.",u:"https://obsidian.md"}
+];
+const EVENTS=[
+ [1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен: «медіум — це повідомлення»"],
+ [1968,"травень 68"],[1969,"Аполлон-11"],[1971,"email, Intel 4004"],[1977,"Apple II"],[1981,"IBM PC"],[1983,"TCP/IP"],
+ [1989,"падіння Берлінського муру"],[1991,"незалежність України"],[1995,"Windows 95, Amazon"],[2000,"доткомова криза"],
+ [2004,"Facebook"],[2007,"iPhone"],[2010,"iPad"],[2020,"пандемія"],[2022,"ChatGPT"]
+];
+
+const byId={};N.forEach(n=>{byId[n.id]=n;n.f=n.f||[];n.kids=[]});
+N.forEach(n=>n.f.forEach(p=>byId[p]&&byId[p].kids.push(n.id)));
+const Y0=1930,Y1=2025,AX=74,H=58,ROW=76;
+const mob=()=>innerWidth<=760;
+let PX=34, sel=null, hover=null, show={text:true,prog:true,edges:true};
+
+const $=s=>document.querySelector(s);
+const scroll=$("#scroll"),canvas=$("#canvas"),lanesEl=$("#lanes"),nodesEl=$("#nodes"),edgesEl=$("#edges"),axis=$("#axis"),cursor=$("#cursor"),status=$("#status");
+const GUT=()=>mob()?96:150, NW=()=>mob()?132:150;
+const X=y=>GUT()+(y-Y0)*PX+12;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function layout(){
+  const W=NW(), total=X(Y1)+W;
+  canvas.style.width=total+"px";
+  // axis
+  let ah='<div class="corner">рік →<br>поруч у світі ◆</div>';
+  for(let y=Y0;y<=Y1;y++){
+    if(y%10===0) ah+=`<div class="tick" style="left:${X(y)}px">${y}</div>`;
+    else if(y%5===0) ah+=`<div class="tick minor" style="left:${X(y)}px"></div>`;
+  }
+  EVENTS.forEach((e,i)=>{ah+=`<div class="ev" data-y="${e[0]}" style="left:${X(e[0])}px;top:${24+(i%3)*16}px" title="${e[0]}">${esc(e[1])}</div>`});
+  axis.innerHTML=ah; axis.style.width=total+"px";
+  // lanes
+  let top=AX, lh="";
+  LANES.forEach(L=>{
+    const rows=[];
+    N.filter(n=>n.l===L.k&&show[n.t]).sort((a,b)=>a.y-b.y).forEach(n=>{
+      const x=X(n.y); let r=rows.findIndex(end=>end+14<=x); if(r<0){r=rows.length;rows.push(0)}
+      rows[r]=x+W; n.x=x; n.r=r;
+    });
+    const h=Math.max(1,rows.length)*ROW+20;
+    N.filter(n=>n.l===L.k).forEach(n=>n.yy=top+14+n.r*ROW);
+    lh+=`<div class="lane" style="height:${h}px"><span class="lane-label">${L.t}<small>${L.s}</small></span></div>`;
+    top+=h;
+  });
+  lanesEl.innerHTML=lh; canvas.style.height=top+"px";
+  cursor.style.height=top+"px";
+  // nodes
+  nodesEl.innerHTML=N.map(n=>{
+    const k=Math.min(5,n.kids.length);
+    const kids=n.t==="text"&&k?`<span class="kids">${"<i></i>".repeat(k)}</span>`:"";
+    const h=n.t==="text"?`<div class="h">¶ ${esc(n.n)}</div>`:`<div class="h"><span>${esc(n.n)}</span></div>`;
+    return `<button class="node ${n.t}${show[n.t]?"":" off"}" data-id="${n.id}" style="left:${n.x}px;top:${n.yy}px;--w:${W}px" aria-label="${esc(n.n)}, ${n.y}, ${n.t==="text"?"текст":"програма"}">${h}<div class="b"><span class="yr">${n.y}</span><span class="who">${esc(n.w)}</span>${kids}</div></button>`;
+  }).join("");
+  nodesEl.style.width=total+"px";
+  drawEdges(); paint();
+}
+
+function drawEdges(){
+  const W=NW(); let s="";
+  N.forEach(b=>b.f.forEach(aid=>{
+    const a=byId[aid]; if(!a||!show[a.t]||!show[b.t])return;
+    let sx,sy,tx,ty,c1x,c1y,c2x,c2y;
+    if(b.x>=a.x+W+24){
+      sx=a.x+W; sy=a.yy+H/2; tx=b.x-2; ty=b.yy+H/2;
+      const d=Math.max(30,(tx-sx)*.45); c1x=sx+d;c1y=sy;c2x=tx-d;c2y=ty;
+    }else{
+      const down=b.yy>a.yy;
+      sx=a.x+W*.6; sy=down?a.yy+H:a.yy; tx=b.x+W*.3; ty=down?b.yy-2:b.yy+H+2;
+      const d=Math.max(20,Math.abs(ty-sy)*.5)*(down?1:-1); c1x=sx;c1y=sy+d;c2x=tx;c2y=ty-d;
+    }
+    const ang=Math.atan2(ty-c2y,tx-c2x), L=11, ex=tx-Math.cos(ang)*L*.8, ey=ty-Math.sin(ang)*L*.8;
+    const p=`M${sx},${sy} C${c1x},${c1y} ${c2x},${c2y} ${ex},${ey}`;
+    const p1=`${tx},${ty}`, p2=`${tx-L*Math.cos(ang-.45)},${ty-L*Math.sin(ang-.45)}`, p3=`${tx-L*Math.cos(ang+.45)},${ty-L*Math.sin(ang+.45)}`;
+    s+=`<g data-a="${a.id}" data-b="${b.id}"><path class="o" d="${p}"/><path class="i" d="${p}"/><polygon points="${p1} ${p2} ${p3}"/></g>`;
+  }));
+  edgesEl.innerHTML=s;
+  edgesEl.setAttribute("width",canvas.style.width);edgesEl.setAttribute("height",canvas.style.height);
+  edgesEl.classList.toggle("hide",!show.edges);
+}
+
+function lineage(id){
+  const up=new Set(),down=new Set();
+  const goU=i=>byId[i].f.forEach(p=>{if(!up.has(p)){up.add(p);goU(p)}});
+  const goD=i=>byId[i].kids.forEach(c=>{if(!down.has(c)){down.add(c);goD(c)}});
+  goU(id);goD(id);return {up,down};
+}
+function paint(){
+  const id=hover||sel;
+  const nodes=nodesEl.querySelectorAll(".node");
+  if(!id){
+    nodes.forEach(e=>e.classList.remove("dim","self"));
+    edgesEl.querySelectorAll("g").forEach(g=>g.classList.remove("dim"));
+    return;
+  }
+  const {up,down}=lineage(id), on=new Set([id,...up,...down]);
+  nodes.forEach(e=>{const i=e.dataset.id;e.classList.toggle("self",i===id||i===sel);e.classList.toggle("dim",!on.has(i))});
+  edgesEl.querySelectorAll("g").forEach(g=>{
+    const a=g.dataset.a,b=g.dataset.b;
+    const ok=(on.has(a)&&on.has(b))&&((up.has(a)||a===id)&&(up.has(b)||b===id)||(down.has(b)||b===id)&&(down.has(a)||a===id));
+    g.classList.toggle("dim",!ok);
+    if(ok)g.parentNode.appendChild(g);
+  });
+  const n=byId[id];
+  status.textContent=`${n.y} · ${n.n} — спирається на ${up.size}, вплинуло на ${down.size}`;
+}
+
+function near(y){
+  return {
+    nodes:N.filter(n=>Math.abs(n.y-y)<=2&&show[n.t]),
+    ev:EVENTS.filter(e=>Math.abs(e[0]-y)<=2)
+  };
+}
+
+function wf(id){const n=byId[id];return `<button class="wf" data-go="${id}">${n.t==="text"?"¶ ":""}${esc(n.n)} <small>${n.y}</small></button>`}
+function open(id,{center=false}={}){
+  sel=id; const n=byId[id];
+  $("#textName").textContent=(n.t==="text"?"¶ ":"")+n.n;
+  const nb=near(n.y);
+  const around=nb.nodes.filter(m=>m.id!==id&&!n.f.includes(m.id)&&!n.kids.includes(m.id));
+  $("#textBody").innerHTML=`
+    <div class="kind"><span class="tag">${n.t==="text"?"¶ текст":"▭ програма"}</span><span>${n.y}</span><span>· ${esc(LANES.find(l=>l.k===n.l).t)}</span></div>
+    <h2>${esc(n.n)}</h2><p class="who">${esc(n.w)}</p>
+    <div class="pic" aria-hidden="true"><span>${n.y}</span></div>
+    <p>${esc(n.d)}</p>
+    ${n.f.length?`<h3>← спирається на</h3>${n.f.map(wf).join("")}`:""}
+    ${n.kids.length?`<h3>→ вплинуло на</h3>${n.kids.map(wf).join("")}`:""}
+    ${(around.length||nb.ev.length)?`<h3>поруч у часі · ±2 роки</h3>${around.map(m=>wf(m.id)).join("")}${nb.ev.map(e=>`<span class="wf ev">◆ ${esc(e[1])} <small>${e[0]}</small></span>`).join("")}`:""}
+    ${n.u?`<p><a class="go" href="${esc(n.u)}" target="_blank" rel="noopener">відкрити ↗</a></p>`:""}`;
+  $("#text").classList.add("open");document.body.classList.add("reading"); $("#textBody").scrollTop=0;
+  history.replaceState(null,"","#"+id);
+  paint();
+  if(center)focusNode(id);
+}
+function focusNode(id){
+  const n=byId[id]; if(!n||n.x==null)return;
+  if(mob()){scroll.scrollTo({left:Math.max(0,n.x-GUT()-16),top:Math.max(0,n.yy-AX-16),behavior:"smooth"});return}
+  const textW=$("#text").classList.contains("open")&&!mob()?$("#text").offsetWidth:0;
+  scroll.scrollTo({left:Math.max(0,n.x-GUT()-Math.max(40,(scroll.clientWidth-GUT()-textW)/2)+ (textW?textW*.6:0)),top:Math.max(0,n.yy-AX-scroll.clientHeight/3),behavior:"smooth"});
+}
+function closeText(){sel=null;$("#text").classList.remove("open");document.body.classList.remove("reading");history.replaceState(null,"",location.pathname);paint()}
+
+// events
+nodesEl.addEventListener("click",e=>{const b=e.target.closest(".node");if(b)open(b.dataset.id)});
+nodesEl.addEventListener("mouseover",e=>{const b=e.target.closest(".node");if(b&&!mob()){hover=b.dataset.id;paint()}});
+nodesEl.addEventListener("mouseout",e=>{const b=e.target.closest(".node");if(b&&!b.contains(e.relatedTarget)){hover=null;paint();if(!sel)status.textContent=defStatus}});
+nodesEl.addEventListener("focusin",e=>{const b=e.target.closest(".node");if(b){hover=b.dataset.id;paint()}});
+nodesEl.addEventListener("focusout",()=>{hover=null;paint()});
+$("#textBody").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)open(b.dataset.go,{center:true})});
+$("#closeText").onclick=closeText;
+$("#aboutBtn").onclick=()=>$("#about").classList.toggle("open");
+$("#closeAbout").onclick=()=>$("#about").classList.remove("open");
+addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#about").classList.contains("open"))$("#about").classList.remove("open");else closeText()}});
+const defStatus=status.textContent;
+
+// time cursor: what happened nearby
+const nearEls=new Set();
+scroll.addEventListener("mousemove",e=>{
+  const r=canvas.getBoundingClientRect(), x=e.clientX-r.left;
+  if(x<GUT()){cursor.style.display="none";return}
+  const y=Math.round(Y0+(x-GUT()-12)/PX);
+  cursor.style.display="block";cursor.style.left=x+"px";cursor.querySelector("b").textContent=y;
+  nearEls.forEach(el=>el.classList.remove("near"));nearEls.clear();
+  const nb=near(y);
+  nb.nodes.forEach(n=>{const el=nodesEl.querySelector(`[data-id="${n.id}"]`);el&&(el.classList.add("near"),nearEls.add(el))});
+  axis.querySelectorAll(".ev").forEach(el=>{if(Math.abs(+el.dataset.y-y)<=2){el.classList.add("near");nearEls.add(el)}});
+  if(!hover){
+    const names=nb.nodes.map(n=>n.n).slice(0,4).join(", ");
+    status.textContent=`${y-2}–${y+2}: `+(names||"тиша")+(nb.ev.length?" · ◆ "+nb.ev.map(e=>e[1]).join(", "):"");
+  }
+});
+scroll.addEventListener("mouseleave",()=>{cursor.style.display="none";nearEls.forEach(el=>el.classList.remove("near"));if(!hover&&!sel)status.textContent=defStatus;else paint()});
+
+// tools
+$("#tools").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;const t=b.dataset.t;
+  if(t in show){show[t]=!show[t];b.setAttribute("aria-pressed",show[t]);
+    if(t==="edges")edgesEl.classList.toggle("hide",!show.edges);else{const keep=scroll.scrollLeft/canvas.offsetWidth;layout();scroll.scrollLeft=keep*canvas.offsetWidth}}
+  if(t==="clear"){hover=null;closeText();scroll.scrollTo({left:0,top:0,behavior:"smooth"})}
+  if(t==="in"||t==="out"){
+    const mid=(scroll.scrollLeft+scroll.clientWidth/2-GUT())/PX;
+    PX=Math.max(16,Math.min(70,PX+(t==="in"?12:-12)));layout();
+    scroll.scrollLeft=mid*PX+GUT()-scroll.clientWidth/2;
+  }
+  if(t==="find"&&sel)focusNode(sel);
+});
+
+// draggable windows
+document.querySelectorAll(".drag").forEach(w=>{
+  const bar=w.querySelector(".tbar");
+  bar.addEventListener("pointerdown",e=>{
+    if(mob()||e.target.closest("button"))return;
+    const sx=e.clientX-w.offsetLeft, sy=e.clientY-w.offsetTop;
+    const mv=ev=>{w.style.left=Math.max(0,ev.clientX-sx)+"px";w.style.top=Math.max(28,ev.clientY-sy)+"px";w.style.right="auto"};
+    const up=()=>{removeEventListener("pointermove",mv);removeEventListener("pointerup",up)};
+    addEventListener("pointermove",mv);addEventListener("pointerup",up);
+  });
+});
+
+// theme
+const root=document.documentElement;
+try{const t=localStorage.getItem("theme");if(t)root.dataset.theme=t}catch(e){}
+$("#themeBtn").onclick=()=>{
+  const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme=dark?"light":"dark";try{localStorage.setItem("theme",root.dataset.theme)}catch(e){}
+};
+
+let rw;addEventListener("resize",()=>{clearTimeout(rw);rw=setTimeout(layout,150)});
+layout();
+const start=location.hash.slice(1);
+if(byId[start])open(start,{center:true});
+
+</script>
+</body>
+</html>
