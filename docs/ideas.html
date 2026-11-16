@@ -561,29 +561,32 @@ const sky=(()=>{
   }
   return {setup};
 })();
-// плашка «шкала стиснута»: хаотично блукає стиснутою зоною і тікає від мишки
+// плашка «шкала стиснута»: плавно блукає стиснутою зоною і тікає від мишки
 const warnBot=(()=>{
   const el=$("#warn"), still=matchMedia("(prefers-reduced-motion: reduce)");
-  let B=null, x=0, y=0, vx=0, vy=1, mx=-1e4, my=-1e4, raf=0, placed=false;
-  const draw=()=>{el.style.transform=`translate(${x|0}px,${y|0}px) rotate(${Math.max(-6,Math.min(6,vx*1.6))}deg)`};
+  let B=null, x=0, y=0, vx=0, vy=0, rot=0, head=Math.PI/2, turn=0, mx=-1e4, my=-1e4, raf=0, last=0, placed=false;
+  const draw=()=>{el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`};
   function bounds(l,t,r,b){
     B={l,t,r:r-el.offsetWidth,b:b-el.offsetHeight};
     if(!placed){x=B.r;y=B.t+10;placed=true}
     x=Math.max(B.l,Math.min(B.r,x));y=Math.max(B.t,Math.min(B.b,y));draw();
-    if(!still.matches&&!raf)raf=requestAnimationFrame(step);
+    if(!still.matches&&!raf){last=0;raf=requestAnimationFrame(step)}
   }
-  function step(){
+  function step(now){
     raf=0; if(!B)return;
-    if(document.hidden){setTimeout(()=>raf||(raf=requestAnimationFrame(step)),500);return}
-    vx+=(Math.random()-.5)*.6; vy+=(Math.random()-.5)*.6+.012;
-    if(Math.random()<.012){const a=Math.random()*6.283,k=2+Math.random()*3;vx=Math.cos(a)*k;vy=Math.sin(a)*k}
+    if(document.hidden){setTimeout(()=>{if(!raf){last=0;raf=requestAnimationFrame(step)}},500);return}
+    const dt=last?Math.min(3,(now-last)/16.7):1; last=now;
+    // напрямок повільно «пливе»: швидкість повороту теж змінюється плавно
+    turn+=(Math.random()-.5)*.012*dt; turn*=Math.pow(.97,dt); turn=Math.max(-.05,Math.min(.05,turn));
+    head+=turn*dt;
+    let tx=Math.cos(head)*1.3, ty=Math.sin(head)*1.3+.25;
     const cx=x+el.offsetWidth/2, cy=y+el.offsetHeight/2, dx=cx-mx, dy=cy-my, d=Math.hypot(dx,dy)||1;
-    let cap=2.4;
-    if(d<170){const f=(170-d)/170*1.8;vx+=dx/d*f;vy+=dy/d*f;cap=8}
-    vx*=.97;vy*=.97; const sp=Math.hypot(vx,vy); if(sp>cap){vx*=cap/sp;vy*=cap/sp}
-    x+=vx;y+=vy;
-    if(x<B.l){x=B.l;vx=Math.abs(vx)}else if(x>B.r){x=B.r;vx=-Math.abs(vx)}
-    if(y<B.t){y=B.t;vy=Math.abs(vy)}else if(y>B.b){y=B.b;vy=-Math.abs(vy)}
+    if(d<180){const f=Math.pow((180-d)/180,1.5)*7;tx+=dx/d*f;ty+=dy/d*f;head=Math.atan2(dy,dx)}
+    const k=1-Math.pow(1-(d<180?.12:.03),dt); vx+=(tx-vx)*k; vy+=(ty-vy)*k;
+    x+=vx*dt; y+=vy*dt;
+    if(x<B.l){x=B.l;head=Math.PI-head;vx=Math.abs(vx)}else if(x>B.r){x=B.r;head=Math.PI-head;vx=-Math.abs(vx)}
+    if(y<B.t){y=B.t;head=-head;vy=Math.abs(vy)}else if(y>B.b){y=B.b;head=-head;vy=-Math.abs(vy)}
+    rot+=(Math.max(-6,Math.min(6,vx*1.4))-rot)*(1-Math.pow(.9,dt));
     draw(); raf=requestAnimationFrame(step);
   }
   $("#scroll").addEventListener("mousemove",e=>{const r=$("#canvas").getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
