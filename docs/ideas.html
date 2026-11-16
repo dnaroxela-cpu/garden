@@ -80,6 +80,9 @@ a{color:inherit}
 .axis .ev.near{background:var(--ink);color:var(--paper)}
 .axis .ev.near::before{background:var(--paper)}
 .axis .corner{position:sticky;left:0;top:0;width:150px;height:72px;background:var(--paper);border-right:2px solid var(--ink);z-index:2;font:12px/1.3 var(--txt);padding:6px 8px;color:var(--ink)}
+.axis .oldzone{position:absolute;top:0;height:22px;font:600 11px/22px var(--txt);padding-left:8px;letter-spacing:.03em;color:var(--ink);border-bottom:1px dashed var(--ink);white-space:nowrap;overflow:hidden}
+.brk{position:absolute;top:0;width:14px;z-index:4;pointer-events:none;background:var(--paper)}
+.brk::after{content:"";position:absolute;inset:0;background:var(--ink);--z:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16'%3E%3Cpath d='M3 0l4 4-4 4 4 4-4 4M9 0l4 4-4 4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");-webkit-mask:var(--z) 0 0/14px 16px repeat-y;mask:var(--z) 0 0/14px 16px repeat-y}
 .lane{position:relative;border-bottom:1px dashed var(--ink)}
 .lane:nth-child(even){background:var(--dither-lite);background-color:transparent}
 .lane-label{position:sticky;left:0;z-index:5;display:block;width:150px;height:100%;background:var(--paper);border-right:2px solid var(--ink);padding:10px 10px;font:600 14px/1.2 var(--txt)}
@@ -227,6 +230,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
       <svg class="edges" id="edges"></svg>
       <div class="layer" id="nodes"></div>
       <div class="cursor" id="cursor"><b></b></div>
+      <div class="brk" id="brk" aria-hidden="true"></div>
     </div>
   </div>
   <div class="status" id="status">Наведи на текст чи програму, щоб побачити, з чого виросла ідея і що виросло з неї.</div>
@@ -297,7 +301,7 @@ const N=[
  {id:"kay77",y:1977,t:"text",l:"learn",n:"Personal Dynamic Media",w:"Алан Кей, Адель Ґолдберґ",f:["kay72","smalltalk"],d:"Звіт про роботу з дітьми в PARC: «метамедіум», що може імітувати будь-який інший медіум. Тексти, музика, анімація — у руках того, хто вчиться.",u:"https://www.newmediareader.com/book_samples/nmr-26-kay.pdf"},
  {id:"mindstorms",y:1980,t:"text",l:"learn",n:"Mindstorms",w:"Сеймур Пейперт",f:["logo"],d:"Діти програмують комп'ютер, а не комп'ютер програмує дітей. «Об'єкти, щоб думати з ними», конструкціонізм і помилки як частина навчання.",u:"https://en.wikipedia.org/wiki/Mindstorms_(book)"},
  {id:"literary",y:1981,t:"text",l:"mem",n:"Literary Machines",w:"Тед Нельсон",f:["nelson74"],d:"Опис Xanadu як всесвітньої гіпертекстової бібліотеки «docuverse» з авторськими мікроплатежами за цитування.",u:"https://en.wikipedia.org/wiki/Literary_Machines"},
- {id:"commonplace",y:1830,yl:"XVI–XIX ст.",kind:"¶ явище",t:"text",l:"pkm",n:"Commonplace books",w:"Еразм, Бекон, Мільтон, Локк, Джефферсон, Вулф…",d:"Століттями читачі вели «книги загальних місць»: виписували цитати, афоризми, рецепти, спостереження і розкладали їх за рубриками, щоб потім із них думати й писати. Еразм вчив цього студентів, Джон Локк 1706 року видав «New Method of Making Common-Place-Books» з покажчиком на дві сторінки, а такі зошити тримали Мільтон, Джефферсон, Вірджинія Вулф. Це не один текст, а практика — читання як збирання, де пам'ять живе зовні, на папері. Пряма лінія до картотеки Лумана, Are.na і цифрових садів.",u:"https://en.wikipedia.org/wiki/Commonplace_book"},
+ {id:"commonplace",y:1550,yl:"XVI–XIX ст.",kind:"¶ явище",t:"text",l:"pkm",n:"Commonplace books",w:"Еразм, Бекон, Мільтон, Локк, Джефферсон, Вулф…",d:"Століттями читачі вели «книги загальних місць»: виписували цитати, афоризми, рецепти, спостереження і розкладали їх за рубриками, щоб потім із них думати й писати. Еразм вчив цього студентів, Джон Локк 1706 року видав «New Method of Making Common-Place-Books» з покажчиком на дві сторінки, а такі зошити тримали Мільтон, Джефферсон, Вірджинія Вулф. Це не один текст, а практика — читання як збирання, де пам'ять живе зовні, на папері. Пряма лінія до картотеки Лумана, Are.na і цифрових садів.",u:"https://en.wikipedia.org/wiki/Commonplace_book"},
  {id:"luhmann",y:1981,t:"text",l:"pkm",n:"Kommunikation mit Zettelkästen",w:"Ніклас Луман",f:["commonplace"],d:"Соціолог описує свою картотеку з ~90 000 карток як партнера в розмові: картки мають номери, посилаються одна на одну, і система сама підкидає несподівані зв'язки.",u:"https://luhmann.surge.sh/communicating-with-slip-boxes"},
  {id:"mac",y:1984,t:"prog",l:"aug",n:"Macintosh",w:"Apple",f:["alto"],d:"Графічний інтерфейс PARC іде в маси. Саме ця пластина 1-бітної графіки — стиль цієї мапи.",u:"https://en.wikipedia.org/wiki/Macintosh_128K"},
  {id:"medialab",y:1987,t:"text",l:"learn",n:"The Media Lab: Inventing the Future at MIT",w:"Стюарт Бренд",f:["wec","mindstorms","kay77"],d:"Бренд провів кілька місяців у Media Lab Ніколаса Негропонте і описав, як телебачення, друк і комп'ютер зливаються в одне цифрове медіа. Тут Пейперт вчить дітей з Logo і LEGO, Кей будує Vivarium, а сама лабораторія «демонструє або помирає». Книжка про те, як винаходять майбутнє, — і про його ризики.",u:"https://en.wikipedia.org/wiki/MIT_Media_Lab"},
@@ -361,7 +365,7 @@ const N=[
  {id:"obsidian",y:2020,t:"prog",l:"pkm",n:"Obsidian",w:"Шида Лі, Ерика Сюй",f:["roam","tiddly","ahrens","wiki"],d:"Звичайні Markdown-файли у твоїй папці, [[посилання]], граф і Canvas. Цей сад живе саме в ньому.",u:"https://obsidian.md"}
 ];
 const EVENTS=[
- [1839,"фотоапарат: дагеротип"],[1844,"телеграф Морзе"],[1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен «Розуміння медіа»"],[1967,"відеокамера Portapak"],
+ [1839,"фотоапарат: дагеротип"],[1844,"телеграф Морзе"],[1895,"кінокамера братів Люм'єр"],[1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен «Розуміння медіа»"],
  [1968,"травень 68"],[1969,"Аполлон-11"],[1971,"email, Intel 4004"],[1977,"Apple II"],[1981,"IBM PC"],[1983,"TCP/IP"],
  [1989,"падіння Берлінського муру"],[1991,"незалежність України"],[1995,"Windows 95, Amazon"],[1997,"Deep Blue обіграє Каспарова"],[2000,"доткомова криза"],
  [2004,"Facebook"],[2007,"iPhone"],[2010,"iPad"],[2016,"AlphaGo"],[2020,"пандемія"]
@@ -370,17 +374,17 @@ const EVENTS=[
 const YR=n=>n.yl||n.y;
 const byId={};N.forEach(n=>{byId[n.id]=n;n.f=n.f||[];n.kids=[]});
 N.forEach(n=>n.f.forEach(p=>byId[p]&&byId[p].kids.push(n.id)));
-const Y0=1930,Y1=2044,NOW=2026,AX=74,H=58,ROW=76;
+const Y0=1925,Y1=2044,NOW=2026,AX=74,H=58,ROW=76;
 const mob=()=>innerWidth<=760;
 let PX=34, sel=null, hover=null, show={text:true,prog:true,edges:true};
 
 const $=s=>document.querySelector(s);
 const scroll=$("#scroll"),canvas=$("#canvas"),lanesEl=$("#lanes"),nodesEl=$("#nodes"),edgesEl=$("#edges"),axis=$("#axis"),cursor=$("#cursor"),status=$("#status");
 const GUT=()=>mob()?96:150, NW=()=>mob()?132:150;
-// до 1930 року шкала стиснута вдесятеро: давні події поміщаються, але не розтягують мапу
-const OLD0=1830, CF=.1, PRE=()=>(Y0-OLD0)*PX*CF;
-const X=y=>GUT()+12+(y>=Y0?PRE()+(y-Y0)*PX:(Math.max(y,OLD0)-OLD0)*PX*CF);
-const yearAt=x=>{const d=x-GUT()-12;return d<PRE()?OLD0+d/(PX*CF):Y0+(d-PRE())/PX};
+// шкала рівномірна від Y0; ліворуч від неї — стиснута «давня» зона з розривом шкали (commonplace books, давні події)
+const OLD0=1500, ZONE=()=>mob()?300:380;
+const X=y=>GUT()+12+(y>=Y0?ZONE()+(y-Y0)*PX:(Math.max(y,OLD0)-OLD0)/(Y0-OLD0)*(ZONE()-44));
+const yearAt=x=>{const d=x-GUT()-12-ZONE();return d<0?null:Y0+d/PX};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function layout(){
@@ -388,10 +392,8 @@ function layout(){
   canvas.style.width=total+"px";
   // axis
   let ah=`<div class="corner">рік →<br>поруч у світі ◆</div><div class="future" style="left:${X(NOW)}px">✦ сьогодні → далі</div>`;
-  for(let y=OLD0+10;y<Y0;y+=10){
-    if(y%50===0) ah+=`<div class="tick" style="left:${X(y)}px">${y}</div>`;
-    else ah+=`<div class="tick minor" style="left:${X(y)}px"></div>`;
-  }
+  const zx=GUT()+12, bx=zx+ZONE()-22;
+  ah+=`<div class="oldzone" style="left:${GUT()}px;width:${bx-GUT()}px">XVI ст. — ${Y0} · шкала стиснута</div>`;
   for(let y=Y0;y<=Y1;y++){
     const f=y>NOW?" fut":"";
     if(y%10===0) ah+=`<div class="tick${f}" style="left:${X(y)}px">${y}</div>`;
@@ -399,10 +401,10 @@ function layout(){
   }
   const evEnd=[-1e9,-1e9,-1e9];
   EVENTS.forEach(e=>{
-    const x=X(e[0]), w=e[1].length*6.6+16;
+    const old=e[0]<Y0, label=(old?e[0]+" · ":"")+e[1], x=X(e[0]), w=label.length*6.6+16;
     let row=evEnd.findIndex(end=>end+6<=x); if(row<0)row=evEnd.indexOf(Math.min(...evEnd));
     evEnd[row]=x+w;
-    ah+=`<div class="ev" data-y="${e[0]}" style="left:${x}px;top:${24+row*16}px" title="${e[0]}">${esc(e[1])}</div>`;
+    ah+=`<div class="ev" data-y="${e[0]}" style="left:${x}px;top:${24+row*16}px" title="${e[0]}">${esc(label)}</div>`;
   });
   axis.innerHTML=ah; axis.style.width=total+"px";
   // lanes
@@ -419,6 +421,7 @@ function layout(){
     top+=h;
   });
   lanesEl.innerHTML=lh; canvas.style.height=top+"px";
+  const brk=$("#brk"); brk.style.left=(GUT()+12+ZONE()-22)+"px"; brk.style.height=top+"px";
   cursor.style.height=top+"px";
   drawSpace(total,top);
   // nodes
@@ -656,8 +659,9 @@ const defStatus=status.textContent;
 const nearEls=new Set();
 scroll.addEventListener("mousemove",e=>{
   const r=canvas.getBoundingClientRect(), x=e.clientX-r.left;
-  if(x<GUT()){cursor.style.display="none";return}
-  const y=Math.round(yearAt(x));
+  const ya=yearAt(x);
+  if(x<GUT()||ya==null){cursor.style.display="none";return}
+  const y=Math.round(ya);
   cursor.style.display="block";cursor.style.left=x+"px";cursor.querySelector("b").textContent=y;cursor.classList.toggle("fut",y>=NOW);
   nearEls.forEach(el=>el.classList.remove("near"));nearEls.clear();
   const nb=near(y);
@@ -677,7 +681,7 @@ $("#tools").addEventListener("click",e=>{
     if(t==="edges")edgesEl.classList.toggle("hide",!show.edges);else{const keep=scroll.scrollLeft/canvas.offsetWidth;layout();scroll.scrollLeft=keep*canvas.offsetWidth}}
   if(t==="clear"){hover=null;closeText();scroll.scrollTo({left:0,top:0,behavior:"smooth"})}
   if(t==="in"||t==="out"){
-    const mid=yearAt(scroll.scrollLeft+scroll.clientWidth/2);
+    const mid=yearAt(scroll.scrollLeft+scroll.clientWidth/2)??Y0;
     PX=Math.max(16,Math.min(70,PX+(t==="in"?12:-12)));layout();
     scroll.scrollLeft=X(mid)-scroll.clientWidth/2;
   }
