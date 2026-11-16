@@ -280,6 +280,7 @@ const N=[
  {id:"storyspace",y:1987,t:"prog",l:"mem",n:"Storyspace",w:"Джей Девід Болтер, Майкл Джойс",f:["intermedia","notecards","nelson74"],d:"Середовище для гіпертекстового письма: простори-картки, мапа зв'язків поруч із текстом, приховані посилання «wireframe». Саме з нього — вигляд цієї сторінки. На ньому вчили студентів писати нелінійно.",u:"https://en.wikipedia.org/wiki/Storyspace"},
  {id:"afternoon",y:1987,t:"text",l:"mem",n:"afternoon, a story",w:"Майкл Джойс",f:["storyspace"],d:"Перший відомий гіпертекстовий роман: кожне прочитання — інше, читач обирає слова, що ведуть далі.",u:"https://en.wikipedia.org/wiki/Afternoon,_a_story"},
  {id:"tbl89",y:1989,t:"text",l:"net",n:"Information Management: A Proposal",w:"Тім Бернерс-Лі, CERN",f:["nelson65","hypercard","arpanet"],d:"Записка начальнику про те, як не губити інформацію в CERN: розподілена гіпертекстова система поверх інтернету. На полях: «Vague but exciting».",u:"https://www.w3.org/History/1989/proposal.html"},
+ {id:"wurman89",y:1989,t:"text",l:"net",n:"Information Anxiety",w:"Річард Сол Вурман",d:"Тривога — це розрив між тим, що ми розуміємо, і тим, що, як нам здається, мали б розуміти. Інформація — лише те, що веде до розуміння, решта — дані, і їх стає дедалі більше. Вурман, який ще 1976 року назвав себе «архітектором інформації» і заснував TED, пропонує LATCH — п'ять способів упорядкувати що завгодно: місце, абетка, час, категорія, ієрархія. Ця мапа, наприклад, складена за часом і категорією.",u:"https://en.wikipedia.org/wiki/Richard_Saul_Wurman"},
  {id:"www",y:1991,t:"prog",l:"net",n:"WorldWideWeb",w:"Тім Бернерс-Лі",f:["tbl89"],d:"Перший браузер — і водночас редактор: веб задумувався як місце, де всі пишуть, а не лише читають. Посилання односпрямовані, зате працюють будь-де.",u:"https://en.wikipedia.org/wiki/WorldWideWeb"},
  {id:"bolter",y:1991,t:"text",l:"mem",n:"Writing Space",w:"Джей Девід Болтер",f:["storyspace"],d:"Комп'ютер як новий простір письма після сувою, кодексу й друку. Гіпертекст повертає письму рухливість і мапи.",u:"https://en.wikipedia.org/wiki/Jay_David_Bolter"},
  {id:"landow",y:1992,t:"text",l:"mem",n:"Hypertext",w:"Джордж Лендоу",f:["intermedia","nelson74"],d:"Гіпертекст як втілення ідей Барта, Дерріди й Фуко: смерть автора, текст як мережа, читач-співавтор. Написано з досвіду курсів на Intermedia.",u:"https://en.wikipedia.org/wiki/George_Landow"},
@@ -517,8 +518,10 @@ function open(id,{center=false}={}){
 function focusNode(id){
   const n=byId[id]; if(!n||n.x==null)return;
   if(mob()){scroll.scrollTo({left:Math.max(0,n.x-GUT()-16),top:Math.max(0,n.yy-AX-16),behavior:"smooth"});return}
-  const textW=$("#text").classList.contains("open")&&!mob()?$("#text").offsetWidth:0;
-  scroll.scrollTo({left:Math.max(0,n.x-GUT()-Math.max(40,(scroll.clientWidth-GUT()-textW)/2)+ (textW?textW*.6:0)),top:Math.max(0,n.yy-AX-scroll.clientHeight/3),behavior:"smooth"});
+  const tw=$("#text"), sr=scroll.getBoundingClientRect();
+  const from=Math.max(GUT(),tw.classList.contains("open")?tw.getBoundingClientRect().right-sr.left+20:0);
+  const room=Math.max(NW(),scroll.clientWidth-from);
+  scroll.scrollTo({left:Math.max(0,n.x-from-(room-NW())/2),top:Math.max(0,n.yy-AX-scroll.clientHeight/3),behavior:"smooth"});
 }
 function closeText(){sel=null;$("#text").classList.remove("open");document.body.classList.remove("reading");history.replaceState(null,"",location.pathname);paint()}
 
