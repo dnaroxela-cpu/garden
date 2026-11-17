@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Карусель «show, not tell»</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Pixelify+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* SF Pro Text — локальні файли в carousel/fonts/ (не в git) */
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Light.otf);font-weight:300}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Medium.otf);font-weight:400 500}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Bold.otf);font-weight:600 700}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Heavy.otf);font-weight:800}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Black.otf);font-weight:900}
+:root{--ink:#000;--paper:#fff;
+  --desk:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1'/%3E%3Crect x='2' y='2' width='1' height='1'/%3E%3C/svg%3E");
+  --ui:"Pixelify Sans",monospace;--txt:"SF Pro Text","IBM Plex Sans",Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#777;display:flex;flex-direction:column;gap:40px;padding:40px;align-items:center}
+.slide{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--paper) var(--desk) 0 0/8px 8px;image-rendering:pixelated;color:var(--ink);font-family:var(--txt)}
+.menubar{position:absolute;inset:0 0 auto 0;height:62px;background:var(--paper);border-bottom:3px solid var(--ink);display:flex;align-items:center;gap:34px;padding:0 34px;font:600 26px/1 var(--txt);z-index:5}
+.menubar .mk{font-size:34px}.menubar .ttl{font:600 30px/1 var(--ui)}.menubar .sp{flex:1}
+.win{position:absolute;background:var(--paper);border:3px solid var(--ink);box-shadow:7px 7px 0 var(--ink);display:flex;flex-direction:column}
+.tbar{height:46px;flex:none;border-bottom:3px solid var(--ink);position:relative;display:flex;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(to bottom,var(--paper) 0 4px,var(--ink) 4px 6px) 0 7px/100% 30px no-repeat}
+.tbar .name{background:var(--paper);padding:0 16px;font:600 27px/46px var(--ui);white-space:nowrap}
+.tbar .box{position:absolute;top:9px;left:14px;width:24px;height:24px;border:3px solid var(--ink);background:var(--paper)}
+.status{flex:none;height:46px;border-top:3px solid var(--ink);font:500 24px/40px var(--txt);padding:0 18px;white-space:nowrap}
+.c{flex:1;position:relative;overflow:hidden}
+svg.ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4}
+.ov path.o{stroke:var(--ink);stroke-width:7;fill:none}.ov path.i{stroke:var(--paper);stroke-width:2.5;fill:none}.ov polygon{fill:var(--ink)}
+
+/* ── 1: той самий жест ── */
+#s1 .L{left:44px;top:120px;width:470px;height:960px}
+#s1 .R{left:566px;top:120px;width:470px;height:960px}
+#s1 .yrs{position:absolute;left:0;right:0;top:1120px;display:flex;justify-content:center;align-items:baseline;gap:40px;font:900 168px/1 var(--txt);letter-spacing:-.04em}
+#s1 .yrs i{font-style:normal;font-weight:300;font-size:140px}
+.locke{padding:22px 26px;font:500 21px/1.3 var(--txt)}
+.locke table{border-collapse:collapse;width:100%;margin-bottom:22px}
+.locke th,.locke td{border:2px solid #000;text-align:center;height:30px;font:600 19px/1 var(--txt);padding:0}
+.locke th{background:#000;color:#fff}
+.locke td.hit{background:#000;color:#fff}
+.locke .row0{width:34px}
+.ent{margin:0 0 18px;position:relative}
+.ent .hd{font:700 26px/1 var(--txt);display:flex;align-items:baseline;gap:14px;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:10px}
+.ent .hd small{font:600 19px var(--txt)}
+.scr{display:block;width:100%;height:16px;margin:6px 0}
+.vide{font:600 20px var(--txt);text-decoration:underline}
+.obs{display:flex;flex-direction:row-reverse;height:100%}
+.obs .side{width:160px;border-left:3px solid #000;padding:18px 14px;font:600 20px/1.7 var(--txt)}
+.obs .side .lbl{font:700 15px/1 var(--txt);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 8px}
+.obs .side .on{background:#000;color:#fff;padding:0 6px;margin:0 -6px}
+.obs .note{flex:1;padding:22px 20px;font:500 21px/1.45 var(--txt)}
+.obs .note h3{font:700 34px/1 var(--txt);margin:0 0 6px}
+.obs .note .meta{font:600 17px var(--txt);margin-bottom:16px}
+.obs .note .bar{height:12px;background:#000;margin:12px 0}
+.obs .note .lnk{display:inline-block;border:2px solid #000;padding:2px 8px;font:700 20px var(--txt);margin:10px 0}
+.obs .gr{position:absolute;left:16px;bottom:16px;width:150px;height:120px;border:3px solid #000;background:#fff}
+
+/* ── 5: значення слова — його сусіди ── */
+#s5 .q{position:absolute;left:44px;right:44px;top:100px;font:700 52px/1.1 var(--txt);letter-spacing:-.025em;margin:0;background:#fff;border:3px solid #000;box-shadow:7px 7px 0 #000;padding:26px 30px}
+#s5 .P{left:44px;top:330px;width:992px;height:700px}
+#s5 .plot{background:#fff}
+#s5 .cards{position:absolute;left:44px;right:44px;top:1090px;height:150px}
+.node{position:absolute;width:310px;height:100px;background:#fff;border:3px solid #000;box-shadow:4px 4px 0 #000;display:flex;flex-direction:column;z-index:3}
+.node .h{height:36px;flex:none;border-bottom:3px solid #000;font:700 18px/31px var(--txt);padding:0 10px;white-space:nowrap;overflow:hidden}
+.node.prog .h{text-align:center;padding:0 32px;position:relative;background:repeating-linear-gradient(to bottom,#fff 0 4px,#000 4px 6px) 0 5px/100% 22px no-repeat}
+.node.prog .h span{background:#fff;padding:0 6px}
+.node.prog .h::before{content:"";position:absolute;left:9px;top:7px;width:14px;height:14px;border:3px solid #000;background:#fff}
+.node .b{flex:1;display:flex;align-items:center;gap:10px;padding:0 10px;font:500 21px/1.1 var(--txt)}
+.node .b b{font-weight:700}
+</style>
+</head>
+<body>
+
+<section class="slide" id="s1">
+  <div class="menubar"><span class="mk">✱</span><span class="ttl">Інструменти мислення</span><span class="sp"></span><span>1/5</span></div>
+  <div class="win L"><div class="tbar"><span class="box"></span><span class="name">Common-place book</span></div>
+    <div class="c locke" id="locke">
+      <table id="idx"></table>
+      <div class="ent" id="e-mem"><div class="hd"><span>Memoria</span><small id="h-mem">p. 2</small></div><svg class="scr" data-w="96"></svg><svg class="scr" data-w="88"></svg><svg class="scr" data-w="94"></svg><svg class="scr" data-w="60"></svg><span class="vide" id="vide">vide p. 4</span></div>
+      <div class="ent"><div class="hd"><span>Amicitia</span><small>p. 4</small></div><svg class="scr" data-w="92"></svg><svg class="scr" data-w="80"></svg><svg class="scr" data-w="70"></svg></div>
+    </div>
+    <div class="status">Джон Локк, покажчик</div></div>
+  <div class="win R"><div class="tbar"><span class="box"></span><span class="name">Obsidian</span></div>
+    <div class="c"><div class="obs">
+      <div class="side"><div class="lbl">Теги</div><div><span class="on">#memoria</span></div><div>#amicitia</div><div>#tempus</div><div class="lbl">Нотатки</div><div>Memoria</div><div>Amicitia</div><div>Tempus</div></div>
+      <div class="note"><h3 id="h2-mem"># Memoria</h3><div class="meta"><span id="t-mem">#memoria</span></div><div class="bar" style="width:92%"></div><div class="bar" style="width:80%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:54%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:84%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:76%"></div><span class="lnk" id="lnk">[[Amicitia]]</span><div class="bar" style="width:40%"></div></div>
+    </div><svg class="gr" id="gr"></svg></div>
+    <div class="status">теги, нотатки, посилання</div></div>
+  <svg class="ov" id="ov1"></svg>
+  <div class="yrs"><span>1706</span><i>/</i><span>2020</span></div>
+</section>
+
+<section class="slide" id="s5">
+  <div class="menubar"><span class="mk">✱</span><span class="ttl">Інструменти мислення</span><span class="sp"></span><span>5/5</span></div>
+  <p class="q">Ми навчили машини читати, рахуючи, які слова стоять поруч.</p>
+  <div class="win P"><div class="tbar"><span class="box"></span><span class="name">Слова поруч</span></div>
+    <div class="c plot"><svg id="plot" width="100%" height="100%"></svg></div>
+    <div class="status" id="eq">&nbsp;</div></div>
+  <div class="cards" id="cards"><svg class="ov" id="ov5"></svg></div>
+</section>
+
+<script>
+function rnd(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const arrowPath=(ax,ay,bx,by,c1,c2,L=20)=>{const ang=Math.atan2(by-c2[1],bx-c2[0]),ex=bx-Math.cos(ang)*L*.8,ey=by-Math.sin(ang)*L*.8,p=`M${ax},${ay} C${c1} ${c2} ${ex},${ey}`;
+  return `<g><path class="o" d="${p}"/><path class="i" d="${p}"/><polygon points="${bx},${by} ${bx-L*Math.cos(ang-.45)},${by-L*Math.sin(ang-.45)} ${bx-L*Math.cos(ang+.45)},${by-L*Math.sin(ang+.45)}"/></g>`};
+
+// ── слайд 1 ──
+function s1(){
+  // покажчик Локка: рядок — перша літера, стовпець — перша голосна; Memoria → M/e → p. 2, Amicitia → A/i → p. 4
+  const V=["a","e","i","o","u"], Ls="ABCDEFGHILM".split(""), hits={"M-e":2,"A-i":4,"T-e":6,"C-o":7};
+  let h=`<tr><th class="row0"></th>${V.map(v=>`<th>${v}</th>`).join("")}</tr>`;
+  Ls.forEach(l=>{h+=`<tr><th class="row0">${l}</th>${V.map(v=>{const k=hits[l+"-"+v];return `<td class="${k?"hit":""}" ${l+"-"+v==="M-e"?'id="cell-mem"':""}>${k||""}</td>`}).join("")}</tr>`});
+  document.getElementById("idx").innerHTML=h;
+  const r=rnd(1706);
+  document.querySelectorAll(".scr").forEach(s=>{const w=s.clientWidth*(+s.dataset.w/100);let x=2,d="M2,10";while(x<w){const st=4+r()*6;d+=` q${(st/2).toFixed(1)},${(-3-r()*7).toFixed(1)} ${st.toFixed(1)},${(r()*2-1).toFixed(1)}`;x+=st;if(r()<.13){x+=7;d+=` M${x.toFixed(1)},10`}}s.innerHTML=`<path d="${d}" fill="none" stroke="#000" stroke-width="2"/>`});
+  const g=document.getElementById("gr"),P=[[30,30],[80,22],[120,58],[60,80],[100,98],[30,95]];let gs="";[[0,1],[1,2],[1,3],[3,4],[3,5],[2,4]].forEach(([a,b])=>gs+=`<path d="M${P[a]}L${P[b]}" stroke="#000" stroke-width="2"/>`);P.forEach(([x,y],i)=>gs+=`<rect x="${x-6}" y="${y-6}" width="12" height="12" fill="${i==0?"#000":"#fff"}" stroke="#000" stroke-width="3"/>`);g.innerHTML=gs;
+  const sl=document.getElementById("s1").getBoundingClientRect(), R=id=>{const b=document.getElementById(id).getBoundingClientRect();return {l:b.left-sl.left,t:b.top-sl.top,r:b.right-sl.left,b:b.bottom-sl.top,cy:(b.top+b.bottom)/2-sl.top}};
+  const pairs=[["cell-mem","t-mem"],["h-mem","h2-mem"],["vide","lnk"]];
+  document.getElementById("ov1").innerHTML=pairs.map(([a,b])=>{const A=R(a),B=R(b),ax=A.r+6,bx=B.l-10,gx=500,L=20,ex=bx-L*.8,p=`M${ax},${A.cy} H${gx} C${gx+46},${A.cy} ${bx-46},${B.cy} ${ex},${B.cy}`;
+    return `<g><path class="o" d="${p}"/><path class="i" d="${p}"/><polygon points="${bx},${B.cy} ${bx-L*Math.cos(-.45)},${B.cy-L*Math.sin(-.45)} ${bx-L*Math.cos(.45)},${B.cy-L*Math.sin(.45)}"/></g>`}).join("");
+}
+
+// ── слайд 5: анімація, кадр визначається часом t (с) ──
+const W5=986, H5=700-46-46-6;
+const WORDS=[
+ ["сад",650,110,"g"],["город",770,160,"g"],["оранжерея",610,190,"g"],["клумба",820,95,"g"],
+ ["нотатка",600,420,"n"],["зошит",740,460,"n"],["картка",650,520,"n"],["щоденник",800,390,"n"],
+ ["думка",110,110,"t"],["ідея",220,80,"t"],["задум",170,170,"t"],
+ ["чоловік",200,450,"k"],["жінка",450,410,"k"],["король",250,270,"k"],["королева",500,230,"q"]
+];
+const ORDER={t:0,g:1,n:2,k:3,q:4};
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), ease=t=>1-Math.pow(1-cl(t),3);
+function bg(){let s="";for(let x=40;x<W5;x+=80)s+=`<path d="M${x},0V${H5}" stroke="#000" stroke-width="1" stroke-dasharray="2 6" opacity=".35"/>`;for(let y=40;y<H5;y+=80)s+=`<path d="M0,${y}H${W5}" stroke="#000" stroke-width="1" stroke-dasharray="2 6" opacity=".35"/>`;return s}
+const BG=bg();
+function vec(ax,ay,bx,by,k,dash){ // стрілка, намальована на частку k
+  if(k<=0)return"";const ex=ax+(bx-ax)*k,ey=ay+(by-ay)*k,ang=Math.atan2(by-ay,bx-ax),L=22;
+  const p=`M${ax},${ay}L${ex},${ey}`;
+  return `<path d="${p}" stroke="#000" stroke-width="7" fill="none" ${dash?'stroke-dasharray="14 8"':""}/><path d="${p}" stroke="#fff" stroke-width="2.5" fill="none" ${dash?'stroke-dasharray="14 8"':""}/>`+(k>.15?`<polygon points="${ex},${ey} ${ex-L*Math.cos(ang-.45)},${ey-L*Math.sin(ang-.45)} ${ex-L*Math.cos(ang+.45)},${ey-L*Math.sin(ang+.45)}" fill="#000"/>`:"");
+}
+window.setT=t=>{
+  let s=BG;
+  const P={};WORDS.forEach(w=>P[w[0]]=[w[1],w[2]]);
+  // 1) слова з'являються купками
+  WORDS.forEach(([w,x,y,g],i)=>{
+    const st=.25+ORDER[g]*.45+(i%4)*.09, a=g==="q"?ease((t-4.6)/.4):ease((t-st)/.35);
+    if(a<=0)return;
+    const sz=12+(1-a)*10, big=g==="q"&&t>4.6;
+    s+=`<g opacity="${a}"><rect x="${x-sz/2}" y="${y-sz/2}" width="${sz}" height="${sz}" fill="${g==="k"||g==="q"?"#000":"#fff"}" stroke="#000" stroke-width="3"/>`+
+       `<text x="${(w==="чоловік"||w==="король")?x-16:x+16}" text-anchor="${(w==="чоловік"||w==="король")?"end":"start"}" y="${y+9}" font-family="SF Pro Text, IBM Plex Sans" font-weight="${g==="k"||g==="q"?700:500}" font-size="${big?30:26}">${w}</text></g>`;
+    if(g==="q"&&t>4.6){const pul=cl(1-(t-4.6)/1.2);if(pul>0)s+=`<rect x="${x-14-pul*24}" y="${y-14-pul*24}" width="${28+pul*48}" height="${28+pul*48}" fill="none" stroke="#000" stroke-width="3" stroke-dasharray="4 4" opacity="${pul}"/>`}
+  });
+  // 2) чоловік → жінка
+  const [mx,my]=P["чоловік"],[wx,wy]=P["жінка"],[kx,ky]=P["король"],[qx,qy]=P["королева"];
+  s+=vec(mx+12,my-2,wx-14,wy+2,ease((t-2.6)/.8));
+  if(t>2.9)s+=`<text x="${(mx+wx)/2}" text-anchor="middle" y="${(my+wy)/2+46}" font-family="SF Pro Text, IBM Plex Sans" font-weight="600" font-size="22" opacity="${ease((t-2.9)/.4)}">+ жінка − чоловік</text>`;
+  // 3) той самий вектор переноситься до «король»: рамка-привид летить знизу вгору
+  const mv=ease((t-3.6)/.9);
+  if(t>3.6&&t<4.7){const ox=(kx-mx)*mv,oy=(ky-my)*mv;s+=`<g opacity=".55">${vec(mx+12+ox,my-2+oy,wx-14+ox,wy+2+oy,1,true)}</g>`}
+  s+=vec(kx+12,ky-2,qx-14,qy+2,t>=4.5?ease((t-4.5)/.5):0,true);
+  document.getElementById("plot").innerHTML=s;
+  // 4) рівняння в рядку стану друкується
+  const eq="король − чоловік + жінка ≈ королева", n=Math.floor(cl((t-5.2)/1.4)*eq.length);
+  document.getElementById("eq").innerHTML=n?eq.slice(0,n)+(n<eq.length?"▌":""):"&nbsp;";
+};
+// картки-джерела внизу, як на мапі
+(()=>{
+  const C=[{t:"text",n:"Philosophical Investigations",w:"Вітгенштайн",y:1953,x:0},{t:"text",n:"Synopsis of Linguistic Theory",w:"Ферт",y:1957,x:341},{t:"prog",n:"word2vec",w:"Міколов",y:2013,x:682}];
+  const box=document.getElementById("cards");
+  C.forEach(c=>box.insertAdjacentHTML("beforeend",`<div class="node ${c.t}" style="left:${c.x}px;top:20px">${c.t==="text"?`<div class="h">¶ ${c.n}</div>`:`<div class="h"><span>${c.n}</span></div>`}<div class="b"><b>${c.y}</b><span>${c.w}</span></div></div>`));
+  let s="";for(let i=0;i<2;i++){const ax=C[i].x+310,bx=C[i+1].x-4,y=70;s+=arrowPath(ax,y,bx,y,[ax+20,y],[bx-20,y],18)}
+  document.getElementById("ov5").innerHTML=s;
+})();
+Promise.all([document.fonts.load('500 30px "SF Pro Text"'),document.fonts.load('700 30px "SF Pro Text"'),document.fonts.load('900 30px "SF Pro Text"'),document.fonts.load('300 30px "SF Pro Text"')])
+  .then(()=>document.fonts.ready).then(()=>{s1();setT(99);window.READY=true});
+</script>
+</body>
+</html>
