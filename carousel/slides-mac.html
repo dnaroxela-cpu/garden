@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Карусель у стилі мапи</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Pixelify+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#000;--paper:#fff;
+  --desk:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1'/%3E%3Crect x='2' y='2' width='1' height='1'/%3E%3C/svg%3E");
+  --d50:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1'/%3E%3Crect x='1' y='1' width='1' height='1'/%3E%3C/svg%3E");
+  --ui:"Pixelify Sans",monospace;--txt:"IBM Plex Sans",Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#777;display:flex;flex-direction:column;gap:40px;padding:40px;align-items:center}
+.slide{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--paper) var(--desk) 0 0/8px 8px;image-rendering:pixelated;color:var(--ink);font-family:var(--txt)}
+.menubar{position:absolute;inset:0 0 auto 0;height:62px;background:var(--paper);border-bottom:3px solid var(--ink);display:flex;align-items:center;gap:34px;padding:0 34px;font:600 26px/1 var(--txt)}
+.menubar .mk{font-size:34px}
+.menubar .ttl{font:600 30px/1 var(--ui)}
+.menubar .sp{flex:1}
+.win{position:absolute;background:var(--paper);border:3px solid var(--ink);box-shadow:7px 7px 0 var(--ink);display:flex;flex-direction:column}
+.tbar{height:46px;flex:none;border-bottom:3px solid var(--ink);position:relative;display:flex;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(to bottom,var(--paper) 0 4px,var(--ink) 4px 6px) 0 7px/100% 30px no-repeat}
+.tbar .name{background:var(--paper);padding:0 18px;font:600 30px/46px var(--ui);white-space:nowrap}
+.tbar .box{position:absolute;top:9px;width:24px;height:24px;border:3px solid var(--ink);background:var(--paper)}
+.tbar .box.l{left:14px}.tbar .box.r{right:14px}
+.tbar .box.r::after{content:"";position:absolute;left:2px;top:2px;width:9px;height:9px;border:3px solid var(--ink)}
+.status{flex:none;height:46px;border-top:3px solid var(--ink);font:400 24px/40px var(--txt);padding:0 18px;white-space:nowrap}
+
+/* картки, як на мапі */
+.node{position:absolute;width:290px;height:100px;background:var(--paper);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);display:flex;flex-direction:column;z-index:3}
+.node .h{height:36px;flex:none;border-bottom:3px solid var(--ink);font:600 23px/31px var(--txt);padding:0 10px;white-space:nowrap;overflow:hidden}
+.node.prog .h{text-align:center;padding:0 32px;position:relative;background:repeating-linear-gradient(to bottom,var(--paper) 0 4px,var(--ink) 4px 6px) 0 5px/100% 22px no-repeat}
+.node.prog .h span{background:var(--paper);padding:0 6px}
+.node.prog .h::before{content:"";position:absolute;left:9px;top:7px;width:14px;height:14px;border:3px solid var(--ink);background:var(--paper)}
+.node .b{flex:1;display:flex;align-items:center;gap:10px;padding:0 10px;font:400 22px/1.1 var(--txt)}
+.node .b .yr{font-weight:600}
+.node .kids{display:flex;gap:5px;margin-left:auto}.node .kids i{width:20px;height:13px;border:2.5px solid var(--ink);border-radius:3px}
+.node.self{background:var(--ink);color:var(--paper)}.node.self .h{border-color:var(--paper)}.node.self .kids i{border-color:var(--paper)}
+svg.edges{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:2}
+.edges path.o{stroke:var(--ink);stroke-width:7;fill:none}.edges path.i{stroke:var(--paper);stroke-width:2.5;fill:none}.edges polygon{fill:var(--ink)}
+
+/* 1 — обкладинка */
+#s1 .main{left:56px;top:110px;width:968px;height:1180px}
+#s1 .head{padding:44px 56px 0}
+#s1 .kick{font:600 24px/1 var(--txt);letter-spacing:.08em;text-transform:uppercase;display:inline-block;border:3px solid var(--ink);padding:8px 12px}
+#s1 h1{font:600 100px/.98 var(--txt);margin:28px 0 22px;letter-spacing:-.025em}
+#s1 .sub{font:400 34px/1.35 var(--txt);margin:0;max-width:760px}
+#s1 .mini{position:relative;flex:1;margin-top:34px;border-top:3px solid var(--ink);overflow:hidden}
+#s1 .axis{position:absolute;left:0;right:0;top:0;height:50px;border-bottom:3px solid var(--ink);background:var(--paper);z-index:4;font:600 22px/1 var(--txt)}
+#s1 .axis span{position:absolute;top:0;bottom:0;border-left:2px solid var(--ink);padding:13px 0 0 8px}
+#s1 .space{position:absolute;top:50px;bottom:0;right:0;z-index:1}
+#s1 .space canvas{position:absolute;inset:0;width:100%;height:100%}
+#s1 .next{position:absolute;z-index:4;color:#fff;font:600 44px/1 var(--ui)}
+#s1 .axis .fut{background:#000;color:#fff;border-color:#fff}
+
+/* 2 — гачок */
+#s2 .w{width:520px;height:280px}
+#s2 .w .c{flex:1;position:relative;overflow:hidden;padding:18px 22px;font:400 22px/1.5 var(--txt)}
+#s2 .line{height:12px;background:var(--ink);margin:12px 0;opacity:1}
+#s2 .dlg{left:70px;top:650px;width:940px;height:630px}
+#s2 .dlg .in{flex:1;display:flex;gap:34px;padding:46px 48px 20px}
+#s2 .dlg .ico{flex:none;width:92px;height:92px}
+#s2 .dlg .small{font:400 32px/1.4 var(--txt);margin:0 0 26px}
+#s2 .dlg .big{font:600 68px/1.02 var(--txt);letter-spacing:-.02em;margin:0 0 26px}
+#s2 .btns{display:flex;gap:26px;padding:0 48px 46px 174px}
+#s2 .btn{font:600 30px/1 var(--txt);border:3px solid var(--ink);border-radius:14px;padding:16px 30px;background:var(--paper)}
+#s2 .btn.def{outline:3px solid var(--ink);outline-offset:5px}
+</style>
+</head>
+<body>
+
+<section class="slide" id="s1">
+  <div class="menubar"><span class="mk">✱</span><span class="ttl">Інструменти мислення</span><span>Тексти</span><span>Програми</span><span class="sp"></span><span>1/5</span></div>
+  <div class="win main">
+    <div class="tbar"><span class="box l"></span><span class="name">Мапа · XVI ст. — ?</span><span class="box r"></span></div>
+    <div class="head">
+      <span class="kick">¶ мапа ідей</span>
+      <h1>Як ми можемо думати</h1>
+      <p class="sub">Коротка історія інструментів для мислення: від книг загальних місць до Obsidian і ШІ.</p>
+    </div>
+    <div class="mini" id="mini">
+      <div class="axis" id="axis"></div>
+      <div class="space" id="space"><canvas id="gal"></canvas></div>
+      <svg class="edges" id="edges"></svg>
+      <div id="nodes"></div>
+    </div>
+    <div class="status">XVI ст. — 2026 — ? · гортай →</div>
+  </div>
+</section>
+
+<section class="slide" id="s2">
+  <div class="menubar"><span class="mk">✱</span><span class="ttl">Інструменти мислення</span><span>Тексти</span><span>Програми</span><span class="sp"></span><span>2/5</span></div>
+  <div class="win w" style="left:60px;top:104px"><div class="tbar"><span class="box l"></span><span class="name">¶ Нотатки</span></div>
+    <div class="c"><div class="line" style="width:80%"></div><div class="line" style="width:92%"></div><div class="line" style="width:64%"></div><div class="line" style="width:86%"></div></div></div>
+  <div class="win w" style="left:190px;top:178px"><div class="tbar"><span class="box l"></span><span class="name">Закладки</span></div>
+    <div class="c">★ As We May Think<br>★ Mother of All Demos<br>★ Are.na / канал<br>★ The Garden and the Stream</div></div>
+  <div class="win w" style="left:320px;top:252px"><div class="tbar"><span class="box l"></span><span class="name">Вікі</span></div>
+    <div class="c">Сад думок росте через <u>[[посилання]]</u>, а не через папки. Кожна сторінка веде до <u>[[іншої]]</u>, а та — ще далі…</div></div>
+  <div class="win w" style="left:450px;top:326px;width:560px;height:280px"><div class="tbar"><span class="box l"></span><span class="name">Граф</span></div>
+    <div class="c" style="padding:0"><svg id="graph" width="100%" height="100%"></svg></div></div>
+  <div class="win dlg">
+    <div class="tbar"><span class="box l"></span><span class="name">Маленьке питання</span></div>
+    <div class="in">
+      <svg class="ico" viewBox="0 0 23 23" shape-rendering="crispEdges"><path d="M4 1h15v1h2v2h1v11h-1v2h-2v1H9l-4 4v-4H4v-1H2v-2H1V4h1V2h2z" fill="#fff" stroke="#000" stroke-width="1.2"/><path d="M9 6h5v1h1v3h-1v1h-2v2h-2v-3h1V9h2V8H9v1H7V7h2zM10 14h2v2h-2z" fill="#000"/></svg>
+      <div>
+        <p class="small">Щодня ми зберігаємо, позначаємо й пов'язуємо: нотатки, закладки, вікі, графи.</p>
+        <p class="big">Але звідки взялася думка, що мислити можна поза головою?</p>
+        <p class="small" style="margin:0">Вона значно старша за комп'ютери.</p>
+      </div>
+    </div>
+    <div class="btns"><span class="btn def">Погортаймо назад →</span></div>
+  </div>
+</section>
+
+<script>
+function rnd(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+// міні-мапа на обкладинці
+const mini=document.getElementById("mini"), W=mini.clientWidth, H=mini.clientHeight;
+const SX=600; // де починається космос
+const AX=[["XVI ст.",14],["1945",250],["1968",420],["2001",600-170],["2026 → ?",SX]];
+document.getElementById("axis").innerHTML=[["XVI ст.",14],["1945",240],["1968",360],["2001",470]].map(([t,x])=>`<span style="left:${x}px">${t}</span>`).join("")+`<span class="fut" style="left:${SX}px;right:0">✦ сьогодні → далі</span>`;
+const NODES=[
+ {id:"cp",t:"text",n:"Commonplace books",y:"XVI–XIX",x:24,top:76,k:4},
+ {id:"bush",t:"text",n:"As We May Think",y:"1945",x:200,top:196,k:5,self:1},
+ {id:"nls",t:"prog",n:"NLS",y:"1968",x:24,top:318,w:"Енґельбарт"},
+ {id:"wiki",t:"prog",n:"Вікіпедія",y:"2001",x:330,top:330,w:"вікі для всіх"},
+ {id:"obs",t:"prog",n:"Obsidian",y:"2020",x:176,top:446,w:"[[посилання]]"},
+];
+document.getElementById("nodes").innerHTML=NODES.map(n=>`<div class="node ${n.t}${n.self?" self":""}" id="n-${n.id}" style="left:${n.x}px;top:${n.top}px">${n.t==="text"?`<div class="h">¶ ${n.n}</div>`:`<div class="h"><span>${n.n}</span></div>`}<div class="b"><span class="yr">${n.y}</span><span>${n.w||""}</span>${n.k?`<span class="kids">${"<i></i>".repeat(Math.min(n.k,4))}</span>`:""}</div></div>`).join("");
+const R=id=>{const e=document.getElementById("n-"+id),m=mini.getBoundingClientRect(),r=e.getBoundingClientRect();return {x:r.left-m.left,y:r.top-m.top,w:r.width,h:r.height}};
+function arrow(ax,ay,bx,by,c1,c2){
+  const ang=Math.atan2(by-c2[1],bx-c2[0]),L=20,ex=bx-Math.cos(ang)*L*.8,ey=by-Math.sin(ang)*L*.8;
+  const p=`M${ax},${ay} C${c1} ${c2} ${ex},${ey}`;
+  return `<g><path class="o" d="${p}"/><path class="i" d="${p}"/><polygon points="${bx},${by} ${bx-L*Math.cos(ang-.45)},${by-L*Math.sin(ang-.45)} ${bx-L*Math.cos(ang+.45)},${by-L*Math.sin(ang+.45)}"/></g>`;
+}
+const e=[];
+let a=R("cp"),b=R("bush");e.push(arrow(a.x+a.w-50,a.y+a.h,b.x+60,b.y-2,[a.x+a.w-50,a.y+a.h+40],[b.x+60,b.y-40]));
+a=R("bush");b=R("nls");e.push(arrow(a.x+40,a.y+a.h,b.x+b.w-60,b.y-2,[a.x+40,a.y+a.h+40],[b.x+b.w-60,b.y-40]));
+a=R("bush");b=R("wiki");e.push(arrow(a.x+a.w-40,a.y+a.h,b.x+b.w/2,b.y-2,[a.x+a.w-40,a.y+a.h+50],[b.x+b.w/2,b.y-50]));
+a=R("nls");b=R("obs");e.push(arrow(a.x+60,a.y+a.h,b.x+30,b.y-2,[a.x+60,a.y+a.h+50],[b.x+30,b.y-40]));
+a=R("wiki");b=R("obs");e.push(arrow(a.x+60,a.y+a.h,b.x+b.w-40,b.y-2,[a.x+60,a.y+a.h+30],[b.x+b.w-40,b.y-30]));
+a=R("obs");e.push(arrow(a.x+a.w,a.y+a.h/2,SX+80,a.y-30,[a.x+a.w+120,a.y+a.h/2],[SX+10,a.y-10]));
+document.getElementById("edges").innerHTML=e.join("");
+
+// космос: растрові смуги, зорі, галактика
+const sp=document.getElementById("space"), cv=document.getElementById("gal"), bw=22;
+sp.style.left=(SX-bw*4)+"px";
+const cw=W-(SX-bw*4), ch=H-50; cv.width=cw; cv.height=ch;
+const x=cv.getContext("2d"), r=rnd(2026);
+const dens=[.12,.25,.5,.75];
+for(let i=0;i<4;i++)for(let yy=0;yy<ch;yy+=2)for(let xx=i*bw;xx<(i+1)*bw;xx+=2){if(r()<dens[i]){x.fillStyle="#000";x.fillRect(xx,yy,2,2)}}
+x.fillStyle="#000";x.fillRect(bw*4,0,cw,ch);
+x.fillStyle="#fff";
+for(let i=0;i<220;i++){const px=bw*4+r()*(cw-bw*4),py=r()*ch,s=r()<.3?3:2;x.fillRect(px|0,py|0,s,s)}
+for(let i=0;i<9;i++){const px=bw*4+20+r()*(cw-bw*4-40),py=20+r()*(ch-40);x.fillRect(px-7,py,15,2);x.fillRect(px,py-7,2,15)}
+const ga=()=>(r()+r()+r()-1.5)/1.5, gx=bw*4+(cw-bw*4)*.5, gy=ch*.56, Rg=Math.min(170,(cw-bw*4)*.48), cs=Math.cos(-.5), sn=Math.sin(-.5);
+const put=(a,b,s)=>{b*=.55;const X=gx+a*cs-b*sn,Y=gy+a*sn+b*cs;if(X>bw*4)x.fillRect(X|0,Y|0,s,s)};
+for(let i=0;i<500;i++){const th=r()*6.283,rr=Rg*.2*Math.abs(ga());put(Math.cos(th)*rr,Math.sin(th)*rr,r()<.5?3:2)}
+for(let k=0;k<2;k++)for(let i=0;i<900;i++){const t=Math.pow(r(),.8),th=k*Math.PI+t*8,rr=Rg*(.1+.9*t),j=Rg*(.03+.07*t);put(Math.cos(th)*rr+ga()*j,Math.sin(th)*rr+ga()*j,r()<.2*(1-t)+.08?3:2)}
+mini.insertAdjacentHTML("beforeend",`<div class="next" style="left:${SX+24}px;top:${78}px">далі — ?</div>`);
+
+// граф на слайді 2
+(()=>{const g=document.getElementById("graph"),w=560-6,h=280-52,r=rnd(7),P=[];for(let i=0;i<11;i++)P.push([30+r()*(w-60),24+r()*(h-48)]);
+let s="";for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++)if(Math.hypot(P[i][0]-P[j][0],P[i][1]-P[j][1])<150)s+=`<path d="M${P[i][0]},${P[i][1]}L${P[j][0]},${P[j][1]}" stroke="#000" stroke-width="2"/>`;
+P.forEach(([a,b],i)=>s+=`<rect x="${a-7}" y="${b-7}" width="14" height="14" fill="${i%3?"#fff":"#000"}" stroke="#000" stroke-width="3"/>`);g.innerHTML=s})();
+document.fonts.ready.then(()=>window.READY=true);
+</script>
+</body>
+</html>
