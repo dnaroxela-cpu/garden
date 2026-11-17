@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Карусель: Як ми можемо думати</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Sans:wght@400;500&family=Pixelify+Sans:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#777;display:flex;flex-direction:column;gap:40px;padding:40px;align-items:center}
+.slide{width:1080px;height:1350px;position:relative;overflow:hidden;background:#ebe9e2;color:#1c1c1a;font-family:"IBM Plex Sans",sans-serif}
+.paper{position:absolute;inset:0;pointer-events:none;z-index:5;mix-blend-mode:multiply}
+.t{filter:url(#ink)}
+.under{display:inline-block;font:500 60px/1.12 "IBM Plex Sans",sans-serif;letter-spacing:-.01em;border-bottom:3px solid #1c1c1a;padding-bottom:2px;margin:0}
+.serif{font-family:"EB Garamond",serif}
+.small{font:400 27px/1.4 "IBM Plex Sans",sans-serif;color:#2a2a28}
+.mark{position:absolute;bottom:44px;left:60px;font:500 22px/1 "Pixelify Sans",monospace;letter-spacing:.02em;color:#2a2a28;z-index:6}
+.num{position:absolute;bottom:42px;right:60px;font:500 22px/1 "IBM Plex Sans",sans-serif;letter-spacing:.04em;color:#2a2a28;z-index:6}
+.ill{position:absolute;display:block}
+.ill img,.ill canvas{position:absolute;inset:0;width:100%;height:100%}
+.ill svg.ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+
+/* 1 — обкладинка */
+#s1 .title{position:absolute;left:96px;top:120px;transform:rotate(-2.2deg);transform-origin:left top}
+#s1 .title .under{display:block;width:max-content}
+#s1 .title .under+.under{margin:8px 0 0 150px}
+#s1 .sub{position:absolute;right:96px;top:300px;text-align:right;transform:rotate(-2.2deg);font-size:30px}
+#s1 .ill{left:255px;top:385px;width:570px;height:722px}
+#s1 .foot{position:absolute;left:0;right:0;bottom:118px;text-align:center;font:italic 400 38px/1.2 "EB Garamond",serif}
+
+/* 2 — гачок */
+#s2 .top{position:absolute;left:0;right:0;top:250px;text-align:center}
+#s2 .big{position:absolute;left:110px;right:110px;top:470px;text-align:center;font:500 92px/1.04 "EB Garamond",serif;letter-spacing:-.01em}
+#s2 .bot{position:absolute;left:0;right:0;top:1000px;text-align:center}
+
+/* 3, 4 — розділи */
+.head{position:absolute;left:96px;top:110px}
+.head .sub2{margin-top:16px;font:italic 400 36px/1.2 "EB Garamond",serif}
+.txt{position:absolute;left:96px;right:110px}
+.lead{margin:0 0 22px;font:500 60px/1.06 "EB Garamond",serif;letter-spacing:-.005em}
+.body{margin:0}
+#s3 .ill{left:80px;top:258px;width:920px;height:640px}
+#s3 .txt{top:925px}
+#s4 .ill{left:140px;top:278px;width:800px;height:640px}
+#s4 .txt{top:925px}
+.lbl{font:400 15px "IBM Plex Sans",sans-serif;fill:#1c1c1a}
+
+/* 5 — мапа */
+#s5 .head{top:96px}
+#s5 .win{position:absolute;left:58px;top:262px;width:964px;height:824px;border:2px solid #1c1c1a;box-shadow:5px 5px 0 #1c1c1a;background:#fff}
+#s5 .tbar{height:40px;border-bottom:2px solid #1c1c1a;position:relative;display:flex;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(to bottom,#fff 0 4px,#1c1c1a 4px 5px) 0 7px/100% 25px no-repeat}
+#s5 .tbar span{background:#fff;padding:0 16px;font:500 24px/40px "Pixelify Sans",monospace}
+#s5 .tbar i{position:absolute;left:14px;top:9px;width:20px;height:20px;border:2px solid #1c1c1a;background:#fff}
+#s5 #vid{position:absolute;left:0;top:42px;width:960px;height:780px;background:#ddd}
+#s5 .txt{top:1112px}
+#s5 .url{position:absolute;left:96px;top:1210px;font:500 26px/1 "Pixelify Sans",monospace}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="4" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1.8"/></filter></svg>
+
+<section class="slide" id="s1">
+  <div class="title t"><h1 class="under">Як ми можемо</h1><h1 class="under">думати</h1></div>
+  <p class="sub small t">коротка історія інструментів<br>для мислення</p>
+  <div class="ill" id="ill1"></div>
+  <p class="foot t">від книг загальних місць до Obsidian і ШІ →</p>
+  <span class="mark t">✱ інструменти мислення</span><span class="num t">1/5</span>
+</section>
+
+<section class="slide" id="s2">
+  <p class="top small t">Щодня ми зберігаємо, позначаємо й пов'язуємо:<br>нотатки, закладки, вікі, графи.</p>
+  <p class="big t">Але звідки взялася думка, що мислити можна поза головою?</p>
+  <p class="bot small t">Вона значно старша за комп'ютери.<br>Погортаймо назад.</p>
+  <span class="mark t">✱ інструменти мислення</span><span class="num t">2/5</span>
+</section>
+
+<section class="slide" id="s3">
+  <div class="head t"><h2 class="under">Commonplace books</h2><div class="sub2">XVI–XIX ст.</div></div>
+  <div class="ill" id="ill3"></div>
+  <div class="txt"><p class="lead t">До комп'ютерів пам'ять жила в&nbsp;зошитах.</p>
+  <p class="body small t">Читачі виписували цитати, афоризми й спостереження і розкладали їх за рубриками, щоб потім із них думати й писати. Еразм учив цього студентів, а Джон Локк 1706 року вигадав для таких зошитів покажчик.</p></div>
+  <span class="mark t">✱ інструменти мислення</span><span class="num t">3/5</span>
+</section>
+
+<section class="slide" id="s4">
+  <div class="head t"><h2 class="under">1945 · As We May Think</h2><div class="sub2">Веннівер Буш, The Atlantic</div></div>
+  <div class="ill" id="ill4"></div>
+  <div class="txt"><p class="lead t">«Людський розум працює асоціаціями».</p>
+  <p class="body small t">Буш уявив Memex — стіл-машину, де читач прокладає між документами стежки, якими потім можна пройти знову. З цього есею виростуть гіпертекст, веб і цифрові сади.</p></div>
+  <span class="mark t">✱ інструменти мислення</span><span class="num t">4/5</span>
+</section>
+
+<section class="slide" id="s5">
+  <div class="head t"><h2 class="under">Мапа ідей</h2><div class="sub2">85 текстів і програм · XVI ст. — 2026 — ?</div></div>
+  <div class="win"><div class="tbar"><i></i><span>Інструменти мислення</span></div><div id="vid"></div></div>
+  <p class="txt small t">Хто на кого вплинув і що відбувалося поруч — живе на моєму сайті.</p>
+  <span class="url t">dnaroxela-cpu.github.io/garden → Інструменти мислення</span>
+  <span class="mark t" style="display:none">✱</span><span class="num t">5/5</span>
+</section>
+
+<script>
+const INK=[28,28,26];
+function rnd(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+// папір: зерно, плями, пил
+function paper(w,h){
+  const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d"),r=rnd(7);
+  const im=x.createImageData(w,h),d=im.data;
+  for(let i=0;i<w*h;i++){const v=255-Math.pow(r(),3)*34-(r()<.0015?120:0);d[i*4]=d[i*4+1]=d[i*4+2]=v;d[i*4+3]=255}
+  x.putImageData(im,0,0);
+  x.globalAlpha=.035;for(let i=0;i<14;i++){const cx=r()*w,cy=r()*h,g=x.createRadialGradient(cx,cy,0,cx,cy,200+r()*400);g.addColorStop(0,"#000");g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(0,0,w,h)}
+  x.globalAlpha=.5;x.fillStyle="#333";for(let i=0;i<60;i++){x.beginPath();x.arc(r()*w,r()*h,r()*1.4+.3,0,7);x.fill()}
+  return c.toDataURL();
+}
+
+// ксерокопія: SVG у відтінках сірого → зернистий 1-біт
+function xerox(svg,w,h,{scale=1.35,contrast=1.5,noise=.75,seed=1}={}){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const cw=Math.round(w/scale),ch=Math.round(h/scale),c=document.createElement("canvas");c.width=cw;c.height=ch;
+      const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,cw,ch);x.drawImage(img,0,0,cw,ch);
+      const im=x.getImageData(0,0,cw,ch),d=im.data,r=rnd(seed);
+      for(let i=0;i<cw*ch;i++){
+        const L=(d[i*4]*.3+d[i*4+1]*.59+d[i*4+2]*.11)/255, L2=Math.min(1,Math.max(0,(L-.5)*contrast+.5));
+        const thr=.5*(1-noise)+r()*noise, on=L2<thr&&L<.985;
+        d[i*4]=INK[0];d[i*4+1]=INK[1];d[i*4+2]=INK[2];d[i*4+3]=on?255:0;
+      }
+      x.putImageData(im,0,0);res(c.toDataURL());
+    };
+    img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+  });
+}
+const grainF=`<filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3" result="n"/><feColorMatrix in="n" type="saturate" values="0" result="m"/><feComposite in="SourceGraphic" in2="m" operator="arithmetic" k1="0" k2="1" k3=".28" k4="-.14"/></filter>`;
+
+// ── 1. старий комп'ютер ──
+function macSVG(){
+  const r=rnd(11);let keys="";
+  for(let row=0;row<4;row++)for(let k=0;k<13;k++){const t=k/13,u=row/4;const x=46+t*290+u*-8,y=699+u*48-t*14;keys+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="17" height="8" rx="2" fill="#bcbcbc" stroke="#555" stroke-width=".8" transform="skewX(-8)"/>`}
+  let cable="M470,712 C430,690 470,660 430,662 C380,665 420,700 380,705 C330,712 360,670 330,672";
+  for(let i=0;i<5;i++)cable+=` c${(r()*30-15).toFixed(0)},${(r()*20-10).toFixed(0)} ${(r()*40-20).toFixed(0)},${(r()*20-10).toFixed(0)} ${(r()*30-15).toFixed(0)},${(r()*10-5).toFixed(0)}`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" width="600" height="760"><defs>${grainF}
+  <linearGradient id="bd" x1="0" x2="1"><stop offset="0" stop-color="#f4f4f2"/><stop offset=".7" stop-color="#d6d6d3"/><stop offset="1" stop-color="#9c9c99"/></linearGradient>
+  <linearGradient id="bz" y1="0" y2="1"><stop offset="0" stop-color="#8a8a88"/><stop offset="1" stop-color="#c4c4c2"/></linearGradient>
+  <radialGradient id="sc" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#3c3c3c"/><stop offset="1" stop-color="#0c0c0c"/></radialGradient>
+  <radialGradient id="sh"><stop offset="0" stop-color="#777"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <g filter="url(#g)">
+  <ellipse cx="300" cy="688" rx="285" ry="34" fill="url(#sh)"/>
+  <path d="${cable}" fill="none" stroke="#2a2a2a" stroke-width="2"/>
+  <rect x="150" y="230" width="300" height="420" rx="20" fill="url(#bd)" stroke="#1a1a1a" stroke-width="3"/>
+  <rect x="180" y="258" width="240" height="196" rx="12" fill="url(#bz)" stroke="#333" stroke-width="2"/>
+  <rect x="200" y="276" width="200" height="160" rx="9" fill="url(#sc)"/>
+  <path d="M158 548 H442" stroke="#888" stroke-width="2"/>
+  <rect x="330" y="585" width="92" height="9" rx="3" fill="#2a2a2a"/>
+  <rect x="176" y="606" width="16" height="16" rx="3" fill="#8a8a8a"/>
+  <rect x="172" y="650" width="256" height="20" rx="4" fill="#a2a2a0" stroke="#333" stroke-width="2"/>
+  <path d="M40 702 L338 682 L360 742 L22 760 Z" fill="#e2e2e0" stroke="#222" stroke-width="2.5"/>
+  ${keys}
+  <ellipse cx="482" cy="724" rx="32" ry="20" fill="#dcdcda" stroke="#222" stroke-width="2.5" transform="rotate(-14 482 724)"/>
+  <path d="M470 708 Q478 718 468 728" stroke="#555" fill="none" stroke-width="1.5"/>
+  </g></svg>`;
+}
+function galaxyOn(canvas){
+  const W=600,H=760,k=1.5;canvas.width=W*k;canvas.height=H*k;const x=canvas.getContext("2d");x.scale(k,k);
+  const r=rnd(1945),ga=()=>(r()+r()+r()-1.5)/1.5;
+  const S={x:200,y:276,w:200,h:160},inS=(px,py)=>px>S.x+3&&px<S.x+S.w-3&&py>S.y+3&&py<S.y+S.h-3,inB=(px,py)=>px>148&&px<452&&py>228&&py<672;
+  const dot=(px,py,s,c)=>{if(inS(px,py)){x.fillStyle=c==="core"?"#e9eeff":"#9fb3ff"}else if(inB(px,py))return;else x.fillStyle=c==="core"?"#1d33a6":"#2c4bd0";x.fillRect(px,py,s,s)};
+  const gx=300,gy=118,cs=Math.cos(-.2),sn=Math.sin(-.2);
+  const put=(a,b,s,c)=>{b*=.42;dot(gx+a*cs-b*sn,gy+a*sn+b*cs,s,c)};
+  for(let i=0;i<900;i++){const th=r()*6.283,rr=40*Math.abs(ga());put(Math.cos(th)*rr,Math.sin(th)*rr,r()<.5?2:1.4,"core")}
+  for(let a=0;a<2;a++)for(let i=0;i<2200;i++){const t=Math.pow(r(),.8),th=a*Math.PI+t*7.6,rr=22+250*t,j=4+16*t;put(Math.cos(th)*rr+ga()*j,Math.sin(th)*rr+ga()*j,r()<.25*(1-t)+.08?2:1.3)}
+  for(let i=0;i<1300;i++){const t=r(),px=300+ga()*(6+t*34),py=S.y+S.h-12-t*(S.h+130);dot(px,py,r()<.4?2:1.3,t<.6?"core":0)}
+  for(let i=0;i<120;i++){const px=r()*W,py=r()*H*.5;if(!inB(px,py)){x.fillStyle="#2c4bd0";x.fillRect(px,py,1.3,1.3)}}
+}
+
+// ── 3. зошит загальних місць ──
+function bookSVG(){
+  const r=rnd(1706);let lines="";
+  const page=(x0,x1,y0,head)=>{
+    let s=`<text x="${x0+8}" y="${y0}" font-family="Georgia,serif" font-style="italic" font-size="30" fill="#1a1a1a">${head}</text><path d="M${x0+6} ${y0+9} H${x0+130}" stroke="#222" stroke-width="1.6"/>`;
+    for(let y=y0+44;y<y0+300;y+=25){
+      if(r()<.12){y+=10;continue}
+      let px=x0+(r()<.2?28:8),end=x1-10-r()*60,d=`M${px},${y}`;
+      while(px<end){const w=4+r()*7;d+=` q${(w/2).toFixed(1)},${(-3-r()*6).toFixed(1)} ${w.toFixed(1)},${(r()*2-1).toFixed(1)}`;px+=w;if(r()<.12){px+=6+r()*6;d+=` M${px.toFixed(1)},${y}`}}
+      s+=`<path d="${d}" fill="none" stroke="#2b2b2b" stroke-width="1.5"/>`;
+    }
+    return s;
+  };
+  lines+=page(110,440,175,"Memoria")+page(480,800,175,"Amicitia");
+  let tabs="";"ABCDEF".split("").forEach((l,i)=>{tabs+=`<rect x="818" y="${150+i*46}" width="22" height="38" fill="#bdbdbd" stroke="#333" stroke-width="1.5"/><text x="823" y="${175+i*46}" font-family="Georgia,serif" font-size="17" fill="#222">${l}</text>`});
+  let barbs="";for(let i=0;i<40;i++){const t=i/40,x=560+t*300,y=600-t*230;barbs+=`<path d="M${x},${y} l${-18-8*Math.sin(t*3)},${-26+t*6}" stroke="#666" stroke-width="1"/><path d="M${x},${y} l${18},${16-t*4}" stroke="#777" stroke-width="1"/>`}
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" width="920" height="640"><defs>${grainF}
+  <linearGradient id="pl" x1="0" x2="1"><stop offset="0" stop-color="#f6f6f4"/><stop offset=".8" stop-color="#e6e6e3"/><stop offset="1" stop-color="#9a9a98"/></linearGradient>
+  <linearGradient id="pr" x1="1" x2="0"><stop offset="0" stop-color="#f6f6f4"/><stop offset=".8" stop-color="#e8e8e5"/><stop offset="1" stop-color="#9a9a98"/></linearGradient>
+  <radialGradient id="sh"><stop offset="0" stop-color="#666"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="qu" x1="0" x2="1"><stop offset="0" stop-color="#cfcfcf"/><stop offset="1" stop-color="#f2f2f2"/></linearGradient></defs>
+  <g filter="url(#g)">
+  <ellipse cx="460" cy="560" rx="430" ry="60" fill="url(#sh)"/>
+  <path d="M70 135 L850 135 L872 560 L48 560 Z" fill="#4a4a48" stroke="#111" stroke-width="2"/>
+  <path d="M86 128 Q270 96 455 140 L455 548 Q270 515 74 545 Z" fill="url(#pl)" stroke="#222" stroke-width="2"/>
+  <path d="M465 140 Q650 96 834 128 L846 545 Q650 515 465 548 Z" fill="url(#pr)" stroke="#222" stroke-width="2"/>
+  ${lines}${tabs}
+  <path d="M452 548 L470 548 L462 630 L456 612 L448 630 Z" fill="#3a3a3a"/>
+  <path d="M548 610 C620 520 760 420 880 352 C800 430 700 520 560 616 Z" fill="url(#qu)" stroke="#333" stroke-width="1.6"/>
+  ${barbs}
+  <path d="M520 640 L560 604" stroke="#111" stroke-width="5"/>
+  </g></svg>`;
+}
+
+// ── 4. Memex ──
+function memexSVG(){
+  const r=rnd(1945);let text="";
+  const screen=(x,y,w,h,sk,id)=>{let s=`<path d="M${x} ${y+h} L${x+w} ${y+h} L${x+w+sk} ${y} L${x+sk} ${y} Z" fill="#6c6c6a" stroke="#1a1a1a" stroke-width="2.5"/><path d="M${x+10} ${y+h-10} L${x+w-10} ${y+h-10} L${x+w+sk-12} ${y+12} L${x+sk+12} ${y+12} Z" fill="#d9d9d6" stroke="#333" stroke-width="1.5"/>`;
+    for(let i=0;i<9;i++){const t=(i+1)/11,yy=y+h-12-t*(h-26),xa=x+14+t*sk,xb=xa+(w-30)*(0.5+r()*.45);s+=`<path d="M${xa.toFixed(1)} ${yy.toFixed(1)} H${xb.toFixed(1)}" stroke="#555" stroke-width="2"/>`}
+    return s;};
+  let drawers="";for(let i=0;i<3;i++){drawers+=`<rect x="${130+i*150}" y="340" width="130" height="70" fill="#bdbdbb" stroke="#333" stroke-width="2"/><path d="M${175+i*150} 375 h40" stroke="#222" stroke-width="4"/>`;drawers+=`<rect x="${130+i*150}" y="425" width="130" height="70" fill="#b1b1af" stroke="#333" stroke-width="2"/><path d="M${175+i*150} 460 h40" stroke="#222" stroke-width="4"/>`}
+  let keys="";for(let i=0;i<14;i++){keys+=`<rect x="${262+i*13}" y="${294}" width="10" height="7" rx="1.5" fill="#999" stroke="#333" stroke-width=".8"/>`}
+  let levers="";for(let i=0;i<4;i++){levers+=`<path d="M${505+i*16} 292 l6 -26" stroke="#222" stroke-width="4"/><circle cx="${511+i*16}" cy="264" r="6" fill="#333"/>`}
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 560" width="700" height="560"><defs>${grainF}
+  <linearGradient id="fr" x1="0" x2="1"><stop offset="0" stop-color="#e2e2df"/><stop offset="1" stop-color="#a8a8a5"/></linearGradient>
+  <radialGradient id="sh"><stop offset="0" stop-color="#666"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <g filter="url(#g)">
+  <ellipse cx="370" cy="525" rx="330" ry="34" fill="url(#sh)"/>
+  <path d="M100 312 L560 312 L560 520 L100 520 Z" fill="url(#fr)" stroke="#1a1a1a" stroke-width="3"/>
+  <path d="M560 312 L640 262 L640 470 L560 520 Z" fill="#8a8a88" stroke="#1a1a1a" stroke-width="3"/>
+  <path d="M100 312 L180 262 L640 262 L560 312 Z" fill="#efefec" stroke="#1a1a1a" stroke-width="3"/>
+  ${drawers}
+  ${screen(210,128,140,140,22,1)}${screen(380,128,140,140,22,2)}
+  <path d="M250 304 L452 304 L462 288 L260 288 Z" fill="#cfcfcc" stroke="#222" stroke-width="2"/>${keys}
+  <path d="M120 300 L200 300 L218 282 L140 282 Z" fill="#6a6a68" stroke="#222" stroke-width="2"/>
+  ${levers}
+  </g></svg>`;
+}
+const memexLabels=`<svg class="ov" viewBox="0 0 700 560"><g class="lbl" stroke="#1c1c1a" stroke-width="1">
+  <path d="M232 160 L120 92" fill="none"/><text x="20" y="84" stroke="none">напівпрозорі екрани</text>
+  <path d="M500 150 L590 92" fill="none"/><text x="560" y="84" stroke="none">другий документ</text>
+  <path d="M520 268 L640 210" fill="none"/><text x="590" y="202" stroke="none">важелі</text>
+  <path d="M168 292 L60 250" fill="none"/><text x="10" y="242" stroke="none">фотопластина</text>
+  <path d="M330 450 L300 545" fill="none"/><text x="230" y="560" stroke="none">мікрофільми в шухлядах</text>
+  <path d="M376 288 L376 112" fill="none"/><text x="376" y="104" text-anchor="middle" stroke="none">клавіатура</text>
+</g></svg>`;
+
+async function build(){
+  await document.fonts.ready;
+  const p=paper(1080,1350);
+  document.querySelectorAll(".slide").forEach(s=>{const d=document.createElement("div");d.className="paper";d.style.background=`url(${p})`;s.appendChild(d)});
+  const put=async(id,svg,w,h,o)=>{const el=document.getElementById(id);const im=new Image();im.src=await xerox(svg,w,h,o);el.appendChild(im);return el};
+  const e1=await put("ill1",macSVG(),600,760,{seed:3});const c=document.createElement("canvas");galaxyOn(c);e1.appendChild(c);
+  await put("ill3",bookSVG(),920,640,{seed:5});
+  const e4=await put("ill4",memexSVG(),700,560,{seed:9});e4.insertAdjacentHTML("beforeend",memexLabels);
+  window.READY=true;
+}
+build();
+</script>
+</body>
+</html>
