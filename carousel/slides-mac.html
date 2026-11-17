@@ -5,10 +5,16 @@
 <title>Карусель у стилі мапи</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Pixelify+Sans:wght@500;600&display=swap" rel="stylesheet">
 <style>
+/* SF Pro Text — локальні файли в carousel/fonts/ (не в git) */
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Light.otf);font-weight:300}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Medium.otf);font-weight:400 500}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Bold.otf);font-weight:600 700}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Heavy.otf);font-weight:800}
+@font-face{font-family:"SF Pro Text";src:url(fonts/SF-Pro-Text-Black.otf);font-weight:900}
 :root{--ink:#000;--paper:#fff;
   --desk:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1'/%3E%3Crect x='2' y='2' width='1' height='1'/%3E%3C/svg%3E");
   --d50:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1'/%3E%3Crect x='1' y='1' width='1' height='1'/%3E%3C/svg%3E");
-  --ui:"Pixelify Sans",monospace;--txt:"IBM Plex Sans",Arial,sans-serif}
+  --ui:"Pixelify Sans",monospace;--txt:"SF Pro Text","IBM Plex Sans",Arial,sans-serif}
 *{box-sizing:border-box}
 body{margin:0;background:#777;display:flex;flex-direction:column;gap:40px;padding:40px;align-items:center}
 .slide{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--paper) var(--desk) 0 0/8px 8px;image-rendering:pixelated;color:var(--ink);font-family:var(--txt)}
@@ -56,11 +62,11 @@ svg.edges{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-in
 #s2 .w{width:520px;height:280px}
 #s2 .w .c{flex:1;position:relative;overflow:hidden;padding:18px 22px;font:400 22px/1.5 var(--txt)}
 #s2 .line{height:12px;background:var(--ink);margin:12px 0;opacity:1}
-#s2 .dlg{left:70px;top:650px;width:940px;height:630px}
-#s2 .dlg .in{flex:1;display:flex;gap:34px;padding:46px 48px 20px}
+#s2 .dlg{left:70px;top:636px;width:940px;height:654px}
+#s2 .dlg .in{flex:1;display:flex;gap:34px;padding:40px 44px 16px}
 #s2 .dlg .ico{flex:none;width:92px;height:92px}
 #s2 .dlg .small{font:400 32px/1.4 var(--txt);margin:0 0 26px}
-#s2 .dlg .big{font:600 68px/1.02 var(--txt);letter-spacing:-.02em;margin:0 0 26px}
+#s2 .dlg .big{font:700 62px/1.04 var(--txt);letter-spacing:-.03em;margin:0 0 24px}
 #s2 .btns{display:flex;gap:26px;padding:0 48px 46px 174px}
 #s2 .btn{font:600 30px/1 var(--txt);border:3px solid var(--ink);border-radius:14px;padding:16px 30px;background:var(--paper)}
 #s2 .btn.def{outline:3px solid var(--ink);outline-offset:5px}
@@ -162,7 +168,7 @@ mini.insertAdjacentHTML("beforeend",`<div class="next" style="left:${SX+24}px;to
 (()=>{const g=document.getElementById("graph"),w=560-6,h=280-52,r=rnd(7),P=[];for(let i=0;i<11;i++)P.push([30+r()*(w-60),24+r()*(h-48)]);
 let s="";for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++)if(Math.hypot(P[i][0]-P[j][0],P[i][1]-P[j][1])<150)s+=`<path d="M${P[i][0]},${P[i][1]}L${P[j][0]},${P[j][1]}" stroke="#000" stroke-width="2"/>`;
 P.forEach(([a,b],i)=>s+=`<rect x="${a-7}" y="${b-7}" width="14" height="14" fill="${i%3?"#fff":"#000"}" stroke="#000" stroke-width="3"/>`);g.innerHTML=s})();
-document.fonts.ready.then(()=>window.READY=true);
+Promise.all([document.fonts.load('500 30px "SF Pro Text"'),document.fonts.load('700 30px "SF Pro Text"')]).then(()=>document.fonts.ready).then(()=>window.READY=true);
 </script>
 </body>
 </html>
