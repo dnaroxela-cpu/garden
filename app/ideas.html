@@ -200,7 +200,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 #phone{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:16px;background:var(--dither-lite)}
 #phone.open{display:grid}
 #phone .win{position:relative;width:100%;max-width:340px;box-shadow:4px 4px 0 var(--ink)}
-#phone .art{display:grid;place-items:center;background:#08090c;border-bottom:2px solid var(--ink)}
+#phone .art{display:grid;place-items:center;background:#000;border-bottom:2px solid var(--ink)}
 #phone .art canvas{display:block;image-rendering:pixelated}
 #phone .in{padding:16px 16px 6px;font-size:15px;line-height:1.45}
 #phone .in p{margin:0 0 10px}
@@ -853,12 +853,12 @@ $("#themeBtn").onclick=()=>{
 
 
 // Чорнильний всесвіт: піксельна картинка для поради на телефоні.
-// Вир із чорнила повільно закручується до центру, жовті зірочки мерехтять. Свої кольори, однакові в обох темах.
+// Вир із чорнила повільно закручується до центру, зірочки мерехтять. Строго чорно-біле, однакове в обох темах.
 function inkSwirl(cv){
   const W=112,H=80; cv.width=W; cv.height=H;
   const s=Math.max(1,Math.floor(cv.parentNode.clientWidth/W)); cv.style.width=W*s+"px"; cv.style.height=H*s+"px";
   const x=cv.getContext("2d"), img=x.createImageData(W,H), d=img.data;
-  const COL={black:[8,9,12],slate:[112,126,140],light:[160,172,184],dot:[44,50,58],star:[246,226,122]};
+  const BK=[0,0,0], WH=[255,255,255];
   let seed=3; const rnd=()=>(seed=seed*16807%2147483647)/2147483647;
   // value noise для рваних, «чорнильних» країв
   const G=16, grid=Array.from({length:G*G},rnd);
@@ -874,19 +874,21 @@ function inkSwirl(cv){
   const dots=Array.from({length:80},()=>({r:5+rnd()*62,a:rnd()*TAU,s:rnd()<.35?2:1}));
   const stars=[[16,14,3],[95,22,2],[24,62,2],[80,70,3],[60,8,1],[104,58,1],[8,40,1]].map(([a,b,k],i)=>({x:a,y:b,k,ph:i*1.7}));
   const specks=Array.from({length:22},()=>({x:Math.floor(rnd()*W),y:Math.floor(rnd()*H),ph:rnd()*TAU}));
+  const tone=(b,px,py)=>b==="black"?BK:b==="light"?WH:(!(px&1)&&!(py&1)?WH:BK); // сірий рукав — розтрушування 25 %
   const put=(px,py,c)=>{if(px<0||py<0||px>=W||py>=H)return;const o=(py*W+px)*4;d[o]=c[0];d[o+1]=c[1];d[o+2]=c[2];d[o+3]=255};
   let t=0, timer=null;
   const frame=()=>{
     const rot=t*.016;
-    for(let py=0;py<H;py++)for(let px=0;px<W;px++)put(px,py,COL[band(px-CX,py-CY,rot)]);
+    for(let py=0;py<H;py++)for(let px=0;px<W;px++)put(px,py,tone(band(px-CX,py-CY,rot),px,py));
     dots.forEach(o=>{const a=o.a-rot,px=Math.round(CX+Math.cos(a)*o.r),py=Math.round(CY+Math.sin(a)*o.r*.92);
-      const c=band(px-CX,py-CY,rot)==="black"?COL.dot:COL.black;
+      if(band(px-CX,py-CY,rot)==="black")return; const c=BK;
       for(let i=0;i<o.s;i++)for(let j=0;j<o.s;j++)put(px+i,py+j,c);
       if(o.s===2){put(px-1,py,c);put(px+2,py+1,c);put(px,py+2,c);put(px+1,py-1,c)}});
-    specks.forEach(o=>{if(Math.sin(t*.09+o.ph)>-.3)put(o.x,o.y,COL.star)});
+    specks.forEach(o=>{if(Math.sin(t*.09+o.ph)>-.3)put(o.x,o.y,WH)});
     stars.forEach(o=>{const k=Math.max(1,Math.round(o.k*(.75+.35*Math.sin(t*.07+o.ph))));
-      put(o.x,o.y,COL.star);for(let r=1;r<=k;r++){put(o.x+r,o.y,COL.star);put(o.x-r,o.y,COL.star);put(o.x,o.y+r,COL.star);put(o.x,o.y-r,COL.star)}
-      if(k>1){put(o.x+1,o.y+1,COL.star);put(o.x-1,o.y-1,COL.star);put(o.x+1,o.y-1,COL.star);put(o.x-1,o.y+1,COL.star)}});
+      for(let dy=-k-1;dy<=k+1;dy++)for(let dx=-k-1;dx<=k+1;dx++)if(Math.abs(dx)+Math.abs(dy)<=k+1)put(o.x+dx,o.y+dy,BK); // чорне коло, щоб зірка читалась
+      put(o.x,o.y,WH);for(let r=1;r<=k;r++){put(o.x+r,o.y,WH);put(o.x-r,o.y,WH);put(o.x,o.y+r,WH);put(o.x,o.y-r,WH)}
+      if(k>1){put(o.x+1,o.y+1,WH);put(o.x-1,o.y-1,WH);put(o.x+1,o.y-1,WH);put(o.x-1,o.y+1,WH)}});
     x.putImageData(img,0,0);
   };
   frame();
