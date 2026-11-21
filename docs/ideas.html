@@ -168,6 +168,12 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 .obj canvas{display:block;image-rendering:pixelated;max-width:100%;height:auto}
 .obj img{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);object-fit:contain;opacity:0;transition:opacity .25s}
 .obj .stage:hover img,.obj.colour img{opacity:1}
+.arr{width:.72em;height:.72em;margin-left:.35em;fill:currentColor;shape-rendering:crispEdges;vertical-align:.05em}
+.obj .tap{display:none;position:absolute;right:8px;bottom:8px;align-items:center;gap:5px;background:var(--paper);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:3px 7px 3px 5px;font:600 13px/1 var(--ui);pointer-events:none}
+.obj .tap .cur{width:8px;height:12px;shape-rendering:crispEdges}
+.obj .tap .cur .k{fill:var(--ink)} .obj .tap .cur .w{fill:var(--paper)}
+@media (hover:none){.obj .tap{display:inline-flex}}
+.obj.colour .tap{display:none}
 .obj figcaption{display:flex;justify-content:space-between;gap:10px;border-top:2px solid var(--ink);padding:5px 8px;font:12px/1.35 var(--txt)}
 .obj figcaption a{white-space:nowrap;font-weight:600}
 .obj figcaption a:hover{background:var(--ink);color:var(--paper)}
@@ -215,8 +221,14 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
   #tools .grid button,#tools .grid button.wide{grid-column:auto;height:38px;border-bottom:0;border-right:2px solid var(--ink)}
   #tools .grid button:last-child{border-right:0}
   #map{left:8px;right:8px;top:90px;bottom:8px}
-  #text{left:8px !important;right:8px;top:auto !important;bottom:8px;width:auto;height:58vh}
-  body.reading #map{bottom:calc(58vh + 16px)}
+  /* картка на весь екран, хрестик великий, з урахуванням вирізу й нижньої смуги телефона */
+  #text{position:fixed;inset:0 !important;width:auto;height:auto;border:0;box-shadow:none;z-index:70;
+    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  #text .tbar{height:40px;background-position:0 8px}
+  #text .tbar .name{line-height:40px;max-width:70%}
+  #text .tbar button.box.close{width:30px;height:30px;top:3px;right:10px}
+  #text .tbar button.box.close::before,#text .tbar button.box.close::after{width:18px;height:3px}
+  #text .scroll{padding:16px max(16px,env(safe-area-inset-left,0px)) 28px}
   #about{left:8px;right:8px;width:auto}
   .lane-label,.axis .corner{width:96px;font-size:12px}
   .lane-label small{display:none}
@@ -712,6 +724,13 @@ function near(y){
   };
 }
 
+// піксельні значки замість символів: ↗ на iPhone малюється як емодзі
+const ARR=(()=>{let r="";for(let y=0;y<8;y++)for(let x=0;x<8;x++)
+  if((y<=1&&x>=2)||(x>=6&&y<=5)||((x+y===7||x+y===8)&&x<=6&&y>=1))r+=`<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  return `<svg class="arr" viewBox="0 0 8 8" aria-hidden="true">${r}</svg>`})();
+const CURSOR=(()=>{const m=["X.......","XX......","XoX.....","XooX....","XoooX...","XooooX..","XoooooX.","XooooooX","XoooXXXX","XoXooX..","XX.XooX.","X...XX.."];
+  let r="";m.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!==".")r+=`<rect x="${x}" y="${y}" width="1" height="1" class="${c==="X"?"k":"w"}"/>`}));
+  return `<svg class="cur" viewBox="0 0 8 12" aria-hidden="true">${r}</svg>`})();
 function wf(id){const n=byId[id];return `<button class="wf" data-go="${id}">${n.t==="text"?"¶ ":""}${esc(n.n)} <small>${YR(n)}</small></button>`}
 function open(id,{center=false}={}){
   sel=id; const n=byId[id], C=CARD[id];
@@ -721,7 +740,7 @@ function open(id,{center=false}={}){
   $("#textBody").innerHTML=`
     <div class="kind"><span class="tag">${n.kind||(n.t==="text"?"¶ текст":'<i class="ico"></i>програма')}</span><span>${YR(n)}</span><span>· ${esc(LANES.find(l=>l.k===n.l).t)}</span></div>
     <h2>${esc(n.n)}</h2><p class="who">${esc(n.w)}</p>
-    ${C?`<figure class="obj"><div class="stage" title="Торкнися, щоб побачити в кольорі"><div class="mat"><canvas data-img="ideas-${id}.webp" width="1" height="1"></canvas><img src="ideas-${id}.webp" alt="${esc(C.cap)}"></div></div><figcaption><span>${esc(C.cap)}</span><a href="${MUSEUM}${C.m}" target="_blank" rel="noopener">Parallel Museum ↗</a></figcaption></figure>`
+    ${C?`<figure class="obj"><div class="stage" title="Торкнися, щоб побачити в кольорі"><div class="mat"><canvas data-img="ideas-${id}.webp" width="1" height="1"></canvas><img src="ideas-${id}.webp" alt="${esc(C.cap)}"></div><span class="tap" aria-hidden="true">${CURSOR}клік</span></div><figcaption><span>${esc(C.cap)}</span><a href="${MUSEUM}${C.m}" target="_blank" rel="noopener">Parallel Museum${ARR}</a></figcaption></figure>`
       :`<div class="pic" aria-hidden="true"><span>${YR(n)}</span></div>`}
     ${C?`<div class="arg"><span class="lab">Ключовий аргумент</span><p>${esc(C.a)}</p></div>`:""}
     <p>${esc(n.d)}</p>
@@ -729,7 +748,7 @@ function open(id,{center=false}={}){
     ${n.f.length?`<h3>← спирається на</h3>${n.f.map(wf).join("")}`:""}
     ${n.kids.length?`<h3>→ вплинуло на</h3>${n.kids.map(wf).join("")}`:""}
     ${(around.length||nb.ev.length)?`<h3>поруч у часі · ±2 роки</h3>${around.map(m=>wf(m.id)).join("")}${nb.ev.map(e=>`<span class="wf ev">◆ ${esc(e[1])} <small>${e[0]}</small></span>`).join("")}`:""}
-    ${n.u?`<p><a class="go" href="${esc(n.u)}" target="_blank" rel="noopener">відкрити ↗</a></p>`:""}`;
+    ${n.u?`<p><a class="go" href="${esc(n.u)}" target="_blank" rel="noopener">відкрити${ARR}</a></p>`:""}`;
   $("#text").classList.add("open");document.body.classList.add("reading"); $("#textBody").scrollTop=0;
   ditherAll();
   history.replaceState(null,"","#"+id);
