@@ -473,6 +473,8 @@ const N=[
 // Розширені картки: фото з Parallel Museum (файли app/ideas-<id>.webp) і три розділи
 const MUSEUM="https://museum.parallel.ai/items/";
 const CARD={
+ geb:{cap:"Gödel, Escher, Bach: An Eternal Golden Braid — «метафорична фуга про розум і машини в дусі Льюїса Керролла»"},
+ fluid95:{cap:"Fluid Concepts and Creative Analogies: на обкладинці — «ґрідфонти», абетки на сітці з проєкту Letter Spirit"},
  hofstadter26:{
   a:"Гофштадтер перевіряє свою давню тезу — свідомість і «я» виникають із рекурсивного самопосилання, дивної петлі системи, що моделює саму себе, — на найважчому випадку: великих мовних моделях, які говорять граматично від першої особи й ніби усвідомлюють себе, хоча під поверхнею не видно рекурсивної моделі себе. Вільне вживання «я» не доводить справжньої самості: без петлі це слово — граматичний артефакт, а не ознака внутрішнього світу. Імовірно, висновок такий: нинішні системи ШІ в точному технічному сенсі безсамісні — вони відтворюють наслідки самопосилання без тієї породжувальної структури, що, за Гофштадтером, робить «я» справжнім.",
   c:"Рамка Гофштадтера стоїть на функціоналістській і структуралістській інтуїції: правильна петля і є самість. Тут легко впасти в коло: якщо визначити справжнє самопосилання так, що нинішні архітектури не можуть йому відповідати за побудовою, аргумент стає не відкриттям про розум ШІ, а виключенням через визначення. Можна заперечити, що механізм уваги в трансформерах уже є певною формою самопосилання — зважування власного контексту — і спитати, чи достатньо роздільна ця рамка, щоб розрізнити такі випадки, а не просто заборонити їх.",
@@ -845,9 +847,9 @@ function open(id,{center=false}={}){
     <h2>${esc(n.n)}</h2><p class="who">${esc(n.w)}</p>
     ${C&&C.cap?`<figure class="obj"><div class="stage" title="Торкнися, щоб побачити в кольорі"><div class="mat"><canvas data-img="ideas-${id}.webp" width="1" height="1"></canvas><img src="ideas-${id}.webp" alt="${esc(C.cap)}"></div><span class="tap" aria-hidden="true">${CURSOR}клік</span></div><figcaption><span>${esc(C.cap)}</span>${C.m?`<a href="${MUSEUM}${C.m}" target="_blank" rel="noopener">Parallel Museum${ARR}</a>`:""}</figcaption></figure>`
       :`<div class="pic" aria-hidden="true"><span>${YR(n)}</span></div>`}
-    ${C?`<div class="arg"><span class="lab">Ключовий аргумент</span><p>${esc(C.a)}</p></div>`:""}
+    ${C?.a?`<div class="arg"><span class="lab">Ключовий аргумент</span><p>${esc(C.a)}</p></div>`:""}
     <p>${esc(n.d)}</p>
-    ${C?`<details><summary>Критика</summary><p>${esc(C.c)}</p></details><details><summary>Чому це важливо</summary><p>${esc(C.w)}</p></details>`:""}
+    ${C?.c?`<details><summary>Критика</summary><p>${esc(C.c)}</p></details>`:""}${C?.w?`<details><summary>Чому це важливо</summary><p>${esc(C.w)}</p></details>`:""}
     ${n.f.length?`<h3>← спирається на</h3>${n.f.map(wf).join("")}`:""}
     ${n.kids.length?`<h3>→ вплинуло на</h3>${n.kids.map(wf).join("")}`:""}
     ${n.more?`<h3>читати далі</h3>${n.more.map(m=>`<a class="wf" href="${esc(m[2])}" target="_blank" rel="noopener">${esc(m[0])} <small>${esc(m[1])}</small>${ARR}</a>`).join("")}`:""}
