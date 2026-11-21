@@ -50,9 +50,7 @@ a{color:inherit}
   background:repeating-linear-gradient(to bottom,var(--paper) 0 3px,var(--ink) 3px 4px) 0 4px/100% 16px no-repeat;user-select:none}
 .tbar .name{background:var(--paper);padding:0 10px;font:600 16px/24px var(--ui);max-width:72%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tbar .box{position:absolute;top:4px;width:15px;height:15px;border:2px solid var(--ink);background:var(--paper)}
-.tbar .box.close{left:8px}
-.tbar .box.zoom{right:8px}
-.tbar .box.zoom::after{content:"";position:absolute;left:1px;top:1px;width:6px;height:6px;border:2px solid var(--ink)}
+.tbar .box.close{right:8px;cursor:pointer}
 .tbar .box:active{background:var(--ink)}
 .tbar button.box.close::before,.tbar button.box.close::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:2px;background:var(--ink);transform:translate(-50%,-50%) rotate(45deg)}
 .tbar button.box.close::after{transform:translate(-50%,-50%) rotate(-45deg)}
@@ -222,7 +220,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 </section>
 
 <section id="map" class="win" aria-label="Мапа">
-  <div class="tbar"><span class="box close" aria-hidden="true"></span><span class="name">Мапа · XVI ст. — ?</span><span class="box zoom" aria-hidden="true"></span></div>
+  <div class="tbar"><span class="name">Мапа · XVI ст. — ?</span></div>
   <div class="scroll" id="scroll">
     <div class="canvas" id="canvas">
       <div class="axis" id="axis"><div class="corner">рік →<br>поруч у світі ◆</div></div>
@@ -240,12 +238,12 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 </section>
 
 <section id="text" class="win drag" role="dialog" aria-label="Нотатка">
-  <div class="tbar"><button class="box close" id="closeText" aria-label="Закрити"></button><span class="name" id="textName"></span><span class="box zoom" aria-hidden="true"></span></div>
+  <div class="tbar"><span class="name" id="textName"></span><button class="box close" id="closeText" aria-label="Закрити"></button></div>
   <div class="scroll" id="textBody"></div>
 </section>
 
 <section id="about" class="win drag" role="dialog" aria-label="Про мапу">
-  <div class="tbar"><button class="box close" id="closeAbout" aria-label="Закрити"></button><span class="name">Про мапу</span></div>
+  <div class="tbar"><span class="name">Про мапу</span><button class="box close" id="closeAbout" aria-label="Закрити"></button></div>
   <div class="in">
     <p>Історія ідей про те, як машини можуть допомагати пам'ятати, пов'язувати й думати — від Memex до Вікіпедії, Obsidian і Are.na.</p>
     <div class="legend"><div class="node text"><div class="h">¶ Текст</div><div class="b"><span class="yr">1945</span><span class="who">есей, книжка</span></div></div></div>
@@ -669,13 +667,13 @@ function open(id,{center=false}={}){
   paint();
   if(center)focusNode(id);
 }
-function focusNode(id){
+function focusNode(id,behavior="smooth"){
   const n=byId[id]; if(!n||n.x==null)return;
-  if(mob()){scroll.scrollTo({left:Math.max(0,n.x-GUT()-16),top:Math.max(0,n.yy-AX-16),behavior:"smooth"});return}
+  if(mob()){scroll.scrollTo({left:Math.max(0,n.x-GUT()-16),top:Math.max(0,n.yy-AX-16),behavior});return}
   const tw=$("#text"), sr=scroll.getBoundingClientRect();
   const from=Math.max(GUT(),tw.classList.contains("open")?tw.getBoundingClientRect().right-sr.left+20:0);
   const room=Math.max(NW(),scroll.clientWidth-from);
-  scroll.scrollTo({left:Math.max(0,n.x-from-(room-NW())/2),top:Math.max(0,n.yy-AX-scroll.clientHeight/3),behavior:"smooth"});
+  scroll.scrollTo({left:Math.max(0,n.x-from-(room-NW())/2),top:Math.max(0,n.yy-AX-scroll.clientHeight/3),behavior});
 }
 function closeText(){sel=null;$("#text").classList.remove("open");document.body.classList.remove("reading");history.replaceState(null,"",location.pathname);paint()}
 
@@ -760,6 +758,7 @@ let rw;addEventListener("resize",()=>{clearTimeout(rw);rw=setTimeout(layout,150)
 layout();
 const start=location.hash.slice(1);
 if(byId[start])open(start,{center:true});
+else focusNode("bush","instant"); // за замовчуванням — поруч з As We May Think
 
 </script>
 </body>
