@@ -1822,7 +1822,7 @@ const ALL=(()=>{
   nodes.forEach(n=>{const h=hash(n.id);n.x=Math.cos(h%628/100)*(80+h%160);n.y=Math.sin(h%628/100)*(80+h%160);n.ph=h%1000/1000*6.28});
   return{nodes,links};
 })();
-function makeSim(canvas,{focus=null,mini=false,shift=null,mark=null,onOpen=null}={}){
+function makeSim(canvas,{focus=null,mini=false,shift=null,mark=null,onOpen=null,core=null}={}){
   let ids;
   if(focus){const s=new Set([focus]);const direct=ALL.links.filter(l=>l.a===focus||l.b===focus);direct.forEach(l=>{s.add(l.a);s.add(l.b)});
     ALL.links.filter(l=>l.k==="tag"&&s.has(l.b)&&l.b!==focus).slice(0,10).forEach(l=>s.add(l.a));ids=s}
@@ -1832,8 +1832,10 @@ function makeSim(canvas,{focus=null,mini=false,shift=null,mark=null,onOpen=null}
   const nb=new Map(nodes.map(n=>[n,new Set([n])]));links.forEach(l=>{nb.get(l.a).add(l.b);nb.get(l.b).add(l.a)});
   const S={canvas,nodes,links,view:{s:1,x:0,y:0},user:false,hover:null,drag:null,mouse:null,w:0,h:0,energy:1,time:Infinity,focusTag:null};
   const vis=n=>n.born<=S.time;
-  function fit(){const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y),pad=mini?40:60;
-    const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+  // core(): на сторінці «Мапа» за замовчуванням — наближення на щільну середину (12–88-й перцентилі), «показати все» — уся мапа
+  function fit(){const zoomIn=core&&core()&&!S.showAll,pc=(a,q)=>a[Math.round((a.length-1)*q)];
+    const xs=nodes.map(n=>n.x).sort((a,b)=>a-b),ys=nodes.map(n=>n.y).sort((a,b)=>a-b),pad=mini?40:zoomIn?20:60;
+    const lo=zoomIn?.12:0,hi=zoomIn?.88:1,minX=pc(xs,lo),maxX=pc(xs,hi),minY=pc(ys,lo),maxY=pc(ys,hi);
     const aw=shift&&S.w>900?S.w*.62:S.w;const s=Math.min((aw-pad*2)/((maxX-minX)||1),(S.h-pad*2)/((maxY-minY)||1),mini?2:2.6);
     const sh=shift?shift(S.w,S.h):[0,0];S.view={s,x:S.w/2+sh[0]-(minX+maxX)/2*s,y:S.h/2+sh[1]-(minY+maxY)/2*s}}
   const toW=(x,y)=>[(x-S.view.x)/S.view.s,(y-S.view.y)/S.view.s];
@@ -1920,7 +1922,7 @@ function makeSim(canvas,{focus=null,mini=false,shift=null,mark=null,onOpen=null}
   S.open=n=>{if(n.kind==="note")(onOpen?onOpen(n.id):openNote(n.id));else{tagF=n.id.slice(1);statusF=null;renderGarden();go("garden")}};
   S.zoom=f=>zoomAt(S.w/2,S.h/2,S.view.s*f);
   if(!mini)canvas.addEventListener("wheel",e=>{e.preventDefault();const[x,y]=pt(e);zoomAt(x,y,S.view.s*Math.exp(-e.deltaY*.0015))},{passive:false});
-  S.size=size;S.step=step;S.draw=draw;S.reset=()=>{S.user=false;fit()};
+  S.size=size;S.step=step;S.draw=draw;S.reset=(all=false)=>{S.user=false;S.showAll=all;fit()};
   for(let i=0;i<220;i++)step(0);
   return S;
 }
@@ -1930,7 +1932,7 @@ var stageAt="home";
 function placeStage(v){if(window.$&&$("#t-range"))setTimeout(()=>setTime(+$("#t-range").value));const want=v==="map"?"map":"home";if(want===stageAt)return false;const st=$("#stage");if(want==="map")$("#map-holder").appendChild(st);else $(".home-map").appendChild(st);stageAt=want;return true}
 var noteSim=null;
 function drawAll(){
-  if(!$("#v-home").hidden||!$("#v-map").hidden){if(!bigSim){bigSim=makeSim($("#homeMap"),{shift:homeShift});setTime(+$("#t-range").value)}bigSim.size();if(bigSim._moved){bigSim._moved=false;bigSim.reset()}}
+  if(!$("#v-home").hidden||!$("#v-map").hidden){if(!bigSim){bigSim=makeSim($("#homeMap"),{shift:homeShift,core:()=>stageAt==="map"});setTime(+$("#t-range").value)}bigSim.size();if(bigSim._moved){bigSim._moved=false;bigSim.reset()}}
   if(noteSim&&noteSim.canvas.isConnected)noteSim.size();
   updateCollapsed&&updateCollapsed();
 }
@@ -1953,7 +1955,7 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-$("#m-reset").onclick=()=>bigSim&&bigSim.reset();
+$("#m-reset").onclick=()=>bigSim&&bigSim.reset(true);
 $("#m-zin").onclick=()=>bigSim&&bigSim.zoom(1.4);
 $("#m-zout").onclick=()=>bigSim&&bigSim.zoom(1/1.4);
 $("#hovercard").addEventListener("click",e=>{if(e.target.closest(".hc-open")&&bigSim&&bigSim.hover){const n=bigSim.hover;bigSim.hover=bigSim.tapped=null;bigSim.open(n)}});
