@@ -255,6 +255,98 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
   .seam .full{display:none}
   .seam .short{display:inline}
 }
+
+/* ── вигляд «Список» (outline, як list view у Finder) ── */
+.menubar .seg{display:inline-flex;border:2px solid var(--ink);font:600 13px/1 var(--txt)}
+.menubar .seg button{padding:2px 9px}
+.menubar .seg button+button{border-left:2px solid var(--ink)}
+.menubar .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+#list{left:14px;right:20px;top:46px;bottom:20px;display:none}
+body.list #list{display:flex}
+body.list #map,body.list #tools{display:none}
+body.list.reading #list{right:530px}
+body.list #text{left:auto !important;right:20px;top:46px !important;bottom:20px;height:auto;width:490px}
+.lbar{flex:none;display:flex;align-items:center;gap:14px;padding:6px 10px;border-bottom:2px solid var(--ink);font:600 12px/1 var(--txt);flex-wrap:wrap}
+.lbar .grp{display:inline-flex;align-items:center;gap:6px}
+.lbar .opt{border:2px solid var(--ink);padding:3px 7px;font:600 12px/1 var(--txt)}
+.lbar .opt[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.lbar .chk{display:inline-flex;align-items:center;gap:5px}
+.lbar .chk i{width:12px;height:12px;border:2px solid var(--ink);display:inline-grid;place-items:center}
+.lbar .chk[aria-pressed="true"] i::after{content:"";width:6px;height:6px;background:var(--ink)}
+.lbar input{font:13px/1 var(--txt);border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:3px 6px;width:150px;border-radius:0}
+.lbar .sp{flex:1}
+.lbar .onmap{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:3px 8px}
+.lbar .onmap:hover,.lbar .opt:hover{outline:2px solid var(--ink);outline-offset:1px}
+.lhead,.row{display:grid;grid-template-columns:18px minmax(0,1.3fr) 92px minmax(0,1fr) 46px 46px;align-items:center;column-gap:10px}
+.lhead{position:sticky;top:0;z-index:3;background:var(--paper);border-bottom:2px solid var(--ink);font:600 12px/1 var(--txt);padding:6px 10px 5px}
+.lhead span:nth-child(5),.lhead span:nth-child(6){text-align:right}
+.lhead .on{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+#lbody{padding-bottom:20px}
+.fam-h{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);font:600 12px/1 var(--ui);letter-spacing:.14em;text-transform:uppercase;padding:5px 10px}
+.fam-h small{font:400 12px/1 var(--txt);letter-spacing:0;text-transform:none;opacity:.8}
+.fam-b{background:var(--dither-lite);border-bottom:2px solid var(--ink)}
+.fam-b .folder,.fam-b .row{background:var(--paper)}
+.folder{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 10px;border-bottom:1px dashed var(--ink)}
+.folder .tri{width:0;height:0;border-style:solid;border-width:5px 0 5px 8px;border-color:transparent transparent transparent var(--ink);flex:none;transition:transform .12s}
+.folder[aria-expanded="true"] .tri{transform:rotate(90deg)}
+.folder svg{width:18px;height:14px;flex:none;shape-rendering:crispEdges;fill:currentColor}
+.folder b{font:600 14px/1.2 var(--txt)}
+.folder small{font:12px/1.2 var(--txt);color:var(--mute);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folder .n{font:600 12px/1 var(--txt);border:2px solid var(--ink);padding:2px 5px}
+.folder:hover,.folder:focus-visible{background:var(--ink) !important;color:var(--paper)}
+.folder:hover .tri,.folder:focus-visible .tri{border-left-color:var(--paper)}
+.folder:hover small{color:var(--paper)}
+.folder:hover .n{border-color:var(--paper)}
+.kids-of[hidden]{display:none}
+.row{width:100%;text-align:left;padding:5px 10px 5px 36px;border-bottom:1px dotted var(--mute);font-size:13px;line-height:1.25;position:relative}
+.row .ic{width:14px;height:12px;display:grid;place-items:center;font:600 13px/1 var(--ui)}
+.row .ic.p{border:2px solid var(--ink);border-top-width:4px;width:13px;height:11px}
+.row .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .nm em{font-style:normal;font-weight:400;display:none}
+.row .yr{font:600 12px/1.2 var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .wh{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .c{text-align:right;font:600 12px/1 var(--txt);white-space:nowrap}
+.row .c.z{color:var(--mute);font-weight:400}
+.row .lane-t{display:none}
+#lbody.time .row .wh{display:none}
+#lbody.time .row .lane-t{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+#lbody.time .row{padding-left:36px}
+.row:hover{background:var(--paper) var(--dither-lite)}
+.row:hover .nm,.row:hover .yr{background:var(--paper)}
+.row.self{background:var(--ink) !important;color:var(--paper)}
+.row.self .c.z{color:var(--paper)}
+.row.self .ic.p{border-color:var(--paper)}
+.row.up::before,.row.down::before{position:absolute;left:12px;top:50%;transform:translateY(-50%);font:600 13px/1 var(--ui);background:var(--ink);color:var(--paper);padding:1px 3px}
+.row.up::before{content:"←"}
+.row.down::before{content:"→"}
+.row.hit .nm mark,.row.hit .wh mark{background:var(--ink);color:var(--paper)}
+.row.self mark{background:var(--paper)!important;color:var(--ink)!important}
+.dec-h{position:sticky;top:27px;z-index:2;display:flex;align-items:baseline;gap:10px;padding:6px 10px;background:var(--paper);border-bottom:2px solid var(--ink);border-top:2px solid var(--ink);font:600 15px/1 var(--ui)}
+.dec-h small{font:12px/1 var(--txt)}
+.dec-h .ev{margin-left:auto;font:12px/1.2 var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+.dec-h.fut{background:#000;color:#fff;border-color:#000}
+.empty{padding:30px 10px;font:600 14px var(--txt);text-align:center}
+@media (max-width:760px){
+  .menubar{gap:4px;padding:0 6px}
+  .menubar .seg button{padding:2px 7px}
+  #list{left:8px;right:8px;top:34px;bottom:8px}
+  body.list.reading #list{right:8px}
+  .lbar{gap:8px}
+  .lbar input{flex:1 1 100%;min-width:0;width:auto;font-size:16px;padding:6px 8px}
+  .lbar .lab,.lbar .onmap{display:none}
+  .lhead{display:none}
+  .lhead,.row{grid-template-columns:18px minmax(0,1fr) auto;column-gap:8px}
+  .row{padding:8px 10px 8px 30px;font-size:14px}
+  .row .wh,.row .c,#lbody.time .row .lane-t{display:none}
+  .row .nm{white-space:normal}
+  .row .nm em{display:block;font-size:12px;margin-top:2px;color:inherit}
+  .row.up::before,.row.down::before{left:6px}
+  .folder{padding:10px}
+  .folder small{display:none}
+  .folder b{flex:1}
+  .dec-h{top:0}
+}
+@media (prefers-reduced-motion:reduce){.folder .tri{transition:none}}
 </style>
 </head>
 <body>
@@ -262,6 +354,7 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
 <nav class="menubar">
   <button class="mark" id="markBtn" title="As We May Think — звідки все почалося" aria-label="Відкрити As We May Think">✱</button>
   <span class="title">Як ми можемо думати</span>
+  <span class="seg" role="group" aria-label="Вигляд"><button data-v="map" aria-pressed="true">Мапа</button><button data-v="list" aria-pressed="false">Список</button></span>
   <button id="aboutBtn">Про мапу</button>
   <button id="themeBtn">Тема</button>
   <span class="sp"></span>
@@ -297,6 +390,25 @@ svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-
     </div>
   </div>
   <div class="status" id="status">Наведи на текст чи програму, щоб побачити, з чого виросла ідея і що виросло з неї.</div>
+</section>
+
+<section id="list" class="win" aria-label="Список">
+  <div class="tbar"><span class="name" id="listName">Список · 118 ідей</span></div>
+  <div class="lbar">
+    <span class="grp"><span class="lab">Групувати:</span>
+      <button class="opt" data-g="lane" aria-pressed="true">за темами</button>
+      <button class="opt" data-g="time" aria-pressed="false">за часом</button></span>
+    <button class="chk" data-t="text" aria-pressed="true"><i></i>¶ тексти</button>
+    <button class="chk" data-t="prog" aria-pressed="true"><i></i>програми</button>
+    <input id="lq" type="search" placeholder="Знайти…" aria-label="Знайти в списку">
+    <span class="sp"></span>
+    <button class="onmap" id="onmap">◎ на мапі</button>
+  </div>
+  <div class="scroll" id="lscroll">
+    <div class="lhead" aria-hidden="true"><span></span><span class="on">Назва</span><span>Рік</span><span id="hWho">Хто</span><span title="спирається на">← з</span><span title="вплинуло на">→ на</span></div>
+    <div id="lbody" role="tree" aria-label="Ідеї"></div>
+  </div>
+  <div class="status" id="lstatus"></div>
 </section>
 
 <section id="text" class="win drag" role="dialog" aria-label="Нотатка">
@@ -1091,6 +1203,108 @@ const start=location.hash.slice(1);
 if(byId[start])open(start,{center:true});
 else focusNode("bush","instant"); // за замовчуванням — поруч з As We May Think
 
+</script>
+<script>
+// ── вигляд «Список» ──
+(()=>{
+const body=$("#lbody"), lst=$("#lstatus"), q=$("#lq");
+const FOLDER=`<svg viewBox="0 0 18 14" aria-hidden="true"><path d="M0 2h7l2 2h9v10H0z M2 6v6h14V6z" fill-rule="evenodd"/></svg>`;
+let group="lane", closed=new Set(), lshow={text:true,prog:true};
+try{group=localStorage.getItem("ideas-list-group")||"lane"}catch(e){}
+const laneT=k=>LANES.find(l=>l.k===k).t;
+const decOf=n=>n.y<Y0?"old":Math.floor(n.y/10)*10;
+const hl=(s,t)=>{s=esc(s);if(!t)return s;const i=s.toLowerCase().indexOf(esc(t).toLowerCase());return i<0?s:s.slice(0,i)+"<mark>"+s.slice(i,i+t.length)+"</mark>"+s.slice(i+t.length)};
+const match=(n,t)=>!t||[n.n,n.w,n.d,YR(n)].join(" ").toLowerCase().includes(t);
+function row(n,t){
+  const c=(v)=>`<span class="c${v?"":" z"}">${v||"·"}</span>`;
+  return `<button class="row" role="treeitem" data-id="${n.id}" tabindex="-1">
+    <span class="ic${n.t==="prog"?" p":""}">${n.t==="text"?"¶":""}</span>
+    <span class="nm">${hl(n.n,t)}<em>${esc(n.w)}</em></span>
+    <span class="yr">${esc(YR(n))}</span>
+    <span class="wh">${hl(n.w,t)}</span><span class="lane-t">${esc(laneT(n.l))}</span>
+    ${c(n.f.length)}${c(n.kids.length)}</button>`;
+}
+function render(){
+  const t=q.value.trim().toLowerCase();
+  const items=N.filter(n=>lshow[n.t]&&match(n,t)).sort((a,b)=>a.y-b.y);
+  body.classList.toggle("time",group==="time");
+  $("#hWho").textContent=group==="time"?"Тема":"Хто";
+  $("#listName").textContent=`Список · ${items.length} ${items.length===N.length?"ідей":"з "+N.length}`;
+  if(!items.length){body.innerHTML=`<div class="empty">Нічого не знайшлося. Спробуй інше слово.</div>`;return paintL()}
+  let h="";
+  if(group==="lane"){
+    let fam=null;
+    LANES.forEach((L,i)=>{
+      const its=items.filter(n=>n.l===L.k); if(!its.length)return;
+      if(L.fam!==fam){ if(fam)h+=`</div>`; fam=L.fam||null;
+        if(fam){const mates=LANES.filter(x=>x.fam===fam).map(x=>x.t).join(" · ");h+=`<div class="fam-h">${esc(FAMS[fam])}<small>${esc(mates)}</small></div><div class="fam-b">`} }
+      const open=!!t||!closed.has(L.k);
+      h+=`<button class="folder" role="treeitem" aria-expanded="${open}" data-k="${L.k}" tabindex="-1"><i class="tri"></i>${FOLDER}<b>${esc(L.t)}</b><small>${esc(L.s)}</small><span class="n">${its.length}</span></button>
+      <div class="kids-of" role="group"${open?"":" hidden"}>${its.map(n=>row(n,t)).join("")}</div>`;
+    });
+    if(fam)h+=`</div>`;
+  }else{
+    const decs=[...new Set(items.map(decOf))];
+    decs.forEach(d=>{
+      const its=items.filter(n=>decOf(n)===d);
+      const ev=EVENTS.filter(e=>d==="old"?e[0]<Y0:e[0]>=d&&e[0]<d+10).map(e=>"◆ "+e[1]).join(" · ");
+      h+=`<div class="dec">`+`<div class="dec-h${d!=="old"&&d+10>NOW?" fut":""}">${d==="old"?"XVI ст. — 1800":d+"-ті"}<small>${its.length}</small>${ev?`<span class="ev">${esc(ev)}</span>`:""}</div>${its.map(n=>row(n,t)).join("")}</div>`;
+    });
+  }
+  body.innerHTML=h; paintL();
+}
+function paintL(){
+  const id=sel, L=id?lineage(id):null;
+  body.querySelectorAll(".row").forEach(r=>{const i=r.dataset.id;
+    r.classList.toggle("self",i===id);
+    r.classList.toggle("up",!!id&&byId[id].f.includes(i));
+    r.classList.toggle("down",!!id&&byId[id].kids.includes(i));
+    r.classList.toggle("hit",!!q.value.trim());
+    r.setAttribute("aria-selected",i===id);
+  });
+  if(id){const n=byId[id];lst.textContent=`${YR(n)} · ${n.n} — ← спирається на ${n.f.length} (усього предків ${L.up.size}) · → вплинуло на ${n.kids.length} (усього ${L.down.size})`}
+  else lst.textContent="Клік — картка; ← → поруч із назвою позначають, на що ідея спирається і що з неї виросло. ↑↓ ←→ Enter — з клавіатури.";
+  const first=body.querySelector(".row.self")||body.querySelector("[role=treeitem]");
+  body.querySelectorAll("[tabindex='0']").forEach(e=>e.tabIndex=-1); if(first)first.tabIndex=0;
+}
+// open() і closeText() викликають paint() — заодно оновлюємо позначки в списку
+const _paint=paint;
+paint=function(){_paint();paintL();if(document.body.classList.contains("list")){const r=body.querySelector(".row.self");r&&r.scrollIntoView({block:"nearest"})}};
+body.addEventListener("click",e=>{
+  const f=e.target.closest(".folder");
+  if(f){const k=f.dataset.k,op=f.getAttribute("aria-expanded")!=="true";op?closed.delete(k):closed.add(k);
+    f.setAttribute("aria-expanded",op);f.nextElementSibling.hidden=!op;return}
+  const r=e.target.closest(".row"); if(r)open(r.dataset.id);
+});
+body.addEventListener("keydown",e=>{
+  const all=[...body.querySelectorAll("[role=treeitem]")].filter(x=>x.offsetParent);
+  const cur=document.activeElement, i=all.indexOf(cur); if(i<0)return;
+  const go=j=>{const x=all[Math.max(0,Math.min(all.length-1,j))];x.focus();x.scrollIntoView({block:"nearest"})};
+  if(e.key==="ArrowDown"){e.preventDefault();go(i+1)}
+  else if(e.key==="ArrowUp"){e.preventDefault();go(i-1)}
+  else if(e.key==="ArrowRight"&&cur.classList.contains("folder")&&cur.getAttribute("aria-expanded")==="false"){cur.click()}
+  else if(e.key==="ArrowLeft"){if(cur.classList.contains("folder")){if(cur.getAttribute("aria-expanded")==="true")cur.click()}else{const f=cur.closest(".kids-of")?.previousElementSibling;f&&f.focus()}}
+});
+$("#list .lbar").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.g){group=b.dataset.g;try{localStorage.setItem("ideas-list-group",group)}catch(e){}
+    $("#list .lbar").querySelectorAll("[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===group));render()}
+  if(b.dataset.t){lshow[b.dataset.t]=!lshow[b.dataset.t];b.setAttribute("aria-pressed",lshow[b.dataset.t]);render()}
+});
+q.addEventListener("input",render);
+$("#list .lbar").querySelectorAll("[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===group));
+// перемикач Мапа / Список
+function view(v){
+  document.body.classList.toggle("list",v==="list");
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));
+  try{localStorage.setItem("ideas-view",v)}catch(e){}
+  if(v==="map"){layout();if(sel)focusNode(sel,"instant")}else{render();const r=body.querySelector(".row.self");r&&r.scrollIntoView({block:"center"})}
+}
+document.querySelector(".seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)view(b.dataset.v)});
+$("#onmap").onclick=()=>view("map");
+let v0="map";try{v0=localStorage.getItem("ideas-view")||"map"}catch(e){}
+render(); view(v0);
+})();
 </script>
 </body>
 </html>
