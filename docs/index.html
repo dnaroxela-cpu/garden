@@ -736,6 +736,7 @@ body.book-open .shelf-drawer{transform:none}
 .acard[aria-expanded="true"] .acover{outline:2px solid var(--ink);outline-offset:3px}
 .acover .a-t{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.12;overflow-wrap:break-word;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:8;overflow:hidden}
 .acover .a-t.m{font-size:18px}.acover .a-t.l{font-size:15px}
+.acover .a-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .acard .a-cap{display:flex;flex-direction:column;gap:4px;min-width:0}
 .acard .a-cap b{font-family:var(--f-mono);font-weight:400;font-size:12px;letter-spacing:.02em}
 .acard:hover .a-cap b,.acard:focus-visible .a-cap b{background:var(--rainbow);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -1637,7 +1638,7 @@ function renderBooks(){
     <span class="mono">${BOOKS.length} конспектів · ${BOOKS.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів · ${Math.min(...years)}–${Math.max(...years)}</span></div>`;
   const cardsHTML=()=>`<div class="agrid">${[...BOOKS].sort((a,b)=>(b.reading-a.reading)||b.readSort-a.readSort).map(b=>{const t=short(b.title).length;
     return `<button class="acard" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" aria-label="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span class="acover" style="background:${b.spine[0]};color:${b.spine[1]}">
-      <span class="a-t${t>70?" l":t>34?" m":""}">${esc(short(b.title))}</span></span>
+      <span class="a-t${t>70?" l":t>34?" m":""}">${esc(short(b.title))}</span>${b.cover?`<img class="a-img" src="${esc(b.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>
     <span class="a-cap"><b>${b.reading?"читаю зараз · ":""}${esc(b.author||"автор невідомий")}${b.year?" · "+b.year:""}</b>${b.excerpt?`<span>${esc(b.excerpt)}</span>`:""}</span></button>`}).join("")}</div>`;
   const shelfHTML=arrange==="cards"?cardsHTML():arrange==="timeline"?`<div class="tl-wrap">${timelineHTML()}</div>`:`<div class="shelf">${groups().map(([label,list])=>`${label&&label[0]==="@"?`<div class="grp full"><div class="yr-h"><b>${label.slice(1)}</b><span class="mono">${list.length} ${list.length===1?"книжка":list.length<5?"книжки":"книжок"} · ${list.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів конспекту</span></div>`:`<div class="grp${label&&label[0]==="%"?" now":""}">${label?`<div class="grp-l">${esc(label[0]==="%"?label.slice(1):label)} <i>${list.length}</i></div>`:""}`}<div class="row-sp">${list.map(b=>`<div class="sp-cell">${label&&label[0]==="%"?coverHTML(b):spineHTML(b)}${arrange==="year"?`<span class="sp-y">${b.year||"—"}</span>`:arrange==="read"?`<span class="sp-y${b.readExact?" exact":""}" title="${b.reading?"читаю зараз":b.readExact?"коли прочитала":"дата конспекту"}">${b.readLabel}</span>`:""}</div>`).join("")}</div></div>`).join("")}</div>`;
   h+=arrange==="cards"?shelfHTML:`<div class="shelf-area${arrange==="timeline"?" tl-mode":""}"><div class="shelf-main">${shelfHTML}</div></div>`;
