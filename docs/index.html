@@ -854,6 +854,8 @@ body.on-home footer.site-foot{display:none}
 /* the header: a plain «на головну» link on the left (no gradient); hidden on the home page itself */
 .bar .logo{color:var(--ink);font-weight:400}.bar .logo:hover{color:var(--muted)}
 body.on-home .bar .logo{opacity:0;pointer-events:none}
+/* на телефоні на головній невидимий «на головну» не займає місце — меню вміщається цілим, з «Інструментами мислення» */
+@media (max-width:600px){body.on-home .bar .logo{display:none}:root body.on-home .bar nav{padding-left:0;margin-left:auto}}
 /* a quiet ending: a photo from the collection (a different one on each visit) runs full-bleed under the footer — first alone, then with the footer's text and lines on top of it */
 footer.site-foot:has(.foot-photo){--ph:clamp(200px,30vw,440px);position:relative;isolation:isolate;margin-bottom:-64px;padding:var(--ph) 0 64px;
   --ink:#f4f4ef;--muted:rgba(244,244,239,.72);--rule:rgba(244,244,239,.24);color:var(--ink);border-image:none;border-top:0}
