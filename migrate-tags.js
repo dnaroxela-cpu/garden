@@ -7,7 +7,7 @@ const path = require('path');
 const os = require('os');
 const matter = require('gray-matter');
 
-const VAULT = process.env.VAULT || '/Users/dnaroxela/Documents/Obsidian Vault';
+const VAULT = process.env.VAULT || '/Users/dnaroxela/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian Vault';
 const WRITE = process.argv.includes('--write');
 // тег, як його розуміє Obsidian: # після початку рядка, пробілу чи дужки; перший символ — не цифра
 const TAG_RE = /(^|[\s(])#([\p{L}_][\p{L}\p{N}_\-/]*)/gu;
