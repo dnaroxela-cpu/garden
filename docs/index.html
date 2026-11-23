@@ -754,6 +754,7 @@ body.book-open .shelf-drawer{transform:none}
 .shelf-main{flex:1 1 520px;min-width:0}
 .shelf-area .shelf{border-bottom:1px solid var(--ink)}
 .shelf-area .piles{flex:1 1 100%}
+#t-want .piles{margin-top:36px;gap:24px}
 .shelf-area.tl-mode{flex-direction:column;align-items:stretch}.shelf-area.tl-mode .shelf-main{flex-basis:auto}
 .piles{display:flex;flex-direction:column;gap:10px;flex:0 1 auto;min-width:0;padding-bottom:0}
 .piles-h{display:flex;justify-content:space-between;gap:16px;align-items:baseline}
@@ -953,6 +954,7 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
     <div class="tabs">
       <button data-tab="books" aria-current="true">Книжки</button>
       <button data-tab="articles">Статті</button>
+      <button data-tab="want">Хочу прочитати</button>
       <button data-tab="films">Фільми</button>
       <button data-tab="series">Серіали</button>
       <button data-tab="quotes">Цитати</button>
@@ -964,6 +966,7 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
     <div id="t-series" hidden></div>
     <div id="t-quotes" hidden><div class="qcloud" id="qcloud" aria-label="Слова, що повторюються"></div><div class="qdeck" id="qdeck" aria-live="polite"></div><div class="qnav"><span id="qcount"></span><button id="qprev" aria-label="Попередня цитата">← назад</button><button id="qnext" aria-label="Наступна цитата">далі →</button></div></div>
     <div id="t-articles" hidden></div>
+    <div id="t-want" hidden></div>
     <div id="t-media" hidden></div>
   </section>
 
@@ -1551,8 +1554,8 @@ BOOKS.forEach(b=>{const k=Object.keys(READ).find(k=>b.title.startsWith(k)),r=k&&
   else{const d=new Date(b.date);b.readYear=d.getFullYear();b.readExact=false;b.readSort=b.date;b.readLabel=d.toLocaleDateString("uk-UA",{month:"short"})}});
 BOOKS.forEach((b,i)=>{b.spine=SPINES[i%SPINES.length];b.w=Math.round(24+40*Math.sqrt(words(b)/maxW));b.h=200+hash(b.id)%70;
   const m=(b.book||"").match(/·\s*(\d{4})/);b.year=m?+m[1]:null;b.author=(b.book||"").split("·")[0].trim();const[h,s,l]=hsl(b.spine[0]);b.hue=s<.18?400+l*100:h});
-const ARR={read:"коли прочитала",color:"кольором",year:"роком видання",topic:"темою",length:"товщиною",timeline:"на шкалі часу"};
-let arrange="year";try{arrange=localStorage.getItem("shelfArrange2")||arrange}catch(e){}if(!ARR[arrange])arrange="color";
+const ARR={cards:"картками",read:"коли прочитала",color:"кольором",year:"роком видання",topic:"темою",length:"товщиною",timeline:"на шкалі часу"};
+let arrange="cards";try{arrange=localStorage.getItem("shelfArrange3")||arrange}catch(e){}if(!ARR[arrange])arrange="cards";
 const spineHTML=(b,extra="")=>`<button class="spine" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${b.w}px;height:${b.h}px;${extra}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}${b.year?", "+b.year:""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`;
 const coverHTML=b=>`<button class="hcover shelf-now" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" style="background:${b.spine[0]}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}${b.year?", "+b.year:""}"><span class="ph" style="color:${b.spine[1]}">${esc(short(b.title).split(/[.:]/)[0])}</span>${b.cover?`<img src="${esc(b.cover)}" alt="${esc(short(b.title))}" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</button>`;
 function groups(){
@@ -1632,8 +1635,12 @@ function renderBooks(){
   const years=BOOKS.filter(b=>b.year).map(b=>b.year);
   let h=`<div class="shelf-bar"><div class="arr" role="group" aria-label="Розставити книжки"><span class="label">Розставити</span>${Object.entries(ARR).map(([k,v])=>`<button data-arr="${k}" aria-pressed="${k===arrange}">${v}</button>`).join("")}</div>
     <span class="mono">${BOOKS.length} конспектів · ${BOOKS.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів · ${Math.min(...years)}–${Math.max(...years)}</span></div>`;
-  const shelfHTML=arrange==="timeline"?`<div class="tl-wrap">${timelineHTML()}</div>`:`<div class="shelf">${groups().map(([label,list])=>`${label&&label[0]==="@"?`<div class="grp full"><div class="yr-h"><b>${label.slice(1)}</b><span class="mono">${list.length} ${list.length===1?"книжка":list.length<5?"книжки":"книжок"} · ${list.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів конспекту</span></div>`:`<div class="grp${label&&label[0]==="%"?" now":""}">${label?`<div class="grp-l">${esc(label[0]==="%"?label.slice(1):label)} <i>${list.length}</i></div>`:""}`}<div class="row-sp">${list.map(b=>`<div class="sp-cell">${label&&label[0]==="%"?coverHTML(b):spineHTML(b)}${arrange==="year"?`<span class="sp-y">${b.year||"—"}</span>`:arrange==="read"?`<span class="sp-y${b.readExact?" exact":""}" title="${b.reading?"читаю зараз":b.readExact?"коли прочитала":"дата конспекту"}">${b.readLabel}</span>`:""}</div>`).join("")}</div></div>`).join("")}</div>`;
-  h+=`<div class="shelf-area${arrange==="timeline"?" tl-mode":""}"><div class="shelf-main">${shelfHTML}</div>${pileHTML()}</div>`;
+  const cardsHTML=()=>`<div class="agrid">${[...BOOKS].sort((a,b)=>(b.reading-a.reading)||b.readSort-a.readSort).map(b=>{const t=short(b.title).length;
+    return `<button class="acard" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" aria-label="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span class="acover" style="background:${b.spine[0]};color:${b.spine[1]}">
+      <span class="a-t${t>70?" l":t>34?" m":""}">${esc(short(b.title))}</span></span>
+    <span class="a-cap"><b>${b.reading?"читаю зараз · ":""}${esc(b.author||"автор невідомий")}${b.year?" · "+b.year:""}</b>${b.excerpt?`<span>${esc(b.excerpt)}</span>`:""}</span></button>`}).join("")}</div>`;
+  const shelfHTML=arrange==="cards"?cardsHTML():arrange==="timeline"?`<div class="tl-wrap">${timelineHTML()}</div>`:`<div class="shelf">${groups().map(([label,list])=>`${label&&label[0]==="@"?`<div class="grp full"><div class="yr-h"><b>${label.slice(1)}</b><span class="mono">${list.length} ${list.length===1?"книжка":list.length<5?"книжки":"книжок"} · ${list.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів конспекту</span></div>`:`<div class="grp${label&&label[0]==="%"?" now":""}">${label?`<div class="grp-l">${esc(label[0]==="%"?label.slice(1):label)} <i>${list.length}</i></div>`:""}`}<div class="row-sp">${list.map(b=>`<div class="sp-cell">${label&&label[0]==="%"?coverHTML(b):spineHTML(b)}${arrange==="year"?`<span class="sp-y">${b.year||"—"}</span>`:arrange==="read"?`<span class="sp-y${b.readExact?" exact":""}" title="${b.reading?"читаю зараз":b.readExact?"коли прочитала":"дата конспекту"}">${b.readLabel}</span>`:""}</div>`).join("")}</div></div>`).join("")}</div>`;
+  h+=arrange==="cards"?shelfHTML:`<div class="shelf-area${arrange==="timeline"?" tl-mode":""}"><div class="shelf-main">${shelfHTML}</div></div>`;
   h+=threadStripHTML();
   h+=`<svg class="threads" aria-hidden="true"></svg>`;
   box.innerHTML=h;
@@ -1647,12 +1654,14 @@ $("#t-books").addEventListener("pointerout",e=>{const sp=e.target.closest(".spin
 $("#t-books").addEventListener("focusin",e=>{const sp=e.target.closest(".spine");if(sp)drawThreads(sp)});
 $("#t-books").addEventListener("click",e=>{
   const on=e.target.closest("[data-open-note]");if(on){e.preventDefault();e.stopPropagation();document.body.classList.add("book-open");shelfStack.set([on.dataset.openNote]);return}
-  const a=e.target.closest("[data-arr]");if(a){arrange=a.dataset.arr;try{localStorage.setItem("shelfArrange2",arrange)}catch(err){}renderBooks();return}
+  const a=e.target.closest("[data-arr]");if(a){arrange=a.dataset.arr;try{localStorage.setItem("shelfArrange3",arrange)}catch(err){}renderBooks();return}
   const s=e.target.closest("[data-book]");if(!s)return;
   if(shelfStack.ids[0]===s.dataset.book&&document.body.classList.contains("book-open")){shelfStack.ids=[];document.body.classList.remove("book-open");renderBooks();return}
   document.body.classList.add("book-open");shelfStack.set([s.dataset.book]);});
 addEventListener("keydown",e=>{if(e.key==="Escape"&&document.body.classList.contains("book-open")){shelfStack.ids=[];document.body.classList.remove("book-open");renderBooks()}});
 renderBooks();
+$("#t-want").innerHTML=pileHTML()||`<p class="mono series-empty">Тут з'явиться список з нотатки «Reading List» в Obsidian.</p>`;
+$("#t-want").addEventListener("click",e=>{const on=e.target.closest("[data-open-note]");if(on){e.preventDefault();document.body.classList.add("book-open");shelfStack.set([on.dataset.openNote])}});
 // real cover on hover; if the image can't load, a cover drawn from the spine colours stands in
 document.body.insertAdjacentHTML("beforeend",`<div class="coverpop" id="coverpop" hidden></div>`);
 function showCover(sp){const b=BY[sp.dataset.book||sp.dataset.hbook];if(!b)return;const pop=$("#coverpop");pop.classList.remove("wide");
@@ -1782,7 +1791,7 @@ box.addEventListener("click",e=>{const f=e.target.closest("[data-at]");if(f){tag
 }
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-current",x===b));
-  hideCover();["books","films","series","quotes","articles","media"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
+  hideCover();["books","films","series","quotes","articles","want","media"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.tab)});
 
 
 // living map: a continuous gentle force simulation; colour = theme on the rainbow, size = note length, pulses travel along [[links]]
