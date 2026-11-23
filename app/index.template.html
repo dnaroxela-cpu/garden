@@ -757,6 +757,7 @@ body.book-open .shelf-drawer{transform:none}
 .shelf-area .piles{flex:1 1 100%}
 .want-bar{justify-content:space-between}.want-bar .home{vertical-align:middle}
 .want-grp{margin-top:48px}.want-grp .agrid{margin-top:20px}
+.acard .a-cap .w-t{order:-1;color:var(--ink);font-size:15px;line-height:1.3;-webkit-line-clamp:2}
 .want-card{cursor:default}.want-card:hover .acover{translate:none}.want-card .a-cap b .home{display:inline-block;vertical-align:middle;margin-left:4px}
 .shelf-area.tl-mode{flex-direction:column;align-items:stretch}.shelf-area.tl-mode .shelf-main{flex-basis:auto}
 .piles{display:flex;flex-direction:column;gap:10px;flex:0 1 auto;min-width:0;padding-bottom:0}
@@ -1668,7 +1669,7 @@ function wantHTML(){
   return `<div class="shelf-bar want-bar"><span class="mono">${total} ${plural(total,"книжка","книжки","книжок")} у черзі · <i class="home"></i> вже є вдома</span><a class="mono" href="#note" data-open-note="${RL.id}">весь список →</a></div>`
   +PILES.map(p=>`<section class="want-grp"><div class="grp-l">${esc(PILE_UA[p.name]||p.name)} <i>${p.items.length}</i></div><div class="agrid">${p.items.map(it=>{const sp=SPINES[hash(it.title)%SPINES.length],t=it.title.length;
     return `<div class="acard want-card"><span class="acover" style="background:${sp[0]};color:${sp[1]}"><span class="a-t${t>70?" l":t>34?" m":""}">${esc(it.title)}</span>${it.cover?`<img class="a-img" src="${esc(it.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>
-    <span class="a-cap"><b>${esc(it.author||"автор невідомий")}${it.year?" · "+it.year:""}${it.home?` <i class="home" title="вже вдома" aria-label="вже вдома"></i>`:""}</b></span></div>`}).join("")}</div></section>`).join("");
+    <span class="a-cap"><span class="w-t">${esc(it.title)}</span><b>${esc(it.author||"автор невідомий")}${it.year?" · "+it.year:""}${it.home?` <i class="home" title="вже вдома" aria-label="вже вдома"></i>`:""}</b></span></div>`}).join("")}</div></section>`).join("");
 }
 $("#t-want").innerHTML=wantHTML()||`<p class="mono series-empty">Тут з'явиться список з нотатки «Reading List» в Obsidian.</p>`;
 $("#t-want").addEventListener("click",e=>{const on=e.target.closest("[data-open-note]");if(on){e.preventDefault();document.body.classList.add("book-open");shelfStack.set([on.dataset.openNote])}});
