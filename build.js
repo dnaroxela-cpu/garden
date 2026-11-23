@@ -1700,6 +1700,39 @@ async function buildApp(files, coversCache) {
       n.media.year = file.year || (found && found.year ? String(found.year) : null);
     }
   }
+  // «Хочу прочитати»: черга з нотатки «Reading List» — розділи (заголовки) і книжки (пункти списку «Назва by Автор», 🐬 — уже вдома)
+  // з обкладинкою і роком: app/covers/<назва-через-дефіси>.* або covers.json → Open Library / iTunes (кеш want:Назва)
+  const rl = data.find(n => n.title === 'Reading List');
+  if (rl) {
+    const txt = h => h.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+    const piles = []; let cur = null;
+    for (const m of rl.html.matchAll(/<(h[1-4])[^>]*>([\s\S]*?)<\/\1>|<li[^>]*>([\s\S]*?)(?=<li|<\/li>|<\/[ou]l>)/g)) {
+      if (m[1]) { cur = { name: txt(m[2]), items: [] }; piles.push(cur); continue; }
+      const raw = txt(m[3].replace(/<[ou]l[\s\S]*$/, '')); if (!raw) continue;
+      if (!cur) { cur = { name: 'Інше', items: [] }; piles.push(cur); }
+      const home = raw.includes('🐬'), t = raw.replace(/🐬/g, '').trim(), parts = t.split(/\sby\s/);
+      cur.items.push({ title: parts[0].trim(), author: parts.slice(1).join(' by ').replace(/\(.*?\)/g, '').trim(), home });
+    }
+    for (const it of piles.flatMap(p => p.items)) {
+      const own = ownCover(it.title.replace(/\s+/g, '-').toLowerCase());
+      const key = 'want:' + it.title;
+      if (!mediaCache[key] || (!mediaCache[key].cover && !own)) {
+        let year = null;
+        try {
+          const q = new URLSearchParams({ title: it.title, limit: '5', fields: 'first_publish_year' });
+          if (it.author) q.set('author', it.author);
+          const r = await (await fetch(`https://openlibrary.org/search.json?${q}`)).json();
+          year = (r.docs || []).map(d => d.first_publish_year).filter(Boolean).sort((a, b) => a - b)[0] || null;
+        } catch (e) {}
+        mediaCache[key] = { cover: own ? null : await fetchBookCover(it.title, it.author), year };
+      }
+      it.cover = own || mediaCache[key].cover || null;
+      it.year = mediaCache[key].year || null;
+    }
+    rl.want = piles.filter(p => p.items.length);
+    const miss = rl.want.flatMap(p => p.items).filter(i => !i.cover).map(i => i.title);
+    if (miss.length) console.log(`📚 «Хочу прочитати» без обкладинки: ${miss.join('; ')}`);
+  }
   saveCoversCache(mediaCache);
 
   // journal: compare paragraphs with the previous build

@@ -755,7 +755,9 @@ body.book-open .shelf-drawer{transform:none}
 .shelf-main{flex:1 1 520px;min-width:0}
 .shelf-area .shelf{border-bottom:1px solid var(--ink)}
 .shelf-area .piles{flex:1 1 100%}
-#t-want .piles{margin-top:36px;gap:24px}
+.want-bar{justify-content:space-between}.want-bar .home{vertical-align:middle}
+.want-grp{margin-top:48px}.want-grp .agrid{margin-top:20px}
+.want-card{cursor:default}.want-card:hover .acover{translate:none}.want-card .a-cap b .home{display:inline-block;vertical-align:middle;margin-left:4px}
 .shelf-area.tl-mode{flex-direction:column;align-items:stretch}.shelf-area.tl-mode .shelf-main{flex-basis:auto}
 .piles{display:flex;flex-direction:column;gap:10px;flex:0 1 auto;min-width:0;padding-bottom:0}
 .piles-h{display:flex;justify-content:space-between;gap:16px;align-items:baseline}
@@ -1587,7 +1589,7 @@ function timelineHTML(){
 
 // reading queue from the «Reading List» note, piled by section; 🐬 = already at home
 const RL=NOTES.find(n=>n.title==="Reading List");
-const PILES=(()=>{if(!RL)return[];const doc=new DOMParser().parseFromString(RL.html,"text/html");const out=[];let cur=null;
+const PILES=(()=>{if(!RL)return[];if(RL.want)return RL.want.map(p=>({...p,items:p.items.filter(it=>!BOOKS.some(b=>short(b.title).toLowerCase().startsWith(it.title.toLowerCase().slice(0,14))))})).filter(p=>p.items.length);const doc=new DOMParser().parseFromString(RL.html,"text/html");const out=[];let cur=null;
   doc.body.querySelectorAll("h1,h2,h3,h4,li").forEach(el=>{if(/^H/.test(el.tagName)){cur={name:el.textContent.trim(),items:[]};out.push(cur);return}
     if(!cur){cur={name:"Інше",items:[]};out.push(cur)}
     const raw=el.textContent.trim();if(!raw)return;const home=raw.includes("🐬");const t=raw.replace("🐬","").trim();const m=t.split(/\sby\s/);
@@ -1639,7 +1641,7 @@ function renderBooks(){
   const cardsHTML=()=>`<div class="agrid">${[...BOOKS].sort((a,b)=>(b.reading-a.reading)||b.readSort-a.readSort).map(b=>{const t=short(b.title).length;
     return `<button class="acard" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" aria-label="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span class="acover" style="background:${b.spine[0]};color:${b.spine[1]}">
       <span class="a-t${t>70?" l":t>34?" m":""}">${esc(short(b.title))}</span>${b.cover?`<img class="a-img" src="${esc(b.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>
-    <span class="a-cap"><b>${esc(b.author||"автор невідомий")}${b.year?" · "+b.year:""}</b></span></button>`}).join("")}</div>`;
+    <span class="a-cap"><b>${b.reading?"читаю зараз · ":""}${esc(b.author||"автор невідомий")}${b.year?" · "+b.year:""}</b></span></button>`}).join("")}</div>`;
   const shelfHTML=arrange==="cards"?cardsHTML():arrange==="timeline"?`<div class="tl-wrap">${timelineHTML()}</div>`:`<div class="shelf">${groups().map(([label,list])=>`${label&&label[0]==="@"?`<div class="grp full"><div class="yr-h"><b>${label.slice(1)}</b><span class="mono">${list.length} ${list.length===1?"книжка":list.length<5?"книжки":"книжок"} · ${list.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів конспекту</span></div>`:`<div class="grp${label&&label[0]==="%"?" now":""}">${label?`<div class="grp-l">${esc(label[0]==="%"?label.slice(1):label)} <i>${list.length}</i></div>`:""}`}<div class="row-sp">${list.map(b=>`<div class="sp-cell">${label&&label[0]==="%"?coverHTML(b):spineHTML(b)}${arrange==="year"?`<span class="sp-y">${b.year||"—"}</span>`:arrange==="read"?`<span class="sp-y${b.readExact?" exact":""}" title="${b.reading?"читаю зараз":b.readExact?"коли прочитала":"дата конспекту"}">${b.readLabel}</span>`:""}</div>`).join("")}</div></div>`).join("")}</div>`;
   h+=arrange==="cards"?shelfHTML:`<div class="shelf-area${arrange==="timeline"?" tl-mode":""}"><div class="shelf-main">${shelfHTML}</div></div>`;
   h+=threadStripHTML();
@@ -1661,7 +1663,14 @@ $("#t-books").addEventListener("click",e=>{
   document.body.classList.add("book-open");shelfStack.set([s.dataset.book]);});
 addEventListener("keydown",e=>{if(e.key==="Escape"&&document.body.classList.contains("book-open")){shelfStack.ids=[];document.body.classList.remove("book-open");renderBooks()}});
 renderBooks();
-$("#t-want").innerHTML=pileHTML()||`<p class="mono series-empty">Тут з'явиться список з нотатки «Reading List» в Obsidian.</p>`;
+function wantHTML(){
+  if(!PILES.length)return"";const total=PILES.reduce((s,p)=>s+p.items.length,0);
+  return `<div class="shelf-bar want-bar"><span class="mono">${total} ${plural(total,"книжка","книжки","книжок")} у черзі · <i class="home"></i> вже є вдома</span><a class="mono" href="#note" data-open-note="${RL.id}">весь список →</a></div>`
+  +PILES.map(p=>`<section class="want-grp"><div class="grp-l">${esc(PILE_UA[p.name]||p.name)} <i>${p.items.length}</i></div><div class="agrid">${p.items.map(it=>{const sp=SPINES[hash(it.title)%SPINES.length],t=it.title.length;
+    return `<div class="acard want-card"><span class="acover" style="background:${sp[0]};color:${sp[1]}"><span class="a-t${t>70?" l":t>34?" m":""}">${esc(it.title)}</span>${it.cover?`<img class="a-img" src="${esc(it.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</span>
+    <span class="a-cap"><b>${esc(it.author||"автор невідомий")}${it.year?" · "+it.year:""}${it.home?` <i class="home" title="вже вдома" aria-label="вже вдома"></i>`:""}</b></span></div>`}).join("")}</div></section>`).join("");
+}
+$("#t-want").innerHTML=wantHTML()||`<p class="mono series-empty">Тут з'явиться список з нотатки «Reading List» в Obsidian.</p>`;
 $("#t-want").addEventListener("click",e=>{const on=e.target.closest("[data-open-note]");if(on){e.preventDefault();document.body.classList.add("book-open");shelfStack.set([on.dataset.openNote])}});
 // real cover on hover; if the image can't load, a cover drawn from the spine colours stands in
 document.body.insertAdjacentHTML("beforeend",`<div class="coverpop" id="coverpop" hidden></div>`);
