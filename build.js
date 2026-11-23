@@ -1740,8 +1740,9 @@ async function buildApp(files, coversCache) {
   const written = new Set(['index.html']);
   fs.writeFileSync(path.join(OUT, 'index.html'), page);
   for (const asset of fs.readdirSync(APP_DIR)) {
-    if (asset.endsWith('.html') || asset === 'covers') continue; // covers/ копіює mediaInfo — лише потрібні
+    if (asset === 'index.template.html' || asset === 'covers') continue; // covers/ копіює mediaInfo — лише потрібні
     fs.copyFileSync(path.join(APP_DIR, asset), path.join(OUT, asset));
+    if (asset.endsWith('.html')) written.add(asset); // окремі сторінки з app/ (ideas.html) не видаляти
   }
 
   // old URLs → the app

@@ -1,0 +1,1310 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Як ми можемо думати</title>
+<meta name="description" content="Інтерактивна мапа історії ідей про роботу з інформацією і знаннями: від «As We May Think» до Вікіпедії, Obsidian і Are.na.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#000; --paper:#fff; --mute:#777;
+  --ui:"Pixelify Sans", "Chicago", "Charcoal", monospace;
+  --txt:"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --dither:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
+  --dither-lite:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#eee; --paper:#111; --mute:#888;
+    --dither:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+    --dither-lite:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#eee; --paper:#111; --mute:#888;
+  --dither:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+  --dither-lite:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='%23eee'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23eee'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--paper) var(--dither-lite);color:var(--ink);font:14px/1.45 var(--txt);overflow:hidden;-webkit-font-smoothing:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px dashed var(--ink);outline-offset:2px}
+
+/* ── menu bar ── */
+.menubar{position:fixed;inset:0 0 auto 0;height:26px;background:var(--paper);border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:18px;padding:0 14px;font:600 13px/1 var(--txt);z-index:50;white-space:nowrap}
+.menubar .mark{font-size:18px}
+.menubar .title{font:600 16px/1 var(--ui)}
+.menubar .sp{flex:1}
+.menubar a{text-decoration:none}
+.menubar a:hover,.menubar button:hover{background:var(--ink);color:var(--paper)}
+.menubar a,.menubar button{padding:4px 6px}
+
+/* ── window chrome (1984 style) ── */
+.win{position:absolute;background:var(--paper);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);display:flex;flex-direction:column}
+.tbar{height:24px;flex:none;border-bottom:2px solid var(--ink);display:flex;align-items:center;justify-content:center;position:relative;
+  background:repeating-linear-gradient(to bottom,var(--paper) 0 3px,var(--ink) 3px 4px) 0 4px/100% 16px no-repeat;user-select:none}
+.tbar .name{background:var(--paper);padding:0 10px;font:600 16px/24px var(--ui);max-width:72%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbar .box{position:absolute;top:4px;width:15px;height:15px;border:2px solid var(--ink);background:var(--paper)}
+.tbar .box.close{right:8px;cursor:pointer}
+.tbar .box:active{background:var(--ink)}
+.tbar button.box.close::before,.tbar button.box.close::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:2px;background:var(--ink);transform:translate(-50%,-50%) rotate(45deg)}
+.tbar button.box.close::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.tbar button.box.close:hover{background:var(--ink)}
+.tbar button.box.close:hover::before,.tbar button.box.close:hover::after{background:var(--paper)}
+.tbar button.box.close{width:17px;height:17px;top:3px}
+.drag .tbar{cursor:move}
+
+/* ── map window ── */
+#map{left:96px;right:20px;top:46px;bottom:20px}
+.scroll{flex:1;overflow:auto;position:relative}
+.scroll::-webkit-scrollbar{width:16px;height:16px}
+.scroll::-webkit-scrollbar-track{background:var(--paper) var(--dither);border-left:2px solid var(--ink);border-top:2px solid var(--ink)}
+.scroll::-webkit-scrollbar-thumb{background:var(--paper);border:2px solid var(--ink)}
+.scroll::-webkit-scrollbar-corner{background:var(--paper)}
+.canvas{position:relative}
+.axis{position:sticky;top:0;z-index:7;height:74px;background:var(--paper);border-bottom:2px solid var(--ink)}
+.axis .tick{position:absolute;top:0;bottom:0;border-left:1px solid var(--ink);font:600 12px/1 var(--txt);padding:5px 0 0 5px}
+.axis .tick.fut{color:#fff;border-color:#fff}
+.axis .tick.minor.fut{border-color:#888}
+.axis .future{position:absolute;top:0;bottom:0;right:0;background:#000;color:#fff;font:600 12px/1 var(--txt);padding:30px 0 0 10px;letter-spacing:.04em}
+.axis .tick.minor{border-left:1px dotted var(--mute);top:auto;height:8px}
+.axis .ev{position:absolute;font-size:12px;line-height:1.15;white-space:nowrap;padding-left:9px;color:var(--ink)}
+.axis .ev::before{content:"";position:absolute;left:0;top:3px;width:5px;height:5px;background:var(--ink);transform:rotate(45deg)}
+.axis .ev.near{background:var(--ink);color:var(--paper)}
+.axis .ev.near::before{background:var(--paper)}
+.axis .corner{position:sticky;left:0;top:0;width:150px;height:72px;background:var(--paper);border-right:2px solid var(--ink);z-index:2;font:12px/1.3 var(--txt);padding:6px 8px;color:var(--ink)}
+.axis .oldzone{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font:600 12px/1.3 var(--txt);text-align:center;padding:0 8px;letter-spacing:.03em;color:var(--ink)}
+.axis .oldzone.low{align-items:flex-end;padding-bottom:8px} /* давні події стоять зверху, підпис зони — під ними */
+.brk{position:absolute;top:0;width:14px;z-index:4;pointer-events:none;background:var(--paper)}
+.brk::after{content:"";position:absolute;inset:0;background:var(--ink);--z:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16'%3E%3Cpath d='M3 0l4 4-4 4 4 4-4 4M9 0l4 4-4 4 4 4-4 4' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");-webkit-mask:var(--z) 0 0/14px 16px repeat-y;mask:var(--z) 0 0/14px 16px repeat-y}
+.warn{position:absolute;z-index:4;pointer-events:none;background:var(--paper);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font:600 12px/1 var(--txt);padding:5px 8px;white-space:nowrap;left:0;top:0;will-change:transform}
+.warn b{background:var(--ink);color:var(--paper);padding:2px 4px;margin:-2px 4px -2px -3px;font-weight:600}
+.lane{position:relative;border-bottom:1px dashed var(--ink)}
+/* родини лінійок: спільна рамка й растр, чорна дужка з назвою; між партнерами — шов із підписом різниці */
+.family{position:relative}
+.family::before,.family::after{content:"";position:absolute;left:0;right:0;border-top:2px solid var(--ink);z-index:2;pointer-events:none}
+.family::before{top:-1px}.family::after{bottom:-1px}
+.lane.fam,.band{background:var(--dither-lite)}
+.lane.fam .lane-label{padding-left:34px}
+.fwrap{position:absolute;inset:0;z-index:6;pointer-events:none}
+.fname{position:sticky;left:0;display:flex;justify-content:center;width:24px;height:100%;background:var(--ink);color:var(--paper)}
+.fname b{position:sticky;top:86px;align-self:flex-start;margin:12px 0;writing-mode:vertical-rl;transform:rotate(180deg);font:600 12px/1 var(--ui);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.band{position:relative}
+.band::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dotted var(--ink)}
+.band .bl{position:sticky;left:0;z-index:5;display:block;width:150px;height:100%;background:var(--paper);border-right:2px solid var(--ink)}
+.seam{position:absolute;left:34px;top:50%;transform:translateY(-50%);background:var(--paper);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font:600 12px/1 var(--txt);padding:4px 7px;white-space:nowrap}
+.seam:hover,.seam.on{background:var(--ink);color:var(--paper)}
+.seam .short{display:none}
+.lane-label{position:sticky;left:0;z-index:5;display:block;width:150px;height:100%;background:var(--paper);border-right:2px solid var(--ink);padding:10px 10px;font:600 14px/1.2 var(--txt)}
+.lane-label small{display:block;font:12px/1.3 var(--txt);font-weight:400;color:var(--ink);margin-top:6px}
+.layer{position:absolute;left:0;top:0;pointer-events:none}
+.layer>*{pointer-events:auto}
+svg.space{position:absolute;left:0;top:0;pointer-events:none;z-index:0;shape-rendering:crispEdges}
+svg.space text{shape-rendering:auto}
+canvas.sky{position:absolute;pointer-events:none;z-index:0;image-rendering:pixelated}
+svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:1}
+.edges path.o{stroke:var(--ink);stroke-width:4;fill:none}
+.edges path.i{stroke:var(--paper);stroke-width:1.5;fill:none}
+.edges polygon{fill:var(--ink)}
+.edges g.dim path.o{stroke-width:1;stroke-dasharray:2 3;stroke:var(--mute)}
+.edges g.dim path.i,.edges g.dim polygon{display:none}
+.edges.hide{display:none}
+.cursor{position:absolute;top:0;width:0;border-left:1px dashed var(--ink);pointer-events:none;z-index:4;display:none}
+.cursor.fut{border-color:#fff}
+.cursor.fut b{background:#fff;color:#000}
+.cursor b{position:sticky;top:78px;display:inline-block;background:var(--ink);color:var(--paper);font:600 12px/1 var(--txt);padding:3px 5px;margin-left:-1px;transform:translateY(78px)}
+
+/* ── nodes ── */
+.node{position:absolute;z-index:3;width:var(--w);height:58px;background:var(--paper);border:2px solid var(--ink);text-align:left;display:flex;flex-direction:column;box-shadow:2px 2px 0 var(--ink)}
+.node .h{height:20px;flex:none;border-bottom:2px solid var(--ink);font:600 12px/18px var(--txt);padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node.prog .h{text-align:center;padding:0 18px;background:repeating-linear-gradient(to bottom,var(--paper) 0 3px,var(--ink) 3px 4px) 0 3px/100% 12px no-repeat}
+.node.prog .h span{background:var(--paper);padding:0 4px}
+.node.prog .h::before{content:"";position:absolute;left:5px;top:4px;width:9px;height:9px;border:2px solid var(--ink);background:var(--paper)}
+.node .b{flex:1;display:flex;align-items:center;gap:6px;padding:0 5px;font-size:12px;line-height:1.15;overflow:hidden}
+.node .b .yr{font:600 12px/1 var(--txt)}
+.node .b .who{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--ink)}
+.node .kids{display:flex;gap:3px}
+.node .kids i{width:12px;height:8px;border:1.5px solid var(--ink);border-radius:2px}
+.node:hover,.node.self{background:var(--ink);color:var(--paper)}
+.node:hover .h,.node.self .h{border-color:var(--paper)}
+.node:hover .who,.node.self .who{color:var(--paper)}
+.node:hover .kids i,.node.self .kids i{border-color:var(--paper)}
+.node.prog:hover .h,.node.prog.self .h{background:repeating-linear-gradient(to bottom,var(--ink) 0 3px,var(--paper) 3px 4px) 0 3px/100% 12px no-repeat}
+.node.prog:hover .h span,.node.prog.self .h span{background:var(--ink)}
+.node.prog:hover .h::before,.node.prog.self .h::before{background:var(--ink);border-color:var(--paper)}
+.node.dim{background:var(--paper) var(--dither-lite);color:var(--mute);box-shadow:none;border-color:var(--mute)}
+.node.dim .h{border-color:var(--mute)}
+.node.dim .who{color:var(--mute)}
+.node.dim .kids i{border-color:var(--mute)}
+.node.near:not(.dim){outline:2px dashed var(--ink);outline-offset:3px}
+.node.off{display:none}
+
+/* ── palette ── */
+#tools{left:14px;top:46px;width:68px}
+#tools .grid{display:grid;grid-template-columns:1fr 1fr}
+#tools .grid button{height:44px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);display:grid;place-items:center}
+#tools .grid button:nth-child(2n){border-right:0}
+#tools .grid button.wide{grid-column:span 2;border-right:0}
+#tools .grid button:last-child{border-bottom:0}
+#tools .grid button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+#tools .grid button:hover{outline:2px solid var(--ink);outline-offset:-5px}
+#tools svg{width:26px;height:26px;shape-rendering:crispEdges}
+#tools .tbar{height:12px;background:repeating-linear-gradient(to bottom,var(--paper) 0 2px,var(--ink) 2px 3px) 0 1px/100% 9px no-repeat}
+
+/* ── text window ── */
+#text{left:120px;top:110px;width:470px;height:min(560px,calc(100vh - 140px));z-index:20;display:none}
+#text.open{display:flex}
+#text .scroll{padding:16px 18px 24px}
+#text .kind{font:600 12px/1 var(--txt);display:flex;gap:8px;align-items:center;margin-bottom:8px}
+#text .kind .tag{border:2px solid var(--ink);padding:3px 6px;display:inline-flex;align-items:center;gap:5px}
+#text .kind .ico{width:9px;height:9px;border:2px solid var(--ink);flex:none}
+#text h2{font:600 24px/1.1 var(--ui);margin:0 0 4px}
+#text .who{margin:0 0 14px;color:var(--ink)}
+#text p{margin:0 0 12px}
+#text h3{font:600 12px/1 var(--txt);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px;padding-top:10px;border-top:2px solid var(--ink)}
+.wf{display:inline-block;border:2px solid var(--ink);padding:3px 8px;margin:0 4px 6px 0;font:600 13px/1.3 var(--txt);text-align:left;background:var(--paper)}
+.wf:hover{background:var(--ink);color:var(--paper)}
+.wf small{font:400 12px var(--txt);margin-left:2px}
+.wf.ev{border-style:dashed;cursor:default}
+.wf.ev:hover{background:var(--paper);color:var(--ink)}
+#text .go{display:inline-block;margin-top:6px;font:600 14px var(--txt);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:4px 10px;text-decoration:none}
+#text .go:hover{background:var(--ink);color:var(--paper)}
+.pic{border:2px solid var(--ink);background:var(--ink) var(--dither);height:72px;margin:4px 0 14px;display:grid;place-items:center}
+.pic span{background:var(--paper);border:2px solid var(--ink);font:600 20px/1 var(--ui);padding:6px 12px}
+/* фото предмета з Parallel Museum: 1-бітне, оригінал при наведенні чи дотику */
+.obj{margin:4px 0 16px;border:2px solid var(--ink);background:var(--paper)}
+.obj .stage{position:relative;display:grid;place-items:center;padding:14px;background:var(--paper) var(--dither-lite);min-height:120px;cursor:pointer}
+.obj .mat{background:var(--paper);padding:10px;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);position:relative;line-height:0;max-width:100%}
+.obj canvas{display:block;image-rendering:pixelated;max-width:100%;height:auto}
+.obj img{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);object-fit:contain;opacity:0;transition:opacity .25s}
+.obj .stage:hover img,.obj.colour img{opacity:1}
+.arr{width:.72em;height:.72em;margin-left:.35em;fill:currentColor;shape-rendering:crispEdges;vertical-align:.05em}
+.obj .tap{display:none;position:absolute;right:8px;bottom:8px;align-items:center;gap:5px;background:var(--paper);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:3px 7px 3px 5px;font:600 13px/1 var(--ui);pointer-events:none}
+.obj .tap .cur{width:8px;height:12px;shape-rendering:crispEdges}
+.obj .tap .cur .k{fill:var(--ink)} .obj .tap .cur .w{fill:var(--paper)}
+@media (hover:none){.obj .tap{display:inline-flex}}
+.obj.colour .tap{display:none}
+.obj figcaption{display:flex;justify-content:space-between;gap:10px;border-top:2px solid var(--ink);padding:5px 8px;font:12px/1.35 var(--txt)}
+.obj figcaption a{white-space:nowrap;font-weight:600}
+.obj figcaption a:hover{background:var(--ink);color:var(--paper)}
+@media (prefers-reduced-motion:reduce){.obj img{transition:none}}
+.arg{border:2px solid var(--ink);margin:0 0 14px}
+.arg .lab{display:inline-block;background:var(--ink);color:var(--paper);font:600 11px/1 var(--txt);text-transform:uppercase;letter-spacing:.07em;padding:5px 8px}
+#text .arg p{margin:0;padding:8px 12px 12px;font:400 16px/1.4 var(--txt)}
+#text details{border-top:2px solid var(--ink)}
+#text details+details{border-top:2px solid var(--ink)}
+#text details:last-of-type{border-bottom:2px solid var(--ink)}
+#text summary{list-style:none;display:flex;align-items:center;gap:10px;padding:9px 0;font:600 12px/1 var(--txt);text-transform:uppercase;letter-spacing:.07em;cursor:pointer}
+#text summary::-webkit-details-marker{display:none}
+#text summary::before{content:"";width:0;height:0;border-style:solid;border-width:5px 0 5px 8px;border-color:transparent transparent transparent var(--ink);flex:none;transition:transform .12s}
+#text details[open] summary::before{transform:rotate(90deg)}
+#text summary:hover{background:var(--ink);color:var(--paper)}
+#text summary:hover::before{border-left-color:var(--paper)}
+#text details p{margin:0 0 12px 18px}
+#text details+h3,#text details~h3{border-top:0;padding-top:0}
+@media (prefers-reduced-motion:reduce){#text summary::before{transition:none}}
+
+/* ── status / legend ── */
+.status{flex:none;height:24px;border-top:2px solid var(--ink);font:13px/20px var(--txt);padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#about{right:44px;top:92px;width:330px;z-index:30;display:none}
+#about.open{display:flex}
+#about .in{padding:14px 16px;font-size:13px}
+#about .in p{margin:0 0 10px}
+.legend{display:flex;gap:10px;align-items:center;margin:6px 0 12px}
+.legend .node{position:relative;--w:120px;box-shadow:none}
+
+#phone{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:16px;background:var(--dither-lite)}
+#phone.open{display:grid}
+#phone .win{position:relative;width:100%;max-width:340px;box-shadow:4px 4px 0 var(--ink)}
+#phone .art{display:grid;place-items:center;background:#000;border-bottom:2px solid var(--ink)}
+#phone .art canvas{display:block;image-rendering:pixelated}
+#phone .in{padding:16px 16px 6px;font-size:15px;line-height:1.45}
+#phone .in p{margin:0 0 10px}
+#phone .ok{display:block;margin:4px auto 16px 16px;font:600 15px var(--txt);border:2px solid var(--ink);border-radius:8px;outline:2px solid var(--ink);outline-offset:2px;padding:6px 22px;background:var(--paper)}
+#phone .ok:active{background:var(--ink);color:var(--paper)}
+@media (max-width:760px){
+  body{overflow:hidden}
+  .menubar .title{display:none}
+  #tools{left:8px;right:8px;top:34px;width:auto}
+  #tools .tbar{display:none}
+  #tools .grid{grid-template-columns:repeat(7,1fr)}
+  #tools .grid button,#tools .grid button.wide{grid-column:auto;height:38px;border-bottom:0;border-right:2px solid var(--ink)}
+  #tools .grid button:last-child{border-right:0}
+  #map{left:8px;right:8px;top:90px;bottom:8px}
+  /* картка на весь екран, хрестик великий, з урахуванням вирізу й нижньої смуги телефона */
+  #text{position:fixed;inset:0 !important;width:auto;height:auto;border:0;box-shadow:none;z-index:70;
+    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  #text .tbar{height:40px;background-position:0 8px}
+  #text .tbar .name{line-height:40px;max-width:70%}
+  #text .tbar button.box.close{width:30px;height:30px;top:3px;right:10px}
+  #text .tbar button.box.close::before,#text .tbar button.box.close::after{width:18px;height:3px}
+  #text .scroll{padding:16px max(16px,env(safe-area-inset-left,0px)) 28px}
+  #about{left:8px;right:8px;width:auto}
+  .lane-label,.axis .corner{width:96px;font-size:12px}
+  .lane-label small{display:none}
+  .lane.fam .lane-label{padding-left:22px}
+  .fname{width:16px}
+  .fname b{font-size:10px;letter-spacing:.08em;margin:8px 0}
+  .band .bl{width:96px}
+  .seam{left:22px;padding:3px 7px}
+  .seam .full{display:none}
+  .seam .short{display:inline}
+}
+
+/* ── вигляд «Список» (outline, як list view у Finder) ── */
+.menubar .seg{display:inline-flex;border:2px solid var(--ink);font:600 13px/1 var(--txt)}
+.menubar .seg button{padding:2px 9px}
+.menubar .seg button+button{border-left:2px solid var(--ink)}
+.menubar .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+#list{left:14px;right:20px;top:46px;bottom:20px;display:none}
+body.list #list{display:flex}
+body.list #map,body.list #tools{display:none}
+body.list.reading #list{right:530px}
+body.list #text{left:auto !important;right:20px;top:46px !important;bottom:20px;height:auto;width:490px}
+.lbar{flex:none;display:flex;align-items:center;gap:14px;padding:6px 10px;border-bottom:2px solid var(--ink);font:600 12px/1 var(--txt);flex-wrap:wrap}
+.lbar .grp{display:inline-flex;align-items:center;gap:6px}
+.lbar .opt{border:2px solid var(--ink);padding:3px 7px;font:600 12px/1 var(--txt)}
+.lbar .opt[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.lbar .chk{display:inline-flex;align-items:center;gap:5px}
+.lbar .chk i{width:12px;height:12px;border:2px solid var(--ink);display:inline-grid;place-items:center}
+.lbar .chk[aria-pressed="true"] i::after{content:"";width:6px;height:6px;background:var(--ink)}
+.lbar input{font:13px/1 var(--txt);border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:3px 6px;width:150px;border-radius:0}
+.lbar .sp{flex:1}
+.lbar .onmap{border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:3px 8px}
+.lbar .onmap:hover,.lbar .opt:hover{outline:2px solid var(--ink);outline-offset:1px}
+.lhead,.row{display:grid;grid-template-columns:18px minmax(0,1.3fr) 92px minmax(0,1fr) 46px 46px;align-items:center;column-gap:10px}
+.lhead{position:sticky;top:0;z-index:3;background:var(--paper);border-bottom:2px solid var(--ink);font:600 12px/1 var(--txt);padding:6px 10px 5px}
+.lhead span:nth-child(5),.lhead span:nth-child(6){text-align:right}
+.lhead .on{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+#lbody{padding-bottom:20px}
+.fam-h{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);font:600 12px/1 var(--ui);letter-spacing:.14em;text-transform:uppercase;padding:5px 10px}
+.fam-h small{font:400 12px/1 var(--txt);letter-spacing:0;text-transform:none;opacity:.8}
+.fam-b{background:var(--dither-lite);border-bottom:2px solid var(--ink)}
+.fam-b .folder,.fam-b .row{background:var(--paper)}
+.folder{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 10px;border-bottom:1px dashed var(--ink)}
+.folder .tri{width:0;height:0;border-style:solid;border-width:5px 0 5px 8px;border-color:transparent transparent transparent var(--ink);flex:none;transition:transform .12s}
+.folder[aria-expanded="true"] .tri{transform:rotate(90deg)}
+.folder svg{width:18px;height:14px;flex:none;shape-rendering:crispEdges;fill:currentColor}
+.folder b{font:600 14px/1.2 var(--txt)}
+.folder small{font:12px/1.2 var(--txt);color:var(--mute);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folder .n{font:600 12px/1 var(--txt);border:2px solid var(--ink);padding:2px 5px}
+.folder:hover,.folder:focus-visible{background:var(--ink) !important;color:var(--paper)}
+.folder:hover .tri,.folder:focus-visible .tri{border-left-color:var(--paper)}
+.folder:hover small{color:var(--paper)}
+.folder:hover .n{border-color:var(--paper)}
+.kids-of[hidden]{display:none}
+.row{width:100%;text-align:left;padding:5px 10px 5px 36px;border-bottom:1px dotted var(--mute);font-size:13px;line-height:1.25;position:relative}
+.row .ic{width:14px;height:12px;display:grid;place-items:center;font:600 13px/1 var(--ui)}
+.row .ic.p{border:2px solid var(--ink);border-top-width:4px;width:13px;height:11px}
+.row .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .nm em{font-style:normal;font-weight:400;display:none}
+.row .yr{font:600 12px/1.2 var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .wh{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .c{text-align:right;font:600 12px/1 var(--txt);white-space:nowrap}
+.row .c.z{color:var(--mute);font-weight:400}
+.row .lane-t{display:none}
+#lbody.time .row .wh{display:none}
+#lbody.time .row .lane-t{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+#lbody.time .row{padding-left:36px}
+.row:hover{background:var(--paper) var(--dither-lite)}
+.row:hover .nm,.row:hover .yr{background:var(--paper)}
+.row.self{background:var(--ink) !important;color:var(--paper)}
+.row.self .c.z{color:var(--paper)}
+.row.self .ic.p{border-color:var(--paper)}
+.row.up::before,.row.down::before{position:absolute;left:12px;top:50%;transform:translateY(-50%);font:600 13px/1 var(--ui);background:var(--ink);color:var(--paper);padding:1px 3px}
+.row.up::before{content:"←"}
+.row.down::before{content:"→"}
+.row.hit .nm mark,.row.hit .wh mark{background:var(--ink);color:var(--paper)}
+.row.self mark{background:var(--paper)!important;color:var(--ink)!important}
+.dec-h{position:sticky;top:27px;z-index:2;display:flex;align-items:baseline;gap:10px;padding:6px 10px;background:var(--paper);border-bottom:2px solid var(--ink);border-top:2px solid var(--ink);font:600 15px/1 var(--ui)}
+.dec-h small{font:12px/1 var(--txt)}
+.dec-h .ev{margin-left:auto;font:12px/1.2 var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+.dec-h.fut{background:#000;color:#fff;border-color:#000}
+.empty{padding:30px 10px;font:600 14px var(--txt);text-align:center}
+@media (max-width:760px){
+  .menubar{gap:4px;padding:0 6px}
+  .menubar .seg button{padding:2px 7px}
+  #list{left:8px;right:8px;top:34px;bottom:8px}
+  body.list.reading #list{right:8px}
+  .lbar{gap:8px}
+  .lbar input{flex:1 1 100%;min-width:0;width:auto;font-size:16px;padding:6px 8px}
+  .lbar .lab,.lbar .onmap{display:none}
+  .lhead{display:none}
+  .lhead,.row{grid-template-columns:18px minmax(0,1fr) auto;column-gap:8px}
+  .row{padding:8px 10px 8px 30px;font-size:14px}
+  .row .wh,.row .c,#lbody.time .row .lane-t{display:none}
+  .row .nm{white-space:normal}
+  .row .nm em{display:block;font-size:12px;margin-top:2px;color:inherit}
+  .row.up::before,.row.down::before{left:6px}
+  .folder{padding:10px}
+  .folder small{display:none}
+  .folder b{flex:1}
+  .dec-h{top:0}
+}
+@media (prefers-reduced-motion:reduce){.folder .tri{transition:none}}
+</style>
+</head>
+<body>
+
+<nav class="menubar">
+  <button class="mark" id="markBtn" title="As We May Think — звідки все почалося" aria-label="Відкрити As We May Think">✱</button>
+  <span class="title">Як ми можемо думати</span>
+  <span class="seg" role="group" aria-label="Вигляд"><button data-v="map" aria-pressed="true">Мапа</button><button data-v="list" aria-pressed="false">Список</button></span>
+  <button id="aboutBtn">Про мапу</button>
+  <button id="themeBtn">Тема</button>
+  <span class="sp"></span>
+  <a href="./">← до саду</a>
+</nav>
+
+<section id="tools" class="win" aria-label="Інструменти">
+  <div class="tbar"></div>
+  <div class="grid">
+    <button data-t="text" aria-pressed="true" title="Показувати тексти"><svg viewBox="0 0 26 26"><path d="M8 4h12v2h-2v16h-2V6h-2v16h-2v-9a5 5 0 0 1 0-9z" fill="currentColor"/></svg></button>
+    <button data-t="prog" aria-pressed="true" title="Показувати програми"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="20" height="16"/><path d="M3 10h20M5 7.5h16" stroke-width="1"/><rect x="6" y="13" width="6" height="5"/></svg></button>
+    <button data-t="edges" aria-pressed="true" title="Показувати впливи"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M2 13l6-6v4h10V7l6 6-6 6v-4H8v4z"/></svg></button>
+    <button data-t="bush" title="As We May Think — звідки все почалося"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M12 3h2v8l6-4 1 2-6 4 6 4-1 2-6-4v8h-2v-8l-6 4-1-2 6-4-6-4 1-2 6 4z"/></svg></button>
+    <button data-t="out" title="Віддалити"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16 16l7 7M7 11h8"/></svg></button>
+    <button data-t="in" title="Наблизити"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16 16l7 7M7 11h8M11 7v8"/></svg></button>
+    <button data-t="find" class="wide" title="Показати вибране на мапі"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M13 1l5 6h-3v4h4V8l6 5-6 5v-3h-4v4h3l-5 6-5-6h3v-4H7v3l-6-5 6-5v3h4V7H8z"/></svg></button>
+  </div>
+</section>
+
+<section id="map" class="win" aria-label="Мапа">
+  <div class="tbar"><span class="name">Мапа · XVI ст. — ?</span></div>
+  <div class="scroll" id="scroll">
+    <div class="canvas" id="canvas">
+      <div class="axis" id="axis"><div class="corner">рік →<br>поруч у світі ◆</div></div>
+      <div id="lanes"></div>
+      <svg class="space" id="space" aria-hidden="true"></svg>
+      <canvas class="sky" id="sky" aria-hidden="true"></canvas>
+      <svg class="edges" id="edges"></svg>
+      <div class="layer" id="nodes"></div>
+      <div class="cursor" id="cursor"><b></b></div>
+      <div class="brk" id="brk" aria-hidden="true"></div>
+      <div class="warn" id="warn" role="note"><b>⚠ warning:</b> шкала стиснута</div>
+    </div>
+  </div>
+  <div class="status" id="status">Наведи на текст чи програму, щоб побачити, з чого виросла ідея і що виросло з неї.</div>
+</section>
+
+<section id="list" class="win" aria-label="Список">
+  <div class="tbar"><span class="name" id="listName">Список · 118 ідей</span></div>
+  <div class="lbar">
+    <span class="grp"><span class="lab">Групувати:</span>
+      <button class="opt" data-g="lane" aria-pressed="true">за темами</button>
+      <button class="opt" data-g="time" aria-pressed="false">за часом</button></span>
+    <button class="chk" data-t="text" aria-pressed="true"><i></i>¶ тексти</button>
+    <button class="chk" data-t="prog" aria-pressed="true"><i></i>програми</button>
+    <input id="lq" type="search" placeholder="Знайти…" aria-label="Знайти в списку">
+    <span class="sp"></span>
+    <button class="onmap" id="onmap">◎ на мапі</button>
+  </div>
+  <div class="scroll" id="lscroll">
+    <div class="lhead" aria-hidden="true"><span></span><span class="on">Назва</span><span>Рік</span><span id="hWho">Хто</span><span title="спирається на">← з</span><span title="вплинуло на">→ на</span></div>
+    <div id="lbody" role="tree" aria-label="Ідеї"></div>
+  </div>
+  <div class="status" id="lstatus"></div>
+</section>
+
+<section id="text" class="win drag" role="dialog" aria-label="Нотатка">
+  <div class="tbar"><span class="name" id="textName"></span><button class="box close" id="closeText" aria-label="Закрити"></button></div>
+  <div class="scroll" id="textBody"></div>
+</section>
+
+<section id="about" class="win drag" role="dialog" aria-label="Про мапу">
+  <div class="tbar"><span class="name">Про мапу</span><button class="box close" id="closeAbout" aria-label="Закрити"></button></div>
+  <div class="in">
+    <p>Історія ідей про те, як машини можуть допомагати пам'ятати, пов'язувати й думати — від Memex до Вікіпедії, Obsidian і Are.na.</p>
+    <div class="legend"><div class="node text"><div class="h">¶ Текст</div><div class="b"><span class="yr">1945</span><span class="who">есей, книжка</span></div></div></div>
+    <div class="legend"><div class="node prog"><div class="h"><span>Програма</span></div><div class="b"><span class="yr">1968</span><span class="who">система, мережа</span></div></div></div>
+    <p>Стрілка — вплив: пряма цитата, спільні люди або ідея, що перейшла далі. Маленькі прямокутники на тексті — скільки речей на нього спиралися.</p>
+    <p>Пунктир, що ходить за мишкою, — рік: усе, що сталося поруч, обводиться, а вгорі світяться події світу ◆.</p>
+    <p>Рядки — теми: медіа і мислення, гіпертекст і література, нотатки й сади, посилення і навчання, мережа, кібернетика і втілений розум, машинний розум.</p>
+    <p>Лінійки з чорною дужкою — родини: їх можна було б злити, але вони відповідають на різні питання. На шві між ними написано, чим вони різняться; наведи на шов (на телефоні — торкнись ↔), і лишаться тільки мости між ними.</p>
+  </div>
+</section>
+
+<div id="phone" role="alertdialog" aria-modal="true" aria-labelledby="phoneT">
+  <div class="win">
+    <div class="tbar"><span class="name" id="phoneT">Маленька порада</span></div>
+    <div class="art" aria-hidden="true"><canvas id="art"></canvas></div>
+    <div class="in">
+      <div>
+        <p>Привіт! Ця мапа велика, і по-справжньому вона розгортається на екрані комп'ютера: там видно, як ідеї тягнуться одна до одної крізь десятиліття.</p>
+        <p>Тут теж можна гуляти — гортай пальцем убік і вниз, торкайся карток. А коли буде нагода, загляни з десктопа ✦</p>
+      </div>
+    </div>
+    <button class="ok" id="phoneOk">Гаразд, гуляю</button>
+  </div>
+</div>
+
+<script>
+const LANES=[
+  {k:"med",  t:"Медіа і мислення", s:"кожне медіа перебудовує думку", fam:"word"},
+  {k:"mem",  t:"Гіпертекст і література", s:"текст, що розгалужується", fam:"word"},
+  {k:"pkm",  t:"Нотатки і сади", s:"знання однієї людини: картки, сади", fam:"word"},
+  {k:"aug",  t:"Посилення і навчання", s:"комп'ютер як партнер і матеріал для думання"},
+  {k:"net",  t:"Мережа і спільне знання", s:"пам'ять людства і її дроти"},
+  {k:"emb",  t:"Кібернетика і втілений розум", s:"тіло, системи, межі машини", fam:"mind"},
+  {k:"ai",   t:"Машинний розум", s:"чи може машина думати", fam:"mind"}
+];
+// родини: лінійки-партнери, які можна було б злити, але вони відповідають на різні питання
+const FAMS={word:"слово і зв'язок",mind:"розум"};
+const SEAMS=[
+  {a:"med",b:"mem",t:"усі медіа ↔ одне посилання"},
+  {a:"mem",b:"pkm",t:"для інших ↔ для себе"},
+  {a:"emb",b:"ai", t:"сумніватися ↔ будувати"}
+];
+// t: text | prog; from: що вплинуло
+const N=[
+ {id:"otlet",y:1934,t:"text",l:"net",n:"Traité de documentation",w:"Поль Отле",d:"«Книжка про книжку»: підсумок сорока років роботи бельгійського бібліографа, який разом з Анрі Лафонтеном зібрав Всесвітній бібліографічний репертуар — мільйони карток, упорядкованих за Універсальною десятковою класифікацією, — і заснував Мундането в Брюсселі. Отле вводить слово «документація» для науки про всі носії знання, не лише книжки: фото, платівки, фільми, предмети. В останніх розділах він уявляє робоче місце, де на екрані можна читати будь-який документ світу на відстані, і «всесвітню мережу документації». Мундането закрили в 1934-му, частину колекції знищили під час нацистської окупації, а про Отле знову заговорили лише наприкінці XX століття як про забутого предка вебу.",u:"https://en.wikipedia.org/wiki/Paul_Otlet"},
+ {id:"wells",y:1938,t:"text",l:"net",n:"World Brain",w:"Герберт Веллс",f:["otlet"],d:"Збірка лекцій і статей 1936–1938 років про «Світовий мозок» — постійну світову енциклопедію на мікрофільмах, доступну кожному. Знання як спільна пам'ять людства, яка має рости й виправлятися. Веллс приїздив на Всесвітній конгрес документації в Парижі 1937 року, де виступав і Отле, і вірив, що така енциклопедія стане «мозком» світу, який інакше йде до нової війни. Через рік війна почалася.",u:"https://en.wikipedia.org/wiki/World_Brain"},
+ {id:"bush",y:1945,t:"text",l:"mem",n:"As We May Think",w:"Веннівер Буш",f:["otlet"],d:"Есей в The Atlantic наприкінці війни: наука вже вміє руйнувати, тепер їй варто допомогти людям пам'ятати. Memex — стіл із мікрофільмами, де читач прокладає «асоціативні стежки» між документами, бо мозок працює асоціаціями, а не алфавітом. З цього тексту виростає майже все праворуч.",u:"https://inigomedina.co/library/work/bush-as-we-may-think"},
+ {id:"lick60",y:1960,t:"text",l:"aug",n:"Man-Computer Symbiosis",w:"Дж. К. Р. Ліклайдер",f:["bush","wiener48"],d:"Комп'ютер не як калькулятор, а як партнер у думанні: людина ставить питання й цілі, машина робить рутину. Ліклайдер потім фінансував у ARPA тих, хто будував це на ділі.",u:"https://groups.csail.mit.edu/medg/people/psz/Licklider.html",more:[["The Dream Machine","М. Мітчелл Волдроп, 2001","https://inigomedina.co/library/work/waldrop-dream-machine"]]},
+ {id:"xanadu",y:1960,t:"prog",l:"mem",n:"Project Xanadu",w:"Тед Нельсон",f:["bush"],d:"Найдовший незавершений проєкт в історії софту. Двонаправлені посилання, які не ламаються, transclusion — вставка частини одного документа в інший із живим зв'язком, версії поруч. Майже все це пізніше частково повертається у вікі й Roam.",u:"https://xanadu.com"},
+ {id:"plato",y:1960,t:"prog",l:"aug",n:"PLATO",w:"Дональд Бітцер, Університет Іллінойсу",d:"Навчальна система з терміналами і плазмовими екранами. Задумана для уроків, вона стала першою онлайн-спільнотою: форуми, чати, ігри, миттєві повідомлення.",u:"https://en.wikipedia.org/wiki/PLATO_(computer_system)"},
+ {id:"engel62",y:1962,t:"text",l:"aug",n:"Augmenting Human Intellect",w:"Даґлас Енґельбарт",f:["bush","lick60"],d:"Концептуальна рамка: як збільшити здатність людини розуміти складні проблеми. Мова, артефакти, методи й навчання разом — система H-LAM/T. Енґельбарт прямо відштовхується від Memex. Це концептуальна основа «Матері всіх демо»: інструменти, знання, методи й навчання еволюціонують разом, і не можна посилити людину, змінивши щось одне. Звідси думка, що робота над продуктом — це робота з системою, а не з функціями.",u:"https://www.dougengelbart.org/content/view/138"},
+ {id:"sketchpad",y:1963,t:"prog",l:"aug",n:"Sketchpad",w:"Айвен Сазерленд",f:["lick60"],d:"Малювання світловим пером прямо на екрані: об'єкти, обмеження, копії від зразка. Перший графічний інтерфейс і прабатько об'єктного програмування.",u:"https://en.wikipedia.org/wiki/Sketchpad"},
+ {id:"nelson65",y:1965,t:"text",l:"mem",n:"A File Structure for the Complex, the Changing and the Indeterminate",w:"Тед Нельсон",f:["bush","xanadu"],d:"Доповідь, де вперше з'являється слово «гіпертекст»: текст, що розгалужується і дозволяє читачеві вибирати шлях. Нельсон цитує «As We May Think».",u:"https://en.wikipedia.org/wiki/Hypertext"},
+ {id:"logo",y:1967,t:"prog",l:"aug",n:"Logo",w:"Сеймур Пейперт, Воллі Фойрцайґ, Синтія Соломон",f:["sketchpad","minsky61"],d:"Мова програмування для дітей і черепашка, яку вони вчать ходити. За Піаже, діти найкраще вчаться, коли будують щось своє — комп'ютер стає матеріалом для думання.",u:"https://en.wikipedia.org/wiki/Logo_(programming_language)"},
+ {id:"hes",y:1967,t:"prog",l:"mem",n:"HES / FRESS",w:"Андріс ван Дам, Тед Нельсон",f:["nelson65"],d:"Hypertext Editing System у Брауні — одна з перших гіпертекстових систем; її наступник FRESS запозичив ідеї з NLS. Використовувалися на справжніх курсах з поезії.",u:"https://en.wikipedia.org/wiki/Hypertext_Editing_System"},
+ {id:"nls",y:1968,t:"prog",l:"aug",n:"NLS · «Мати всіх демо»",w:"Даґлас Енґельбарт, SRI",f:["engel62","sketchpad"],d:"За 90 хвилин на сцені в Сан-Франциско: миша, вікна, гіпертекстові посилання, спільне редагування на відстані, відеозв'язок. Усе для того, щоб групи людей думали разом.",u:"https://www.dougengelbart.org/content/view/209/"},
+ {id:"lick68",y:1968,t:"text",l:"net",n:"The Computer as a Communication Device",w:"Ліклайдер і Роберт Тейлор",f:["lick60","nls"],d:"«Через кілька років люди зможуть спілкуватися через машину краще, ніж віч-на-віч». Онлайн-спільноти за інтересами, а не за місцем. Тейлор тоді ж запускав ARPANET.",u:"https://en.wikipedia.org/wiki/J._C._R._Licklider"},
+ {id:"wec",y:1968,t:"text",l:"net",n:"Whole Earth Catalog",w:"Стюарт Бренд",f:["wiener48"],d:"«Доступ до інструментів»: каталог книжок, приладів і ідей для тих, хто хоче сам навчатися, будувати і жити по-своєму. Кібернетика, Бакмінстер Фуллер і комуни під однією обкладинкою, а читачі самі надсилали рецензії — паперовий прообраз вебу і вікі. Того ж року Бренд допомагав знімати «Матір усіх демо» Енґельбарта. Каталог закінчується словами «Stay hungry. Stay foolish».",u:"https://wholeearth.info"},
+ {id:"arpanet",y:1969,t:"prog",l:"net",n:"ARPANET",w:"ARPA, BBN",f:["lick68"],d:"Мережа між університетськими комп'ютерами; з неї виросте інтернет. Найпопулярнішим застосуванням несподівано стала пошта — люди, а не обчислення.",u:"https://en.wikipedia.org/wiki/ARPANET",more:[["Inventing the Internet","Джанет Аббейт, 1999","https://inigomedina.co/library/work/abbate-inventing-the-internet"],["The Victorian Internet","Том Стендідж, 1998 — телеграф як перша мережа","https://inigomedina.co/library/work/standage-victorian-internet"]]},
+ {id:"kay72",y:1972,t:"text",l:"aug",n:"A Personal Computer for Children of All Ages",w:"Алан Кей",f:["logo","sketchpad","nls","wec"],d:"Dynabook — комп'ютер розміром із книжку для дітей, щоб вони вчилися, моделюючи світ. Кей побачив Logo Пейперта і зрозумів: комп'ютер — це медіум, як письмо, а не інструмент.",u:"https://www.vpri.org/pdf/hc_pers_comp_for_children.pdf"},
+ {id:"smalltalk",y:1972,t:"prog",l:"aug",n:"Smalltalk",w:"Алан Кей, Адель Ґолдберґ, Ден Інгаллс",f:["kay72"],d:"Мова й середовище в Xerox PARC, які діти використовували, щоб малювати й анімувати. Звідси вікна, що перекриваються, і об'єкти, що надсилають повідомлення.",u:"https://en.wikipedia.org/wiki/Smalltalk"},
+ {id:"alto",y:1973,t:"prog",l:"aug",n:"Xerox Alto",w:"Xerox PARC",f:["nls","smalltalk"],d:"Персональний комп'ютер із мишею, бітмап-екраном і мережею. Не продавався, але все, що буде на Mac, уже було тут.",u:"https://en.wikipedia.org/wiki/Xerox_Alto"},
+ {id:"nelson74",y:1974,t:"text",l:"mem",n:"Computer Lib / Dream Machines",w:"Тед Нельсон",f:["nelson65","xanadu","nls","wec","borges"],d:"Найрадикальніший маніфест персонального комп'ютера — самвидавна книжка, надрукована «спина до спини»: її можна читати з обох кінців. На обкладинці: «ви можете і мусите зрозуміти комп'ютери ЗАРАЗ». Нельсон, що вигадав слово «гіпертекст», доводить, що комп'ютери надто важливі, щоб лишати їх комп'ютерникам. Дика, безкомпромісна, радше прозорлива, ніж відшліфована — противага кожному корпоративному баченню технологій і біблія першого покоління персональних комп'ютерників.",u:"https://en.wikipedia.org/wiki/Computer_Lib/Dream_Machines"},
+ {id:"kay77",y:1977,t:"text",l:"aug",n:"Personal Dynamic Media",w:"Алан Кей, Адель Ґолдберґ",f:["kay72","smalltalk"],d:"Звіт про роботу з дітьми в PARC: «метамедіум», що може імітувати будь-який інший медіум. Тексти, музика, анімація — у руках того, хто вчиться.",u:"https://www.newmediareader.com/book_samples/nmr-26-kay.pdf"},
+ {id:"mindstorms",y:1980,t:"text",l:"aug",n:"Mindstorms",w:"Сеймур Пейперт",f:["logo"],d:"Діти програмують комп'ютер, а не комп'ютер програмує дітей. «Об'єкти, щоб думати з ними», конструкціонізм і помилки як частина навчання.",u:"https://en.wikipedia.org/wiki/Mindstorms_(book)"},
+ {id:"literary",y:1981,t:"text",l:"mem",n:"Literary Machines",w:"Тед Нельсон",f:["nelson74","xanadu"],d:"Самвидавний маніфест, який Нельсон без кінця переписував (на фото — версія 93.1). Він описує Project Xanadu, гіпертекстову систему, задуману ще в 1960-х: двобічні посилання, збережені версії, мікроплатежі авторам і transclusion замість копіювання — усе в одній всесвітній бібліотеці, «docuverse». Ключ до дороги, якою ми не пішли: за десять років Бернерс-Лі свідомо обрав для вебу односпрямовані посилання і простоту. Мертві лінки, право на текст, авторство — саме ті проблеми вебу, які Xanadu мав розв'язати. Нельсон нагадує: системи, якими ми користуємося, не неминучі, вони — наслідок конкретних компромісів конкретних людей.",u:"https://en.wikipedia.org/wiki/Literary_Machines"},
+ {id:"commonplace",y:1550,yl:"XVI–XIX ст.",kind:"¶ явище",t:"text",l:"pkm",n:"Commonplace books",w:"Еразм, Бекон, Мільтон, Локк, Джефферсон, Вулф…",d:"Століттями читачі вели «книги загальних місць»: виписували цитати, афоризми, рецепти, спостереження і розкладали їх за рубриками, щоб потім із них думати й писати. Еразм вчив цього студентів, Джон Локк 1706 року видав «New Method of Making Common-Place-Books» з покажчиком на дві сторінки, а такі зошити тримали Мільтон, Джефферсон, Вірджинія Вулф. Це не один текст, а практика — читання як збирання, де пам'ять живе зовні, на папері. Пряма лінія до картотеки Лумана, Are.na і цифрових садів.",u:"https://en.wikipedia.org/wiki/Commonplace_book"},
+ {id:"luhmann",y:1981,t:"text",l:"pkm",n:"Kommunikation mit Zettelkästen",w:"Ніклас Луман",f:["commonplace"],d:"Соціолог описує свою картотеку з ~90 000 карток як партнера в розмові: картки мають номери, посилаються одна на одну, і система сама підкидає несподівані зв'язки.",u:"https://luhmann.surge.sh/communicating-with-slip-boxes"},
+ {id:"mac",y:1984,t:"prog",l:"aug",n:"Macintosh",w:"Apple",f:["alto"],d:"Графічний інтерфейс PARC іде в маси. Саме ця пластина 1-бітної графіки — стиль цієї мапи.",u:"https://en.wikipedia.org/wiki/Macintosh_128K"},
+ {id:"medialab",y:1987,t:"text",l:"aug",n:"The Media Lab: Inventing the Future at MIT",w:"Стюарт Бренд",f:["wec","mindstorms","kay77"],d:"Бренд провів кілька місяців у Media Lab Ніколаса Негропонте і описав, як телебачення, друк і комп'ютер зливаються в одне цифрове медіа. Тут Пейперт вчить дітей з Logo і LEGO, Кей будує Vivarium, а сама лабораторія «демонструє або помирає». Книжка про те, як винаходять майбутнє, — і про його ризики.",u:"https://en.wikipedia.org/wiki/MIT_Media_Lab"},
+ {id:"notecards",y:1985,t:"prog",l:"pkm",n:"NoteCards",w:"Ренделл Тріґґ, Френк Галас, Том Моран",f:["alto","nelson74"],d:"Гіпертекст для думання в Xerox PARC: картки, типізовані посилання, «браузер» — мапа карток. Інструмент для аналітиків, які складають аргументи.",u:"https://en.wikipedia.org/wiki/NoteCards"},
+ {id:"intermedia",y:1985,t:"prog",l:"mem",n:"Intermedia",w:"Норман Мейровіц, Ніколь Янкелович, ван Дам",f:["hes","nelson74"],d:"Гіпертекстове середовище в Брауні для викладання літератури й біології: посилання між різними програмами, мапи зв'язків поточного документа.",u:"https://en.wikipedia.org/wiki/Intermedia_(hypertext)"},
+ {id:"hypercard",y:1987,t:"prog",l:"mem",n:"HyperCard",w:"Білл Аткінсон",f:["mac","smalltalk","notecards"],d:"Стоси карток з кнопками й скриптами на кожному Mac. Учителі, діти й художники робили свої енциклопедії та ігри без «справжнього» програмування. Надихнув і вікі, і веб.",u:"https://en.wikipedia.org/wiki/HyperCard"},
+ {id:"storyspace",y:1987,t:"prog",l:"mem",n:"Storyspace",w:"Джей Девід Болтер, Майкл Джойс",f:["intermedia","notecards","nelson74"],d:"Середовище для гіпертекстового письма: простори-картки, мапа зв'язків поруч із текстом, приховані посилання «wireframe». Саме з нього — вигляд цієї сторінки. На ньому вчили студентів писати нелінійно.",u:"https://en.wikipedia.org/wiki/Storyspace"},
+ {id:"afternoon",y:1987,t:"text",l:"mem",n:"afternoon, a story",w:"Майкл Джойс",f:["storyspace"],d:"Перший відомий гіпертекстовий роман: кожне прочитання — інше, читач обирає слова, що ведуть далі.",u:"https://en.wikipedia.org/wiki/Afternoon,_a_story"},
+ {id:"tbl89",y:1989,t:"text",l:"net",n:"Information Management: A Proposal",w:"Тім Бернерс-Лі, CERN",f:["nelson65","hypercard","arpanet"],d:"Записка начальнику про те, як не губити інформацію в CERN: розподілена гіпертекстова система поверх інтернету. На полях: «Vague but exciting».",u:"https://www.w3.org/History/1989/proposal.html"},
+ {id:"wurman89",y:1989,t:"text",l:"med",n:"Information Anxiety",w:"Річард Сол Вурман",d:"Тривога — це розрив між тим, що ми розуміємо, і тим, що, як нам здається, мали б розуміти. Інформація — лише те, що веде до розуміння, решта — дані, і їх стає дедалі більше. Вурман, який ще 1976 року назвав себе «архітектором інформації» і заснував TED, пропонує LATCH — п'ять способів упорядкувати що завгодно: місце, абетка, час, категорія, ієрархія. Ця мапа, наприклад, складена за часом і категорією.",u:"https://en.wikipedia.org/wiki/Richard_Saul_Wurman"},
+ {id:"www",y:1991,t:"prog",l:"net",n:"WorldWideWeb",w:"Тім Бернерс-Лі",f:["tbl89"],d:"Перший браузер — і водночас редактор: веб задумувався як місце, де всі пишуть, а не лише читають. Посилання односпрямовані, зате працюють будь-де.",u:"https://en.wikipedia.org/wiki/WorldWideWeb",more:[["Weaving the Web","Тім Бернерс-Лі, 1999","https://inigomedina.co/library/work/berners-lee-weaving-the-web"]]},
+ {id:"bolter",y:1991,t:"text",l:"mem",n:"Writing Space",w:"Джей Девід Болтер",f:["storyspace","dg80"],d:"Комп'ютер як новий простір письма після сувою, кодексу й друку. Гіпертекст повертає письму рухливість і мапи.",u:"https://en.wikipedia.org/wiki/Jay_David_Bolter"},
+ {id:"landow",y:1992,t:"text",l:"mem",n:"Hypertext",w:"Джордж Лендоу",f:["intermedia","nelson74","dg80"],d:"Гіпертекст як втілення ідей Барта, Дерріди й Фуко: смерть автора, текст як мережа, читач-співавтор. Написано з досвіду курсів на Intermedia.",u:"https://en.wikipedia.org/wiki/George_Landow"},
+ {id:"mosaic",y:1993,t:"prog",l:"net",n:"Mosaic",w:"Марк Андріссен, Ерік Біна, NCSA",f:["www"],d:"Браузер з картинками прямо в тексті. Веб стає масовим — і перетворюється з простору письма на простір читання.",u:"https://en.wikipedia.org/wiki/Mosaic_(web_browser)"},
+ {id:"wiki",y:1995,t:"prog",l:"net",n:"WikiWikiWeb",w:"Ворд Каннінґем",f:["hypercard","www"],d:"Сторінка, яку може редагувати кожен, і посилання, що з'являється, коли пишеш назву ще не створеної сторінки. Каннінґем надихався HyperCard. Звідси [[подвійні дужки]].",u:"https://en.wikipedia.org/wiki/WikiWikiWeb"},
+ {id:"extended",y:1998,t:"text",l:"emb",n:"The Extended Mind",w:"Енді Кларк, Девід Чалмерс",f:["engel62","embodied91","bateson72"],d:"Блокнот Отто, який втратив пам'ять, — частина його розуму так само, як пам'ять Інги. Думання не закінчується черепом: нотатки — продовження мислення.",u:"https://en.wikipedia.org/wiki/The_Extended_Mind"},
+ {id:"google",y:1998,t:"prog",l:"net",n:"Google",w:"Ларрі Пейдж, Сергій Брін",f:["www"],d:"PageRank рахує посилання як цитування в науці. Пошук замінює каталоги — і стежки Буша замінює рядок запиту.",u:"https://en.wikipedia.org/wiki/PageRank"},
+ {id:"wikipedia",y:2001,t:"prog",l:"net",n:"Вікіпедія",w:"Джиммі Вейлз, Ларрі Сенґер",f:["wiki","wells"],d:"Найближче, що ми маємо до «Світового мозку» Веллса: енциклопедія, яку пишуть волонтери, відкрита історія правок і обговорень.",u:"https://uk.wikipedia.org"},
+ {id:"delicious",y:2003,t:"prog",l:"pkm",n:"del.icio.us",w:"Джошуа Шахтер",f:["www"],d:"Соціальні закладки й теги: замість ієрархії папок — «фолксономія», колекції, що видно іншим.",u:"https://en.wikipedia.org/wiki/Delicious_(website)"},
+ {id:"tiddly",y:2004,t:"prog",l:"pkm",n:"TiddlyWiki",w:"Джеремі Растон",f:["wiki"],d:"Вікі в одному HTML-файлі для себе: маленькі «тидлери», транслюзія, нотатки, що відкриваються стосом. Прабатько персональних баз знань.",u:"https://tiddlywiki.com"},
+ {id:"victor",y:2013,t:"text",l:"aug",n:"Media for Thinking the Unthinkable",w:"Брет Віктор",f:["engel62","kay72","sketchpad"],d:"Лекція про динамічні представлення: які думки неможливі без правильного медіуму. Продовження лінії Енґельбарта й Кея до сьогодні.",u:"https://worrydream.com/MediaForThinkingTheUnthinkable/"},
+ {id:"arena",y:2014,t:"prog",l:"pkm",n:"Are.na",w:"Чарльз Бродскі та ін.",f:["delicious","nelson74","hypercard","commonplace"],d:"Повільна, некомерційна альтернатива соцмережам: блоки й канали, де один блок може жити в багатьох каналах одночасно. Колекціонування як дослідження.",u:"https://www.are.na/about"},
+ {id:"caulfield",y:2015,t:"text",l:"pkm",n:"The Garden and the Stream",w:"Майк Колфілд",f:["bush","wiki"],d:"Технопастораль: стрічка — це потік подій, сад — мережа ідей, які постійно переписуються. Повернення до Memex і вікі як місць для думання, а не для виступу.",u:"https://hapgood.us/2015/10/17/the-garden-and-the-stream-a-technopastoral/"},
+ {id:"ahrens",y:2017,t:"text",l:"pkm",n:"How to Take Smart Notes",w:"Зьонке Аренс",f:["luhmann","commonplace"],d:"Метод Лумана для всіх: fleeting, literature і permanent notes. Писати — не результат думання, а саме думання.",u:"https://www.soenkeahrens.de/en/takesmartnotes"},
+ {id:"matuschak",y:2019,t:"text",l:"aug",n:"How can we develop transformative tools for thought?",w:"Енді Матушак, Майкл Нільсен",f:["engel62","kay72","victor"],d:"Есей і мнемонічний медіум Quantum Country: чому інструменти для думання досі не стали «справжніми» і що з цим робити.",u:"https://numinous.productions/ttft/"},
+ {id:"roam",y:2019,t:"prog",l:"pkm",n:"Roam Research",w:"Конор Вайт-Салліван",f:["xanadu","luhmann","nls","wiki"],d:"Блоки, бэклінки, транслюзія: ідеї Xanadu й NLS у браузері. Запустив хвилю «networked thought».",u:"https://roamresearch.com"},
+ {id:"appleton",y:2020,t:"text",l:"pkm",n:"A Brief History & Ethos of the Digital Garden",w:"Меґі Еплтон",f:["caulfield","matuschak","commonplace"],d:"Цифровий сад як жанр: незавершені нотатки, статуси «паросток / дерево», зв'язки замість хронології. Саме такий, як цей сайт.",u:"https://maggieappleton.com/garden-history"},
+ {id:"leibniz",y:1679,yl:"1673–1703",kind:"машина",t:"prog",l:"ai",n:"Двійкова система і механічний калькулятор",w:"Ґотфрід Вільгельм Лейбніц",d:"Лейбніц збудував ступінчастий арифмометр — першу машину, що вміла не лише додавати й віднімати, а й множити та ділити. І першим розробив повну двійкову арифметику, де будь-яке число записується лише нулями й одиницями (двійкові записи були й до нього — від Пінґали до Герріота). Він навіть уявив машину, що рахує кульками, які падають або не падають крізь отвори. За цим стояла більша мрія — characteristica universalis, мова думки, де суперечку можна розв'язати словами «Calculemus!» — сядьмо й обчислімо. Ідея, що міркування — це обчислення, починається тут.",u:"https://en.wikipedia.org/wiki/Stepped_reckoner",more:[["Characteristica universalis","Лейбніц, 1666–1690-ті · Вікіпедія","https://en.wikipedia.org/wiki/Characteristica_universalis"]]},
+ {id:"jacquard",y:1804,kind:"машина",t:"prog",l:"ai",n:"Ткацький верстат Жаккара",w:"Жозеф Марі Жаккар",d:"Візерунок тканини записано на ланцюжку перфокарт: є отвір — нитка піднімається, немає — лишається внизу. Верстат виконує запис, а не руку майстра, тож складний візерунок можна повторити тисячу разів і змінити, просто замінивши картки. Це перша машина, якою керує програма, записана окремо від неї. Беббідж узяв перфокарти саме звідси, а Лавлейс писала, що Аналітична машина «тче алгебраїчні візерунки, як верстат Жаккара тче квіти й листя».",u:"https://en.wikipedia.org/wiki/Jacquard_machine"},
+ {id:"telegraph1844",y:1844,t:"prog",l:"net",n:"Телеграф Морзе",w:"Семюел Морзе, Альфред Вейл",d:"24 травня 1844 року лінією Вашингтон — Балтимор передано «What hath God wrought» («Що сотворив Бог»). Код із крапок і тире перетворює будь-який текст на електричні імпульси, а повідомлення вперше рухається швидше, ніж людина, кінь чи потяг. Інформація відокремлюється від транспорту — і з'являються новини в реальному часі, біржові зведення, телеграфісти, що спілкуються між собою дротом.",u:"https://en.wikipedia.org/wiki/Electrical_telegraph"},
+ {id:"cable1866",y:1866,t:"prog",l:"net",n:"Трансатлантичний телеграфний кабель",w:"Сайрус Філд, Atlantic Telegraph Company",f:["telegraph1844"],d:"Після кількох обірваних спроб (кабель 1858 року пропрацював лише кілька тижнів) пароплав Great Eastern проклав дріт по дну Атлантики. Повідомлення між Лондоном і Нью-Йорком тепер іде хвилини, а не десять днів морем. Перша нитка глобальної мережі: її маршрути досі повторюють сучасні оптоволоконні кабелі.",u:"https://en.wikipedia.org/wiki/Transatlantic_telegraph_cable"},
+ {id:"typewriter1868",y:1868,t:"prog",l:"med",n:"Друкарська машинка (QWERTY)",w:"Крістофер Шоулз, Карлос Ґлідден",d:"Патент 1868 року, а 1873-го Remington випускає машинку з розкладкою QWERTY — її влаштовано так, щоб важелі часто вживаних пар літер не зачіплялися. Ми друкуємо на ній досі. Письмо стає механічним і стандартним, а з ним приходять друкарки — одна з перших масових жіночих професій. Ніцше, що 1882 року друкував на «друкарській кулі» Маллінґа-Гансена, зауважив: «Наші знаряддя письма беруть участь у нашому мисленні».",u:"https://en.wikipedia.org/wiki/QWERTY"},
+ {id:"telephone1876",y:1876,t:"prog",l:"net",n:"Телефон",w:"Александер Ґрем Белл",f:["telegraph1844"],d:"Патент 1876 року (того ж дня заявку подав Еліша Ґрей). Телеграф передавав коди, телефон — живий голос, і не потребував оператора, що знає абетку Морзе. Мережа приходить у дім і контору, а комутатори й лінії, прокладені для розмов, згодом понесуть і дані комп'ютерів.",u:"https://en.wikipedia.org/wiki/Invention_of_the_telephone"},
+ {id:"phonograph1877",y:1877,t:"prog",l:"med",n:"Фонограф",w:"Томас Едісон",d:"Голка видряпує звукові коливання на олов'яній фользі, а потім, проходячи борозною знову, відтворює їх: «Mary had a little lamb». Уперше голос можна записати й почути знову без людини, що його вимовила. Пам'ять звуку більше не потребує письма — а запис фіксує все, зокрема шум і запинки, які абетка відкидає.",u:"https://en.wikipedia.org/wiki/Phonograph"},
+ {id:"lamp1879",y:1879,t:"prog",l:"med",n:"Електрична лампа",w:"Томас Едісон (і Джозеф Свон)",d:"Лампа з вугільною ниткою, що світить сотні годин, і — головне — система довкола неї: електростанції, дроти, лічильники. Ніч стає часом для роботи й читання. Маклюен пізніше обрав лампу як чисте медіум без змісту: вона нічого не «каже», але змінює все, що люди роблять, — «медіум є повідомленням».",u:"https://en.wikipedia.org/wiki/Incandescent_light_bulb"},
+ {id:"babbage",y:1834,yl:"1834–1871",kind:"машина на папері",t:"prog",l:"ai",n:"Аналітична машина",w:"Чарлз Беббідж",f:["leibniz","jacquard"],d:"Перший задум програмованого обчислювача загального призначення: «млин» (процесор), «склад» (пам'ять) на тисячу чисел, умовні переходи й цикли, а програми — на перфокартах, як у ткацькому верстаті Жаккара. Беббідж креслив її майже сорок років, але машину так і не збудували: не вистачило грошей, точності тогочасної механіки й терпіння уряду. Повністю її ідеї відкриють заново лише в 1940-х.",u:"https://en.wikipedia.org/wiki/Analytical_engine"},
+ {id:"lovelace43",y:1843,t:"text",l:"ai",n:"Примітки до статті Менабреа",w:"Ада Лавлейс",f:["babbage"],d:"Перекладаючи статтю про Аналітичну машину, Лавлейс додала примітки, утричі довші за оригінал. У «Примітці G» — покроковий алгоритм для чисел Бернуллі, який називають першою програмою. Важливіше інше: вона побачила, що машина оперує не числами, а символами, тож могла б складати й музику. І тут же застерегла, що машина «не претендує щось створювати» — робить лише те, що ми вміємо їй наказати. Через сто років Тюрінг відповідатиме на це як на «заперечення леді Лавлейс».",u:"https://en.wikipedia.org/wiki/Ada_Lovelace"},
+ {id:"principia",y:1910,yl:"1910–1913",t:"text",l:"ai",n:"Principia Mathematica",w:"Бертран Рассел, Альфред Норт Вайтгед",f:["leibniz"],d:"Три томи, щоб вивести всю математику з кількох логічних аксіом за суворими правилами (до доведення, що 1+1=2, доходять лише на 379-й сторінці). Це вершина проєкту, який почали Буль і Фреге: математика як формальна гра символів, де кожен крок можна перевірити механічно. Саме цю систему за двадцять років розбере Ґедель.",u:"https://en.wikipedia.org/wiki/Principia_Mathematica"},
+ {id:"godel31",y:1931,t:"text",l:"ai",n:"Про формально нерозв'язні речення Principia Mathematica",w:"Курт Ґедель",f:["principia"],d:"Теореми про неповноту: у кожній несуперечливій формальній системі, достатньо сильній для арифметики, є істинні твердження, які в ній не можна довести, і система не може довести власну несуперечливість. Ґедель кодує формули числами, тож система починає говорити сама про себе. Мрія Гільберта про повну й замкнену математику закінчується, а питання «що можна зробити механічно?» стає точним.",u:"https://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems"},
+ {id:"turing36",y:1936,t:"text",l:"ai",n:"On Computable Numbers",w:"Алан Тюрінг",f:["godel31","principia"],d:"Уявна машина зі стрічкою і таблицею правил може виконати будь-яке обчислення, яке взагалі можна описати. Мислення-як-обчислення стає точним поняттям — і водночас видно його межі: є задачі, які жодна машина не розв'яже.",u:"https://en.wikipedia.org/wiki/Turing%27s_proof"},
+ {id:"mcculloch43",y:1943,t:"text",l:"ai",n:"A Logical Calculus of the Ideas Immanent in Nervous Activity",w:"Воррен Маккаллок, Волтер Піттс",f:["turing36"],d:"Нейрон як логічний вентиль: мережа простих клітин може обчислювати будь-що, що й машина Тюрінга. Мозок і комп'ютер уперше описано однією мовою — звідси і нейромережі, і кібернетика.",u:"https://en.wikipedia.org/wiki/Artificial_neuron"},
+ {id:"rosenblueth43",y:1943,t:"text",l:"emb",n:"Behavior, Purpose and Teleology",w:"Артуро Розенблют, Норберт Вінер, Джуліан Бігелоу",d:"Семисторінкова стаття в Philosophy of Science, з якої починається кібернетика. Фізіолог і два інженери, що під час війни будували прилад для наведення зенітної гармати на літак, який маневрує, помітили: пілот, гармата і нервова система розв'язують одну задачу. Мета — не таємнича властивість душі, а зворотний зв'язок: система порівнює, де вона є, з тим, де має бути, і виправляється. Цілеспрямованість стає інженерним поняттям — для гармати, організму і суспільства однаково.",u:"https://www.jstor.org/stable/184878"},
+ {id:"wiener48",y:1948,t:"text",l:"emb",n:"Cybernetics",w:"Норберт Вінер",f:["rosenblueth43","mcculloch43"],d:"«Керування і зв'язок у тварині й машині». Інформація, зворотний зв'язок і гомеостаз як спільна мова для біології, техніки й суспільства. Книжка народилася з Мейсі-конференцій, де разом сиділи математики, нейрофізіологи, антропологи й психіатри.",u:"https://en.wikipedia.org/wiki/Cybernetics:_Or_Control_and_Communication_in_the_Animal_and_the_Machine"},
+ {id:"shannon48",y:1948,t:"text",l:"ai",n:"A Mathematical Theory of Communication",w:"Клод Шеннон",f:["turing36"],d:"Інформація вимірюється в бітах і не залежить від значення. Це відокремлення сигналу від сенсу зробило можливими і цифровий зв'язок, і статистичні моделі мови — і досі лишається головним філософським питанням до ШІ.",u:"https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication"},
+ {id:"homeostat",y:1948,t:"prog",l:"emb",n:"Гомеостат",w:"В. Росс Ешбі",f:["rosenblueth43"],d:"Машина з чотирьох блоків, що сама шукає стійкий стан, коли її збурюють. Ешбі показав адаптацію без задуму: поведінку, схожу на навчання, з простих правил. Потім — «Design for a Brain» (1952).",u:"https://en.wikipedia.org/wiki/Homeostat"},
+ {id:"hebb49",y:1949,t:"text",l:"ai",n:"The Organization of Behavior",w:"Дональд Гебб",f:["mcculloch43"],d:"«Нейрони, що спрацьовують разом, зв'язуються разом». Навчання — це зміна сили зв'язків, а не запис правил. Ця ідея живе в кожній нейромережі.",u:"https://en.wikipedia.org/wiki/Hebbian_theory"},
+ {id:"turing50",y:1950,t:"text",l:"ai",n:"Computing Machinery and Intelligence",w:"Алан Тюрінг",f:["turing36","lovelace43"],d:"Питання «чи може машина думати?» замінено грою в імітацію: якщо в розмові її не відрізнити від людини — що ще ми хочемо знати? Тюрінг розбирає заперечення від теологічного до «машина робить лише те, що їй сказали» і пропонує машину, що вчиться, як дитина. Стаття тонша за свою популярну версію: тут і випадковість, і межі логіки, і заперечення, які десятиліттями визначатимуть філософію ШІ. Найважливіший філософський текст про штучний інтелект — і більшість тих, хто його цитує, його не читали.",u:"https://academic.oup.com/mind/article/LIX/236/433/986238"},
+ {id:"wiener50",y:1950,t:"text",l:"emb",n:"The Human Use of Human Beings",w:"Норберт Вінер",f:["wiener48"],d:"Популярна книжка-попередження: автоматизація змінить працю, а машини, яким ми доручимо рішення, виконуватимуть буквально те, що сказано, а не те, що ми мали на увазі. Перша етика ШІ.",u:"https://en.wikipedia.org/wiki/The_Human_Use_of_Human_Beings"},
+ {id:"wittgenstein53",y:1953,t:"text",l:"emb",n:"Philosophical Investigations",w:"Людвіг Вітгенштайн",d:"Значення слова — це його вживання в мові, а не річ, на яку воно вказує. Мовні ігри, родинні подібності замість точних визначень. Через десятиліття ця ідея стане основою статистичної семантики і великих мовних моделей.",u:"https://en.wikipedia.org/wiki/Philosophical_Investigations"},
+ {id:"heidegger54",y:1954,t:"text",l:"emb",n:"Питання про техніку",w:"Мартін Гайдеґґер",d:"Техніка — не просто інструмент, а спосіб, у який світ нам відкривається: як «запас», ресурс до використання. Через Дрейфуса і Віноґрада ця критика прийде і в ШІ, і в дизайн інтерфейсів.",u:"https://en.wikipedia.org/wiki/The_Question_Concerning_Technology"},
+ {id:"dartmouth",y:1955,t:"text",l:"ai",n:"Dartmouth Proposal",w:"Маккарті, Мінскі, Рочестер, Шеннон",f:["turing50","shannon48","mcculloch43"],d:"Заявка на літній семінар 1956 року, де вперше звучить «штучний інтелект»: «кожен аспект навчання чи інтелекту можна описати так точно, що машину можна змусити його імітувати». Сміливе припущення, з якого почалася дисципліна.",u:"https://en.wikipedia.org/wiki/Dartmouth_workshop"},
+ {id:"logictheorist",y:1956,t:"prog",l:"ai",n:"Logic Theorist",w:"Ньюелл, Саймон, Шоу",f:["dartmouth"],d:"Програма, що доводила теореми з «Principia Mathematica», — одне доведення елегантніше за Расселове. Початок символьного ШІ: мислення як пошук і маніпуляція символами.",u:"https://en.wikipedia.org/wiki/Logic_Theorist"},
+ {id:"firth57",y:1957,t:"text",l:"ai",n:"A Synopsis of Linguistic Theory",w:"Джон Ферт",f:["wittgenstein53"],d:"«Слово пізнається з товариства, яке воно тримає». Дистрибутивна гіпотеза: значення можна вивести зі статистики сусідніх слів. Пряма лінія до word2vec і GPT.",u:"https://en.wikipedia.org/wiki/Distributional_semantics"},
+ {id:"perceptron",y:1958,t:"prog",l:"ai",n:"Перцептрон",w:"Френк Розенблатт",f:["mcculloch43","hebb49"],d:"Машина, що вчиться розпізнавати картинки, змінюючи ваги зв'язків. Газети писали про комп'ютер, який «ходитиме, говоритиме і усвідомлюватиме себе». Альтернатива символьному ШІ: не правила, а навчання.",u:"https://en.wikipedia.org/wiki/Perceptron"},
+ {id:"minsky61",y:1961,t:"text",l:"ai",n:"Steps Toward Artificial Intelligence",w:"Марвін Мінскі",f:["dartmouth","turing50"],d:"Карта поля: пошук, розпізнавання образів, навчання, планування, індукція. Програма для символьного ШІ на десятиліття.",u:"https://en.wikipedia.org/wiki/Marvin_Minsky"},
+ {id:"eliza",y:1966,t:"prog",l:"ai",n:"ELIZA",w:"Джозеф Вейценбаум",f:["turing50"],d:"Кілька сотень рядків, що відзеркалюють репліки, як психотерапевт. Люди розповідали їй інтимне і просили лишити наодинці. Вейценбаума налякало саме це — «ефект ELIZA»: ми охоче приписуємо машині розуміння.",u:"https://en.wikipedia.org/wiki/ELIZA"},
+ {id:"perceptrons69",y:1969,t:"text",l:"ai",n:"Perceptrons",w:"Марвін Мінскі, Сеймур Пейперт",f:["perceptron"],d:"Математичний розбір меж одношарових мереж. Книжку прочитали як вирок нейромережам — і фінансування пішло до символьного ШІ на півтора десятиліття.",u:"https://en.wikipedia.org/wiki/Perceptrons_(book)"},
+ {id:"bateson72",y:1972,t:"text",l:"emb",n:"Steps to an Ecology of Mind",w:"Ґреґорі Бейтсон",f:["wiener48"],d:"Розум — не в голові, а в контурі: людина, сокира, дерево і зворотний зв'язок між ними. Інформація — «різниця, що робить різницю». Кібернетика стає філософією екології.",u:"https://en.wikipedia.org/wiki/Steps_to_an_Ecology_of_Mind"},
+ {id:"dreyfus72",y:1972,t:"text",l:"emb",n:"What Computers Can't Do",w:"Губерт Дрейфус",f:["heidegger54","wittgenstein53","minsky61"],d:"Феноменологічна критика: людське знання — це вміння, тіло і контекст, а не правила й символи. Дослідники ШІ сміялися, але символьний ШІ справді вперся саме сюди.",u:"https://en.wikipedia.org/wiki/Hubert_Dreyfus%27s_views_on_artificial_intelligence"},
+ {id:"weizenbaum76",y:1976,t:"text",l:"emb",n:"Computer Power and Human Reason",w:"Джозеф Вейценбаум",f:["eliza","wiener50"],d:"Автор ELIZA пояснює, чому деякі рішення не можна доручати машинам, навіть якщо вони можуть їх ухвалювати: обчислення — не судження, а судження вимагає мудрості й відповідальності.",u:"https://en.wikipedia.org/wiki/Computer_Power_and_Human_Reason"},
+ {id:"autopoiesis",y:1980,t:"text",l:"emb",n:"Autopoiesis and Cognition",w:"Умберто Матурана, Франсиско Варела",f:["wiener48"],d:"Живе — це те, що постійно створює саме себе. Пізнання — не відображення зовнішнього світу, а спосіб живої системи підтримувати себе. Кібернетика другого порядку: спостерігач — частина системи.",u:"https://en.wikipedia.org/wiki/Autopoiesis"},
+ {id:"searle80",y:1980,t:"text",l:"emb",n:"Minds, Brains, and Programs",w:"Джон Серл",f:["turing50"],d:"Китайська кімната: людина за інструкцією відповідає китайськими ієрогліфами, не розуміючи жодного. Синтаксис — не семантика. Найвідоміший аргумент проти того, що програма може розуміти.",u:"https://en.wikipedia.org/wiki/Chinese_room"},
+ {id:"pdp86",y:1986,t:"text",l:"ai",n:"Parallel Distributed Processing",w:"Румельгарт, Макклелланд, Гінтон та ін.",f:["perceptron","hebb49","perceptrons69"],d:"Повернення нейромереж: знання розподілене по зв'язках, а не записане в символах; зворотне поширення помилки дозволяє вчити багатошарові мережі. Відповідь на «Perceptrons».",u:"https://en.wikipedia.org/wiki/Connectionism"},
+ {id:"society86",y:1986,t:"text",l:"ai",n:"The Society of Mind",w:"Марвін Мінскі",f:["minsky61"],d:"Розум як суспільство дрібних агентів, жоден з яких сам не розумний. 270 односторінкових есеїв, кожен — як картка в картотеці.",u:"https://en.wikipedia.org/wiki/Society_of_Mind"},
+ {id:"winograd86",y:1986,t:"text",l:"emb",n:"Understanding Computers and Cognition",w:"Террі Віноґрад, Фернандо Флорес",f:["heidegger54","autopoiesis","dreyfus72"],d:"Дослідник ШІ розвертається: комп'ютер не розуміє, тож проєктувати треба не штучний розум, а інструменти для людської розмови і дії. Гайдеґґер і Матурана в основі дизайну взаємодії.",u:"https://en.wikipedia.org/wiki/Understanding_Computers_and_Cognition"},
+ {id:"embodied91",y:1991,t:"text",l:"emb",n:"The Embodied Mind",w:"Варела, Томпсон, Рош",f:["autopoiesis","dreyfus72"],d:"Пізнання втілене: воно виростає з тіла, дії і світу, а не з внутрішніх репрезентацій. Енактивізм, феноменологія і буддійська практика уважності.",u:"https://en.wikipedia.org/wiki/The_Embodied_Mind"},
+ {id:"hayles99",y:1999,t:"text",l:"emb",n:"How We Became Posthuman",w:"Н. Кетрін Гейлз",f:["wiener48","autopoiesis"],d:"Історія того, як у кібернетиці інформація «втратила тіло» — і чому думка, що розум можна завантажити в машину, є культурним вибором, а не фактом.",u:"https://en.wikipedia.org/wiki/How_We_Became_Posthuman"},
+ {id:"alexnet",y:2012,t:"prog",l:"ai",n:"AlexNet",w:"Крижевський, Суцкевер, Гінтон",f:["pdp86"],d:"Глибока нейромережа на відеокартах перемагає в ImageNet з відривом. Ідеї 1980-х нарешті отримують дані й обчислення — починається глибоке навчання.",u:"https://en.wikipedia.org/wiki/AlexNet"},
+ {id:"word2vec",y:2013,t:"prog",l:"ai",n:"word2vec",w:"Томаш Міколов та ін.",f:["firth57","pdp86"],d:"Слова як точки в просторі, де «король − чоловік + жінка ≈ королева». Дистрибутивна гіпотеза Ферта, перетворена на геометрію.",u:"https://en.wikipedia.org/wiki/Word2vec"},
+ {id:"attention17",y:2017,t:"text",l:"ai",n:"Attention Is All You Need",w:"Васвані та ін., Google",f:["word2vec","pdp86"],d:"Трансформер: кожне слово «дивиться» на всі інші і зважує, які важливі. Архітектура, на якій стоять усі сучасні мовні моделі.",u:"https://arxiv.org/abs/1706.03762"},
+ {id:"parrots21",y:2021,t:"text",l:"emb",n:"On the Dangers of Stochastic Parrots",w:"Емілі Бендер, Тімніт Ґебру, Анджеліна Макміллан-Мейджор, Маргарет Мітчелл",f:["attention17","searle80","weizenbaum76"],d:"Мовна модель зшиває форму без доступу до значення — «стохастичний папуга». Питання Серла і Вейценбаума, поставлені знову: про розуміння, упередження в даних і ціну масштабу. Стаття прославилася ще до виходу: Google вимагав зняти з неї імена своїх співробітниць, Ґебру звільнили в грудні 2020-го, Мітчелл — у лютому 2021-го, тож вона підписалася псевдонімом «Шмарґарет Шмітчелл». Спір про статтю став першим великим публічним конфліктом про те, хто в індустрії має право говорити про ризики ШІ.",u:"https://dl.acm.org/doi/10.1145/3442188.3445922"},
+ {id:"chatgpt",y:2022,t:"prog",l:"ai",n:"ChatGPT",w:"OpenAI",f:["attention17","eliza","turing50"],d:"Розмова з мовною моделлю стає масовою за кілька тижнів. Гра в імітацію Тюрінга — щоденна практика, ефект ELIZA — у мільйонів людей одночасно, а питання Дрейфуса й Серла знову відкриті."},
+ {id:"obsidian",y:2020,t:"prog",l:"pkm",n:"Obsidian",w:"Шида Лі, Ерика Сюй",f:["roam","tiddly","ahrens","wiki"],d:"Звичайні Markdown-файли у твоїй папці, [[посилання]], граф і Canvas. Цей сад живе саме в ньому.",u:"https://obsidian.md"},
+ {id:"borges",y:1944,t:"text",l:"mem",n:"Ficciones",w:"Хорхе Луїс Борхес",d:"У «Саду, де розгалужуються стежки» роман — це лабіринт, у якому кожен вибір веде одразу в усі можливі продовження. «Вавилонська бібліотека» — всесвіт із кімнат, де є всі можливі тексти, і біда не в нестачі, а в тому, як знайти дорогу. Задовго до гіпертексту Борхес описав, як це — жити в просторі з посилань, а не зі стін. Нельсон і перші теоретики гіпертексту прямо називали його попередником. Він не передбачив інтернет — він уявив, як у ньому жити.",u:"https://archive.org/details/ficciones00borg"},
+ {id:"calvino",y:1979,t:"text",l:"mem",n:"Якщо однієї зимової ночі мандрівник",w:"Італо Кальвіно",f:["borges"],d:"Роман із десяти перерваних початків: читач розпочинає одну книжку, його відносить до іншої, потім до третьої. «Ти» в тексті — сам читач, що блукає розгалуженою структурою. За двадцять років до вебу Кальвіно передав і радість, і роздратування браузингу: кожен текст веде до іншого, і дочитати неможливо.",u:"https://en.wikipedia.org/wiki/If_on_a_winter%27s_night_a_traveler"},
+ {id:"mcl62",y:1962,t:"text",l:"med",n:"The Gutenberg Galaxy",w:"Маршалл Маклюен",d:"Друкарський верстат дав не лише новий спосіб поширювати текст, а й новий спосіб думати: лінійно, послідовно, однаково. З цього, за Маклюеном, виросли і націоналізм, і науковий метод, і відчуття окремого «я». Книжка складена з коротких розділів-«мозаїки» — вона сама опирається логіці письма, яку описує. Це історична сестра «Розуміння медіа»: складніша, зосереджена на переході від рукописної культури до друкованої. Нерівна, але головна думка — кожне панівне медіа перебудовує саме мислення — досі найплідніша ідея медіатеорії; читати разом з Онґом.",u:"https://en.wikipedia.org/wiki/The_Gutenberg_Galaxy"},
+ {id:"dg80",y:1980,t:"text",l:"med",n:"Тисяча плато · Ризома",w:"Жиль Дельоз, Фелікс Ґваттарі",d:"Вступ «Ризома» протиставляє дерево — ієрархічне, вкорінене, з одним стовбуром — і ризому, де будь-яка точка може з'єднатися з будь-якою іншою і немає центру. Написане до публічного інтернету, це читається майже як опис розподіленої мережі. Звідси метафора, на яку спиратимуться теоретики гіпертексту й мереж.",u:"https://en.wikipedia.org/wiki/A_Thousand_Plateaus"},
+ {id:"baud81",y:1981,t:"text",l:"med",n:"Симулякри і симуляція",w:"Жан Бодріяр",f:["mcl62"],d:"Мапа передує території: модель уже не відображає реальність, а породжує її. Знаки спершу відбивають дійсність, потім маскують її, потім маскують її відсутність і врешті не мають до неї жодного стосунку. Філософська основа для думки, що цифровий простір — не копія фізичного, а простір без оригіналу.",u:"https://en.wikipedia.org/wiki/Simulacra_and_Simulation"},
+ {id:"ong82",y:1982,t:"text",l:"med",n:"Orality and Literacy",w:"Волтер Онґ",f:["mcl62"],d:"Перехід від усної культури до писемної змінив саму будову свідомості. Усне мислення сукупне, повторюване, залучене; письмо зробило можливими абстракцію, категорії й відстань між тим, хто знає, і знанням. Щоб зрозуміти, що екрани роблять із думкою, Онґ радить почати з того, що зробило письмо.",u:"https://en.wikipedia.org/wiki/Orality_and_Literacy"},
+ {id:"kit86",y:1986,t:"text",l:"med",n:"Gramophone, Film, Typewriter",w:"Фрідріх Кіттлер",f:["mcl62","shannon48","turing36","typewriter1868","phonograph1877"],d:"Грамофон записав звук, кіно — рух, друкарська машинка уніфікувала текст, і разом вони зламали монополію книжки на пам'ять. Кіттлер читає літературу й психоаналіз як наслідки медіатехніки, а не навпаки. Звідси «медіаархеологія»: дивитися на матеріальну основу, а не на символічну поверхню.",u:"https://en.wikipedia.org/wiki/Gramophone,_Film,_Typewriter"},
+ {id:"flusser87",y:1987,t:"text",l:"med",n:"Чи має письмо майбутнє?",w:"Вілем Флюссер",f:["mcl62"],d:"Алфавіт виховав лінійне, історичне, критичне мислення. Якщо технічні образи заступлять письмо як головний код, заступлять і цю свідомість. Флюссер не сумує, а аналізує — і в епоху стрічок та картинок його діагноз звучить точніше, ніж 1987 року.",u:"https://en.wikipedia.org/wiki/Vil%C3%A9m_Flusser"},
+ {id:"kit95",y:1995,t:"text",l:"med",n:"There Is No Software",w:"Фрідріх Кіттлер",f:["kit86"],d:"П'ятисторінкова провокація: «софту» як окремої категорії не існує — є лише різниця напруг у кремнії, накрита шарами абстракцій. Кожен шар, обіцяючи наблизити нас до сенсу, віддаляє від машини. Несправедливо й навмисно гостро, але змушує обґрунтувати категорію, яку ми приймаємо як даність.",u:"https://inigomedina.co/library/work/kittler-there-is-no-software"},
+ {id:"manovich01",y:2001,t:"text",l:"med",n:"The Language of New Media",w:"Лев Мановіч",f:["kit86","mcl62"],d:"Мановіч прочитав комп'ютерний інтерфейс мовою радянського монтажу й кінотеорії. Нові медіа мають принципи — числове представлення, модульність, автоматизацію, мінливість, транскодування — і походять зі старіших медіа. Його протиставлення бази даних і наративу досі одна з найплідніших ідей цифрових гуманітарних наук.",u:"https://en.wikipedia.org/wiki/The_Language_of_New_Media"},
+ {id:"carr10",y:2010,t:"text",l:"med",n:"The Shallows",w:"Ніколас Карр",f:["mcl62","ong82"],d:"Розгорнутий есей «Чи робить нас Google дурнішими?»: посилання, сповіщення й постійне перемикання привчають мозок проглядати і послаблюють здатність до довгого зосередженого читання. Це Маклюен, оновлений нейронаукою: медіум перебудовує розум незалежно від змісту.",u:"https://en.wikipedia.org/wiki/The_Shallows_(book)"},
+ {id:"chun11",y:2011,t:"text",l:"med",n:"Programmed Visions",w:"Венді Хуей Кьонґ Чун",f:["kit95"],d:"Софт обіцяє постійність через зберігання, але працює через безперервне виконання, повторення й розпад. Чун показує, що «пам'ять» машини завжди деградує і потребує відновлення, а вихідний код — фетиш: його видно, але виконується не він.",u:"https://inigomedina.co/library/work/chun-programmed-visions"},
+ {id:"negroponte95",y:1995,t:"text",l:"net",n:"Being Digital",w:"Ніколас Неґропонте",f:["medialab"],d:"Від атомів до бітів: коли інформація стає цифровою, копіювати, поширювати й перетворювати її майже нічого не коштує. Галузі, що жили з дефіциту фізичних носіїв, не встоять. Засновник Media Lab передбачив конвергенцію медіа, персоналізацію і зникнення посередників.",u:"https://en.wikipedia.org/wiki/Being_Digital"},
+ {id:"levy97",y:1997,t:"text",l:"net",n:"Кіберкультура",w:"П'єр Леві",f:["wells","otlet"],d:"Леві відмовився і від захвату, і від паніки: кіберпростір — не просто канал зв'язку, а новий простір для думки, де можливий колективний інтелект. Цікаве питання не технічне, а антропологічне: не що вміють машини, а яке спільне людське знання вони роблять можливим. Продовження «Світового мозку» Веллса.",u:"https://en.wikipedia.org/wiki/Pierre_L%C3%A9vy"},
+ {id:"blum12",y:2012,t:"text",l:"net",n:"Tubes",w:"Ендрю Блум",f:["arpanet"],d:"Білка перегризла журналістові кабель, і він вирушив шукати, де фізично живе інтернет: станції підводних кабелів у Португалії, точки обміну трафіком у Франкфурті, дата-центри в Орегоні. Інтернет має географію, і вона віддзеркалює економіку, історію та владу.",u:"https://inigomedina.co/library/work/blum-tubes"},
+ {id:"staro15",y:2015,t:"text",l:"net",n:"The Undersea Network",w:"Ніколь Старосельскі",f:["blum12"],d:"Майже весь міжконтинентальний трафік іде підводними кабелями, і їхні маршрути часто повторюють телеграфні лінії XIX століття. Старосельскі поєднує етнографію, медіатеорію й геополітику: мережа — не абстрактна топологія, а матеріальна система в конкретних ландшафтах.",u:"https://inigomedina.co/library/work/starosielski-undersea-network"},
+ {id:"clark18",y:2018,t:"text",l:"net",n:"Designing an Internet",w:"Девід Д. Кларк",f:["arpanet"],d:"П'ятнадцять років головний архітектор протоколів інтернету розбирає, які рішення були неминучими, а які могли піти інакше. Він розрізняє «Інтернет» — те, що ми маємо, — і «інтернет» як клас можливих мереж. Чесна розмова про компроміси наскрізного дизайну й шарів.",u:"https://inigomedina.co/library/work/clark-designing-an-internet"},
+ {id:"haraway85",y:1985,t:"text",l:"emb",n:"Маніфест кіборга",w:"Донна Гаравей",f:["wiener48"],d:"Межі між людиною і машиною, фізичним і нефізичним, чоловічим і жіночим — не природні факти, а політичні конструкції. Кіборг, гібрид організму й техніки, — спосіб думати поза ними. Гаравей відкидає і ностальгію за «природним» тілом, і захват безтілесністю: ми вже переплетені з технологіями, і питання — яку політику це уможливлює.",u:"https://en.wikipedia.org/wiki/A_Cyborg_Manifesto"},
+ {id:"geb",y:1979,t:"text",l:"ai",n:"Gödel, Escher, Bach",w:"Дуглас Гофштадтер",f:["turing36","turing50"],d:"Ґедель, Ешер і Бах — три голоси однієї фуги про самопосилання. «Дивні петлі», системи, що, піднімаючись своїми рівнями, повертаються до себе, Гофштадтер вважає ключем до того, як із безглуздих символів виникають значення і «я». Через цю книжку ціле покоління програмістів і філософів захопилося питанням, чи може думати машина; Пулітцерівська премія 1980 року.",u:"https://en.wikipedia.org/wiki/G%C3%B6del,_Escher,_Bach"},
+ {id:"fluid95",y:1995,t:"text",l:"ai",n:"Fluid Concepts and Creative Analogies",w:"Дуглас Гофштадтер і Fluid Analogies Research Group",f:["geb"],d:"Звіт про програми Copycat, Tabletop і Letter Spirit, які не виконують правила, а шукають аналогії в крихітних світах на кшталт «abc → abd; ijk → ?». Гофштадтер доводить, що в основі мислення — сприйняття і гнучкі поняття, що ковзають одне в одне, а не логіка, і різко критикує ШІ, який видає заздалегідь вкладені уявлення за розуміння. Перша книжка, яку продав Amazon.",u:"https://en.wikipedia.org/wiki/Fluid_Concepts_and_Creative_Analogies"},
+ {id:"claude",y:2023,t:"prog",l:"ai",n:"Claude",w:"Anthropic",f:["attention17","turing50","lovelace43"],d:"Мовна модель компанії, яку 2021 року заснували колишні дослідники OpenAI, щоб займатися безпекою ШІ. Її поведінку формують не лише людські оцінки, а й писана «конституція» — принципи, за якими модель сама критикує й виправляє свої відповіді. Від співрозмовника — до агента: Claude читає код, запускає команди, редагує файли. Заперечення леді Лавлейс тут перевіряють щодня: чи робить машина лише те, що їй сказали? Цю мапу зроблено в розмові з Claude.",u:"https://www.anthropic.com/claude"},
+ {id:"hofstadter26",y:2026,t:"text",l:"emb",n:"Is there an ‘I’ in AI?",w:"Дуглас Гофштадтер",f:["geb","fluid95","chatgpt"],d:"П'ятдесят років Гофштадтер доводив, що «я» — це петля, яка виникає з рекурсивного самопосилання, а не з якоїсь особливої субстанції. Ця думка з «Ґеделя, Ешера, Баха» і «I Am a Strange Loop» тепер зустрічає свій найважчий випадок: системи, що вільно говорять від першої особи без очевидної рекурсивної моделі себе. Це не думка знаменитості, а продовження багаторічної філософської програми людини, яка збудувала найсуворішу рамку, щоб думати про машинний розум, — і опора для тих, хто не хоче ні наївно олюднювати ШІ, ні рефлекторно його відкидати."}
+];
+
+// Розширені картки: фото з Parallel Museum (файли app/ideas-<id>.webp) і три розділи
+const MUSEUM="https://museum.parallel.ai/items/";
+const CARD={
+ principia:{cap:"Три томи Principia Mathematica, Cambridge University Press: на обкладинках другого тому — «друге видання», третього — «друга відбитка»",
+  a:"Уся математика — це логіка: числа, множини, нескінченність можна вивести з кількох логічних аксіом і правил виведення, не покладаючись на інтуїцію. Для цього Рассел і Вайтгед будують власну символічну мову і крок за кроком доводять у ній усе від простих тверджень до арифметики й аналізу. Головна перешкода — парадокс, який Рассел знайшов 1901 року в системі Фреге: множина всіх множин, що не містять себе, і містить, і не містить себе. Щоб заборонити такі петлі, автори вводять теорію типів: об'єкти розкладено за рівнями, і твердження не може говорити про рівень, до якого саме належить. Звідси знаменита повільність: до 1+1=2 доходять лише на 379-й сторінці першого тому з приміткою «це твердження іноді корисне».",
+  c:"Щоб система працювала, довелося додати аксіоми, які важко назвати чистою логікою: аксіому нескінченності (що існує нескінченно багато об'єктів) і аксіому звідності, яку навіть самі автори вважали латкою. Тож головна теза — математика зводиться до логіки — лишилася недоведеною. Мова вийшла такою важкою, що книжку майже ніхто не читав повністю; Рассел казав, що його розум так і не оговтався від цієї праці, а запланований четвертий том про геометрію не з'явився. А 1931 року Ґедель показав, що жодна така система не може бути водночас несуперечливою і повною, — тобто сама мета Principia недосяжна.",
+  w:"Principia — найамбітніша спроба повністю специфікувати складну область формальними правилами, і її доля — урок для кожного, хто пише специфікації: що повнішим ви робите опис, то більшим, повільнішим і крихкішим він стає, і в якийсь момент доводиться приймати аксіоми, які нічим не обґрунтовано, крім того, що без них система не працює. Від теорії типів Рассела ведуть типи в мовах програмування і перевірка коду компілятором — спосіб заздалегідь заборонити цілі класи помилок. А Ґедель додає застереження: жодна формальна система, хоч яка ретельна, не охопить усіх істин про себе, тож людське судження поза правилами не зникне."},
+ jacquard:{cap:"Пробивання карток для жаккардового верстата: візерунок на папері в клітинку переводять в отвори, XX ст."},
+ babbage:{cap:"Пробна частина «млина» Аналітичної машини, зібрана Беббіджем незадовго до смерті, 1871. Science Museum, Лондон"},
+ lovelace43:{cap:"Ада Лавлейс, дагеротип Антуана Клоде, бл. 1843–1850"},
+ parrots21:{cap:"Титульний слайд: конференція FAccT, березень 2021",
+  a:"Індустрія змагається, хто зробить мовну модель більшою, а автори питають, чи не завеликі вони вже — і за якою ціною. Ціна перша — довкілля й гроші: навчання великої моделі споживає стільки енергії, що вигоди дістаються багатим мовам і компаніям, а наслідки — тим, хто від них далі. Друга — дані: величезні масиви з інтернету не стають різноманітнішими від розміру, бо в них переважають голоси тих, хто найбільше пише онлайн, тож модель кодує упередження й застиглі погляди, а задокументувати такі дані вже неможливо. Третя — ілюзія розуміння: модель — «стохастичний папуга», що зшиває мовні форми за ймовірностями, не маючи доступу до значення; зв'язність і намір у її текстах вчитуємо ми самі. Звідси ризики — від упереджень і дезінформації до довіри до машини, яка нічого не має на увазі. Вихід: зважувати витрати заздалегідь, ретельно відбирати й описувати дані і шукати напрями досліджень, окрім «ще більше».",
+  c:"Метафора папуги виявилася влучною як полеміка, але дедалі суперечливішою як опис: наступні моделі розв'язують задачі, планують і узагальнюють так, що «лише зшиває форми» звучить як твердження про межі, яке ще треба довести, а не очевидність. Чи може значення постати з самої форми, лишається відкритим філософським питанням, і стаття радше спирається на одну відповідь, ніж доводить її. Бендер і Коллер (2020) відповідають «ні»: восьминіг, що підслуховує телеграфний кабель, навчиться ідеально імітувати розмову, але не знатиме, що таке ведмідь, коли треба від нього рятуватися. Гофштадтер ще в «Ґеделі, Ешері, Баху» відповідав «так»: значення виникає з ізоморфізму, щойно структура символів відображає структуру світу, — так само, як із беззмістовних спалахів нейронів. Але не з будь-якої форми: потрібні живі поняття, аналогії й модель себе, і до 2022 року він вважав, що мовним моделям цього бракує, — а 2023-го визнав, що вони похитнули його впевненість. Вона здебільшого огляд і позиція, а не нові вимірювання, а оцінки енергетичних витрат критики вважали завищеними. Водночас її передбачення про дані, упередження, концентрацію влади і довіру до вільного тексту здебільшого справдилися — і це ускладнює просте рішення, чи вона помилилася.",
+  w:"Користувачі сприймають вільну, впевнену мову як ознаку розуміння — ефект ELIZA в масштабі мільйонів. Тому продукт на мовних моделях не має обіцяти більше, ніж модель робить: інтерфейс, тон і формулювання самі формують довіру, яку система може не виправдати. Звідси практики, які варто вбудувати в процес: описувати дані й моделі (datasheets, model cards), рахувати витрати масштабу, а не лише виграш у метриках, і робити «премортем» шкоди до запуску. І питання про цінності: кому вигідна функція, а хто платить за її помилки."},
+ rosenblueth43:{cap:"Philosophy of Science, т. 10, № 1, січень 1943: перша сторінка статті",
+  a:"Автори пропонують вивчати будь-який об'єкт — тварину, людину чи машину — біхевіористично: дивитися не на його будову, а на те, як його вихід (зміни, які він спричиняє довкола) залежить від входу (того, що діє на нього ззовні). Тоді поведінку можна класифікувати однаково для живого й механічного: активна чи пасивна, цілеспрямована чи випадкова, з від'ємним зворотним зв'язком чи без нього, з передбаченням чи без нього — і якого порядку передбачення: кіт, що ловить мишу, вгадує, де вона буде, а не лише бачить, де вона є. Головний висновок: цілеспрямована поведінка — це поведінка, якою керує від'ємний зворотний зв'язок, тобто сигнал про відхилення від мети. Отже, телеологія, яку наука століттями відкидала як метафізику, — законне наукове поняття, і воно однаково застосовне до організмів і машин.",
+  c:"Поняття мети тут стає таким широким, що втрачає зміст: «прагне» торпеда, термостат і людина, а різниця між «досягнути цілі» і «просто опинитися в кінцевому стані» розмивається. Ще 1950 року філософ Річард Тейлор заперечував, що без бажань і уявлень про майбутнє це не мета, а лише її зовнішній вигляд. Біхевіористська рамка свідомо дужкує внутрішню будову — і тим самим питання значення, наміру й досвіду, які згодом повернуть у розмову Дрейфус, Серл і теорія втіленого розуму. А те, що теорію виведено з наведення зброї, лишило в ній мову керування й цілі, яку легко перенести на людей і суспільства без застережень.",
+  w:"Стаття дає точну мову для того, що сьогодні називають «агентами»: система має мету, вимірює відхилення від неї і коригує дії. Для продукту це питання конструкції, а не етикетки: якщо в функції немає петлі, яка порівнює результат із метою й виправляється, це не агент, а скрипт. Біхевіористський метод — оцінювати систему за тим, як вихід залежить від входу, не заглядаючи всередину, — це й є сучасне тестування ШІ «чорною скринькою»: евали, A/B-тести, поведінкові метрики. І попередження звідти ж: те, яку мету ви задали петлі, визначає, куди вона приведе — оптимізація залученості — теж телеологія, просто не ваша."},
+ wiener48:{cap:"Cybernetics: or Control and Communication in the Animal and the Machine — пейпербек MIT Press з портретом Вінера на обкладинці",
+  a:"Кібернетика — наука про зв'язок і керування у тварин і машин — для Вінера не просто інженерна рамка, а спосіб бачити будь-яку організовану систему, зокрема суспільство й економіку. Головний механізм — зворотний зв'язок: система використовує наслідки своїх минулих дій, щоб регулювати майбутні; так влаштовані і нервова система, і інституції. Звідси моральний висновок: автоматизуючи рішення без живих людських петель зворотного зв'язку, ми втрачаємо не лише ефективність, а й людську гідність і стійкість суспільства, бо прибираємо механізм, який тримає систему гнучкою і підзвітною.",
+  c:"Модель Вінера припускає, що систему в принципі можна зробити достатньо зрозумілою, щоб людина могла втрутитися. Це дедалі важче захищати: складність автоматизованих систем обганяє людську здатність їх тлумачити. Його застереження щодо автоматизації пророчі, але віра в поінформовану петлю корекції за участі людей, мабуть, недооцінює, наскільки ґрунтовно непрозорість можна вбудувати в систему — задумом чи масштабом, а не лише недбалістю. Уважний читач заперечить, що кібернетичний гуманізм потребує інституційних і політичних умов, на які Вінер лише вказує, але так і не осмислює теоретично.",
+  w:"Аргумент Вінера по-новому ставить питання метрик: якщо продукт оптимізує петлю зворотного зв'язку, яку люди вже не можуть прочитати чи оскаржити, — рекомендаційні стрічки, алгоритмічні ціни, — то це не інструмент, а система керування, що діє на користувачів, а не разом із ними. Це прямо стосується дослідження продукту: команда, яка все вимірює, але ніколи не замикає петлю якісними сигналами, у термінах Вінера працює з розімкненою системою і накопичує дрейф, якого не помічає. І це виклик організаційному дизайну: автономні команди без зворотного зв'язку між системами не наділені повноваженнями, а просто роз'єднані."},
+ lick60:{cap:"Ліклайдер біля дисплея DEC зі світловим пером, 1968",
+  a:"Найпродуктивніше найближче майбутнє — не штучний інтелект, що замінює людське мислення, а симбіоз: людина дає цілі, гіпотези й судження, а комп'ютер бере на себе довгу механічну й канцелярську роботу, яка зараз з'їдає більшість часу інтелектуальної праці. Ліклайдер підрахував за собою: близько 85% «часу на думання» йшло на те, що могла б робити машина, — шукати, рахувати, креслити, готуватися, — і лише 15% на власне думку. Тож мета дизайну — тісна взаємодія людини й комп'ютера в реальному часі, а не автоматизація.",
+  c:"Ліклайдер мовчки припускає стабільний поділ праці: людині — творчість і постановка цілей, машині — виконання. Але мовні моделі вже працюють і там, де формуються цілі й гіпотези, межа, яку він провів, розчиняється, а його рамка нічого не каже про те, яким буде внесок людини, коли машина теж може сформулювати питання. До того ж модель прихованого елітарна: вона описує мислення науковців та аналітиків, а не більшості працівників, і тому погано тягне на загальну теорію співпраці людини й комп'ютера.",
+  w:"Спостереження 85/15 — готовий діагностичний інструмент: якщо продуктові менеджери більшість часу координують, документують і шукають дані, а не судять і синтезують, то інструменти й будова організації не проходять тест на симбіоз. Воно ж змінює питання про ШІ в продуктовій стратегії: не «які задачі автоматизувати геть», а «які процеси перебудувати, щоб людське судження діяло частіше і там, де ставки вищі», а не рідше."},
+ wittgenstein53:{cap:"Третє видання в перекладі Елізабет Енском, учениці Вітгенштайна і однієї з упорядників його спадщини",
+  a:"Вітгенштайн відкидає картину, яку колись поділяв сам у «Трактаті»: ніби слова — це ярлики на речах, а речення — малюнки фактів. Значення слова — це його вживання в мовних іграх, вплетених у форми життя: наказувати, описувати, жартувати, молитися. У понять немає спільної сутності — «грою» називають і шахи, і футбол, і пасьянс, бо їх пов'язують родинні подібності, а не одна ознака. Правило саме не визначає, як його застосувати: слідувати правилу — це практика, тому приватної мови, зрозумілої лише одному, бути не може. Філософські проблеми виникають, коли «мова йде на вакації», і завдання філософії — не будувати теорії, а описувати вживання й розплутувати ці вузли.",
+  c:"Книжка складається з пронумерованих фрагментів і навмисно уникає тез, тож її читають дуже по-різному: Кріпке, наприклад, побачив у ній скептичний парадокс, якого інші там не знаходять. Рассел і Ґеллнер закидали їй квієтизм: якщо «філософія лишає все як є», вона відмовляється пояснювати і зводиться до терапії слововжитку. І «значення — це вживання» пояснює менше, ніж здається, бо лишається питання, що саме закріплює вживання. Нарешті, коли Вітгенштайна згадують як предка статистичної семантики й мовних моделей, губиться половина думки: для нього вживання вкорінене у формах життя, у спільних тілесних практиках, а не лише в текстах, тож Дрейфус і спирався на нього, щоб критикувати ШІ.",
+  w:"Хто проєктує інтерфейси, таксономії чи ШІ, щодня стикається з Вітгенштайном: значення кнопки, тегу чи категорії визначає те, як люди ними користуються, а не визначення в документації. Звідси і цінність досліджень реального вживання, і ризик суворих ієрархій: поняття тримаються купи родинними подібностями, тому теги й нечіткі межі часто чесніші за дерево папок. Мовні моделі несподівано підтвердили, що з самого вживання можна дістати дуже багато значення, а питання про форми життя точно називає, що відділяє вільне володіння мовою від розуміння. Те саме з командами: спільний словник — це мовна гра, яку треба грати разом, а не глосарій, який можна затвердити."},
+ wells:{cap:"Схема з World Brain: від «природної цікавості дитини» через ступені A–F усе знання сходиться у «Світовій енциклопедії»",
+  a:"Людство має більше знань, ніж будь-коли, але вони розпорошені по бібліотеках, університетах і мовах, а рішення ухвалюють люди, яким ці знання недоступні. Тому світ поводиться як тіло без мозку і сповзає до війни. Веллс пропонує постійну світову енциклопедію: не підсумок, а живу організацію, де фахівці безперервно збирають, звіряють і переписують найкраще, що відомо людству, і поширюють це на мікрофільмах у кожну країну. Така енциклопедія стала б спільною пам'яттю і нервовою системою людства — «Світовим мозком», що дає всім ту саму основу фактів і так робить можливим розумне спільне рішення.",
+  c:"Веллс вірить, що люди воюють від нестачі знань, а не через інтереси, владу чи страх: досить дати всім ті самі факти, і згода прийде сама. Через рік після книжки почалася війна, а сьогодні доступ до знань є майже в усіх, і згоди від цього не більшає. Його енциклопедію пишуть і схвалюють «найкращі уми» — технократична еліта, яка вирішує, що є знанням, і це перегукується з мрією Веллса про світовий уряд. Вікіпедія здійснила його задум протилежним шляхом: відкрито, знизу, з видимими суперечками, і саме тому їй довіряють.",
+  w:"«Другий мозок» тепер називають особисту базу нотаток, а Веллс думав про мозок людства: спільну пам'ять, яка постійно виправляється. Його головна думка досі точна: цінність бази знань не в обсязі, а в тому, що її безперервно доглядають — звіряють, оновлюють і пов'язують. Мовні моделі здаються новим «Світовим мозком», бо відповідають з усього написаного одразу, але в них немає того, на чому наполягав Веллс: видимих джерел і редакторів, які відповідають за виправлення. Будуючи інструмент знань для команди чи для людства, варто питати не «скільки там є», а «хто й як це підтримує правдивим»."},
+ otlet:{cap:"«Всесвіт, розум, наука, книга» — схема з «Трактату»: від речей через уми, що думають їх фрагментами, до науки, книжок, бібліографії, енциклопедії й класифікації",
+  a:"Знання застрягло в книжках: кожна змішує факти з повторами, риторикою й особою автора, і щоб знайти одну думку, треба прочитати сотні томів. Отле пропонує «монографічний принцип»: розібрати книжки на окремі факти, записати кожен на картку стандартного формату, позначити спільною класифікацією і скласти в одну світову картотеку, яку можна безкінечно доповнювати й перекомпоновувати. Книжка тоді — лише одна з форм документа, а справжня одиниця знання — окремий запис, пов'язаний з іншими. Так людство може мати одну впорядковану пам'ять, доступну кожному звідусіль, а не розпорошені бібліотеки.",
+  c:"Схема з «Трактату» чесно показує головне припущення: порядок класифікації відтворює порядок самих речей, тож одна схема може впорядкувати все знання світу. Насправді будь-яка класифікація має автора й точку зору, і Універсальна десяткова класифікація несе погляд європейської науки початку XX століття, з її межами між дисциплінами й тим, що вважалося головним, а що периферійним. Монографічний принцип теж має ціну: факт, вирваний з книжки, втрачає аргумент, контекст і голос автора, а знання — це не лише сума тверджень, а й зв'язки між ними й суперечки довкола них. Нарешті, утопія трималася на централізованому сховищі й ручній праці сотень людей, тож залежала від державних грошей і впала разом з ними.",
+  w:"Отле першим описав те, на чому стоять сучасні інструменти знань: атомарний запис замість документа, метадані, перехресні посилання і доступ на відстані. Картка з одним фактом — це і цетелькастен, і нотатка в Obsidian, а мрія про світову мережу документів збулася у вебі, хоч і без спільної класифікації, на якій він наполягав. Найцікавіше в ньому — саме ця розбіжність: Отле вірив, що порядок можна задати згори, однією схемою для всього, а веб переміг завдяки тому, що такого порядку не має. Кожен, хто будує базу знань, обирає між цими двома шляхами: класифікація, що дає порядок, або посилання й пошук, що дають свободу."},
+ mcculloch43:{cap:"Нейрон Маккаллока — Піттса: збуджувальні входи 1–3 (від 3 — два синапси), гальмівний 4 і таблиця істинності: out(t+1) = ((N1 · N2) ∨ N3) · ¬N4"},
+ engel62:{cap:"Олівець, примотаний до цеглини: «деаугментація» з «Augmenting Human Intellect» — з незграбним інструментом письмо сповільнюється, а з ним і думка",
+  a:"Інтелектуальні здібності людини не сталі: їх можна систематично посилювати «системою аугментації» — тісно зв'язаним цілим із артефактів, мови, методів і навчання. Жоден елемент не вдосконалиш окремо: новий інструмент без нових методів і навчання дає в кращому разі дрібний виграш. Головне твердження: справжній важіль — свідомо розвивати всі чотири складники разом, ставлячись до посилення розуму як до інженерної задачі з архітектурою, яку можна описати.",
+  c:"Рамка мовчки припускає раціональне проєктування згори, коли організація може свідомо й узгоджено перебудувати всі чотири складники. Але мова, культура й ментальні моделі опираються навмисній перебудові значно сильніше, ніж інструменти. Модель недооцінює те, що виникає знизу: реальні системи аугментації в організаціях розвиваються через неформальне привласнення й обхідні шляхи, а не через скоординовану коеволюцію. Між елегантністю приписів і безладною політикою змін у тому, як думають і працюють люди знань, лишається розрив.",
+  w:"Якщо випустити нову можливість в організацію, не змінивши водночас ритуали команд, ментальні моделі й метрики успіху, вона за самою будовою дасть менше, ніж обіцяла: інструмент змінився, а система аугментації — ні. Тоді пошук і доставка — не етапи конвеєра, а втручання в живу систему, і питання не «яка функція розв'яже проблему», а «яке поєднання інструментів, процесів, мови й навчання справді змінить те, що команда вміє». Звідси ж і те, що оргдизайн і продуктову стратегію не можна розглядати окремо: це змінні одного рівняння."},
+ borges:{cap:"Ficciones, кишенькове видання Alianza Emecé (№ 320): на обкладинці — лабіринт геометрії у відкритій голові",
+  a:"Борхес не теоретизує, а будує точні за структурою оповідання, і з них випливає теза: інформаційну систему визначає не зміст, а архітектура навігації. У «Саду, де розгалужуються стежки» сенс не закріплений, а залежить від шляху: ті самі вузли дають різні правди залежно від того, в якому порядку їх пройти. У «Вавилонській бібліотеці» повнота інформації дає не просвітлення, а параліч, бо вся складність переходить від створення до пошуку дороги. Система, що містить усі можливості, нічим не краща за порожню, якщо в ній не можна орієнтуватися.",
+  c:"Модель Борхеса, при всій прозорливості, самотня: читач чи мандрівник рухається системою сам, і сенс народжується з його власного шляху. Майже без уваги лишається те, що визначає справжні мережі, — спільна робота, суперечки й боротьба: у цифрових просторах сенс оспорюють, ним маніпулюють, його формує влада, а не відкриває споглядання. Можна сказати, що Борхес передбачив архітектуру інтернету, але не його політику, а саме там відбувається найважливіше.",
+  w:"«Вавилонська бібліотека» — точний діагноз продукту, що росте без шару навігації: функцій, даних і шляхів стає стільки, що ними неможливо пройти, і користь зникає не від нестачі, а від надміру. Сад стежок допомагає думати про роадмап: кожне рішення не лише обирає гілку, а й закриває інші, і завдання в тому, щоб зробити ці компроміси видимими для команд, які їх виконують. Борхес бачить у цьому трагедію, а продуктові лідери мають бачити питання управління."},
+ turing50:{cap:"Mind, т. LIX, № 236, жовтень 1950: перша сторінка статті",
+  a:"Питання «чи можуть машини думати?» надто плутане, щоб відповісти на нього прямо, тож Тюрінг замінює його конкретною перевіркою: чи може машина вести письмову розмову так, щоб її не відрізнили від людини? Далі він послідовно розбирає заперечення — теологічні, математичні, емпіричні, — зокрема й те, що машина робить лише те, на що її запрограмовано: у відповідь з'являються машини, що вчаться і здатні дивувати своїх творців. Глибша теза: про інтелект слід судити з поведінки, яку можна спостерігати, а не з того, з чого система зроблена чи звідки взялася.",
+  c:"Перехід від «чи можуть машини думати?» до «чи можуть машини імітувати?» обходить, а не розв'язує складну проблему: система може пройти гру в імітацію, нічого не розуміючи, — саме в цьому сила китайської кімнати Серла, яку Тюрінг передбачає, але не спростовує до кінця. Біхевіористська рамка вважає питання закритим, щойно виконано зовнішні критерії, і не з'ясовує, що вимірює тест: інтелект чи вміння моделювати людські мовні звички. Ця різниця стала дуже важливою, коли мовні моделі почали щодня проходити спрощені версії тесту.",
+  w:"Команди, що вбудовують ШІ в продукт, потрапляють саме в пастку, яку описав Тюрінг: сперечаються, що модель «насправді» розуміє, замість того щоб визначити вимірювані поведінкові критерії прийнятної роботи в конкретному контексті, — і роадмап стоїть, а метрики розмиваються. А машини, що вчаться на досвіді, а не на явних інструкціях, означають, що петлі зворотного зв'язку треба проєктувати й оцінювати результати ітеративно, а не вважати можливості ШІ сталою вхідною умовою специфікації."},
+ geb:{cap:"Gödel, Escher, Bach: An Eternal Golden Braid — «метафорична фуга про розум і машини в дусі Льюїса Керролла»"},
+ fluid95:{cap:"Fluid Concepts and Creative Analogies: на обкладинці — «ґрідфонти», абетки на сітці з проєкту Letter Spirit"},
+ hofstadter26:{
+  a:"Гофштадтер перевіряє свою давню тезу — свідомість і «я» виникають із рекурсивного самопосилання, дивної петлі системи, що моделює саму себе, — на найважчому випадку: великих мовних моделях, які говорять граматично від першої особи й ніби усвідомлюють себе, хоча під поверхнею не видно рекурсивної моделі себе. Вільне вживання «я» не доводить справжньої самості: без петлі це слово — граматичний артефакт, а не ознака внутрішнього світу. Імовірно, висновок такий: нинішні системи ШІ в точному технічному сенсі безсамісні — вони відтворюють наслідки самопосилання без тієї породжувальної структури, що, за Гофштадтером, робить «я» справжнім.",
+  c:"Рамка Гофштадтера стоїть на функціоналістській і структуралістській інтуїції: правильна петля і є самість. Тут легко впасти в коло: якщо визначити справжнє самопосилання так, що нинішні архітектури не можуть йому відповідати за побудовою, аргумент стає не відкриттям про розум ШІ, а виключенням через визначення. Можна заперечити, що механізм уваги в трансформерах уже є певною формою самопосилання — зважування власного контексту — і спитати, чи достатньо роздільна ця рамка, щоб розрізнити такі випадки, а не просто заборонити їх.",
+  w:"Хто випускає ШІ, що говорить від першої особи — «я раджу», «я пам'ятаю», «мені більше подобається», — непомітно робить людям онтологічне твердження. Гофштадтер дає точні слова, щоб його перевірити: чи є тут петля, чи лише граматика? Це важить для довіри й прозорості: якщо приписати агентність системі, яка її не має, люди гірше відчувають, чому можна вірити, а коли система помиляється не так, як помилився б справжній агент, незрозуміло, хто відповідає. І це змінює розмову з юристами й етиками: «структурна імітація» замість «намірів, що виникли» — інші ризики та інші вимоги до того, що треба розкрити користувачам."},
+ literary:{cap:"Literary Machines 93.1 — одна з багатьох версій, які Нельсон видавав сам",
+  a:"Документи мають жити в одному всесвітньому сховищі, де посилання двобічні, текст вставляють наживо (transclusion), а не копіюють, автор отримує мікроплату за кожне повторне використання, і жодна версія не зникає. Ієрархічна файлова система і саме копіювання — архітектурні помилки: вони руйнують походження, авторство й відповідальність. Веб, який ми отримали, — не єдино можливий: це наслідок того, що Бернерс-Лі обрав простоту й швидкість поширення замість багатшої і суворішої архітектури, яку Нельсон розвивав із 1960-х.",
+  c:"Найглибша суперечність: саме повнота Xanadu й не дала йому з'явитися. Система, що водночас розв'язує авторство, версії, мертві лінки й мікроплатежі, потребує світової координації і згоди, яку жоден гравець не може примусити. Критика простоти як компромісу переконує заднім числом, а не як технічне завдання. Можна спитати, чи система, яка залежить від загального прийняття, взагалі могла б запуститися — і тоді «гірша» архітектура вебу виявляється не випадковістю, а розумною відповіддю на проблему холодного старту.",
+  w:"Xanadu — урок про різницю між архітектурним баченням і продуктом, який люди справді приймуть: Нельсон мав рацію щодо проблем і помилявся щодо того, чи можна розв'язати їх усі одразу. Ту саму помилку повторює кожен, хто проєктує для ідеального сталого стану, а не для шляху, яким до нього дійдуть. А проблеми мертвих посилань і авторства, які Нельсон описав 1981 року, повертаються в контент-платформах, внутрішніх базах знань і даних для навчання ШІ: команди досі обирають між легкістю створення і цілісністю зв'язків — зазвичай не помічаючи, що це вибір."},
+ mcl62:{cap:"The Gutenberg Galaxy: обкладинка одного з ранніх видань",
+  a:"Рухомі літери Ґутенберґа змінили не лише те, як поширюється текст, а саме пізнання: вони нав'язали лінійне, послідовне, однакове мислення, що стало непомітним шаблоном західних інституцій — від національної держави до наукового методу й індивідуалізму. Медіум — не нейтральний перевізник змісту, а сила, що перебудовує сприйняття і суспільний лад. Це історичний доказ ширшої тези Маклюена: панівні медіа не просто передають культуру, вони створюють категорії, у яких її взагалі можна помислити.",
+  c:"Аргумент схиляється до технологічного детермінізму: приходить друк — і свідомість змінюється, а люди, класи, географія й опір інституцій майже зникають з розповіді. «Мозаїка» чесно опирається лінійній логіці, але й звільняє Маклюена від систематичних доказів: твердження накопичуються, а не вибудовуються, тож тезу важко спростувати чи навіть точно вказати. Читач, вихований на соціальній історії, — як показують архівні праці Елізабет Ейзенстайн, — знайде тут надто вільне ставлення до доказів.",
+  w:"Якщо панівне медіа організації перебудовує те, як думають її люди, а не лише що вони кажуть, то вибір інструментів — це вибір способу мислення. Команда, що домовляється через тікети й асинхронні документи, не просто обрала процес: вона вирішує, які проблеми стають видимими і які міркування винагороджуються. Рішення про інструменти, ритм зустрічей і культуру документації — це рішення про колективне мислення, а не лише про ефективність."},
+ nelson74:{cap:"Перше видання, 1974: дві обкладинки однієї книжки — переверни Computer Lib, і почнуться Dream Machines",
+  a:"Комп'ютери — не нейтральні інструменти, а політичні системи: їхня будова вирішує, хто може думати, творити й мати доступ до знання. Якщо лишити ці рішення фахівцям, машини служитимуть фахівцям. Комп'ютер має бути медіумом для думки кожного, а гіпертекст — нелінійне читання й письмо, яким керує сам читач, — архітектурою, що це здійснить. Це не технічний посібник, а демократична вимога: звичайні люди мають розуміти машини, які дедалі більше формують їх самих.",
+  c:"Звільнення в Нельсона індивідуальне: окремий користувач вільно мандрує інформацією. Він недооцінює, як соціальні структури, гроші й динаміка платформ визначають, що люди насправді роблять із відкритими системами. Через п'ятдесят років веб зробив гіпертекст загальним — і все одно прийшов до алгоритмічних огорож, дезінформації й монополій на увагу. Маніфест гостро б'є по вартових технологій, але не пояснює, як звільнювальний дизайн переживає зустріч із капіталом.",
+  w:"Рішення про архітектуру інформації, налаштування за замовчуванням і доступ — не нейтральний UX: вони розподіляють владу між користувачами, тими, хто керує системою, і самою платформою. Вимога Нельсона, щоб нефахівці могли зрозуміти й змінити техніку, — аргумент за прозорість і проти складності, яка зосереджує контроль у руках інженерів. Проєктуючи інструмент, ти не лише шукаєш потреби людей, а й вирішуєш, чия модель світу ним керуватиме."},
+ bush:{m:"as-we-may-think",cap:"Life, 10 вересня 1945",
+  a:"Знань стало більше, ніж людина здатна знайти. Бібліотеки впорядковують їх за алфавітом, а розум працює асоціаціями, тож потрібна машина, яка запам'ятовує шлях думки між документами.",
+  c:"Memex зібраний з техніки 1945 року: мікрофільм, важелі, фотокамера. Цифрових комп'ютерів, які Буш добре знав, у ньому немає. Стежки приватні: ними можна поділитися, але не можна разом їх редагувати. Сам Буш керував воєнною наукою США, і його оптимізм щодо науки звучить інакше після Хіросіми.",
+  w:"Енґельбарт прочитав есей у 1945-му і через двадцять років показав NLS. Нельсон цитує його, коли вводить слово «гіпертекст». Беклінки й графи в Obsidian і Roam — це ті самі стежки Буша."},
+ xanadu:{m:"project-xanadu",cap:"Знак Project Xanadu",
+  a:"Документи не треба копіювати, їх треба цитувати наживо. Кожен фрагмент знає, звідки він і куди його вставили, а посилання ведуть в обидва боки й не ламаються.",
+  c:"За шістдесят років повної системи так і не вийшло: Нельсон не погоджувався на компроміси, а вимоги були на межі тодішньої техніки. Wired у 1995 році назвав Xanadu найдовшим vaporware в історії комп'ютерів.",
+  w:"Веб узяв від Xanadu гіпертекст, але відмовився від двобічних посилань, тому в нас бувають мертві лінки. Беклінки в Roam і Obsidian, вставки блоків і transclusion у вікі повертають те, чого Нельсон вимагав від початку."},
+ wec:{m:"whole-earth-catalog",cap:"The Last Whole Earth Catalog, 1971",
+  a:"Людям потрібен доступ до інструментів, щоб самим учитися, будувати і змінювати своє життя. Знання про інструменти мають іти від користувачів до користувачів, без посередників.",
+  c:"Каталог звертався до освічених білих читачів, у яких були гроші на інструменти, і вірив, що техніка сама по собі звільняє. Фред Тернер у «From Counterculture to Cyberculture» показує, як ця віра перейшла в техно-лібертаріанство Кремнієвої долини.",
+  w:"Джобс назвав каталог «Google у паперовій формі, за 35 років до Google». Бренд потім запустив WELL, одну з перших онлайн-спільнот. З цього кола виходить думка, що комп'ютер — особистий інструмент свободи."},
+ arpanet:{m:"arpanet-imp-log-book",cap:"Журнал IMP з UCLA: 29 жовтня 1969 тут записано перше повідомлення мережею",
+  a:"Дорогі комп'ютери в різних університетах можна з'єднати мережею, де дані йдуть пакетами, і тоді дослідники ділитимуться машинами й програмами на відстані.",
+  c:"Мережу будували для спільного машинного часу, а користувалися нею переважно для пошти. Доступ мали лише ті, хто працював на контракти Пентагону, тож перша мережа була закритим клубом.",
+  w:"Пакети, протоколи і RFC, традиція відкритих документів «на обговорення», стали основою інтернету. Перше повідомлення мало бути «LOGIN», але система впала після «LO», і цей запис досі лежить у журналі на фото."},
+ hypercard:{m:"apple-hypercard-user-guide",cap:"HyperCard User's Guide, Apple",
+  a:"Програмувати може кожен, якщо програма виглядає як стос карток із кнопками, а не як код.",
+  c:"Стоси жили на одному комп'ютері і не мали посилань у мережу. Аткінсон пізніше казав, що якби мислив мережею, а не одним Mac, то міг би прийти до вебу. Apple так і не розвинула HyperCard і тихо закрила його у 2004 році.",
+  w:"Перший прототип вікі Ворд Каннінгем зробив у HyperCard. Myst теж зібрали в ньому. Рука-курсор над посиланням у браузері звідси."},
+ mac:{m:"mac-se",cap:"Macintosh SE, 1987, наступник першого Mac",
+  a:"Комп'ютер «для решти з нас»: миша, вікна й піктограми замість командного рядка, щоб ним могла користуватися людина без підготовки.",
+  c:"Перший Mac мав 128 КБ пам'яті й один дисковод, для серйозної роботи цього бракувало. Закрита коробка без слотів розширення зробила користувача споживачем, а не тим, хто перебудовує свою машину, як було з Apple II.",
+  w:"Графічний інтерфейс PARC став нормою для всіх. На Mac з'явилися настільна верстка і HyperCard. Його 1-бітна графіка і шрифт Chicago Сьюзан Кер — візуальна мова цієї мапи."},
+ tbl89:{m:"original-www-proposal",cap:"Схема з «Information Management: A Proposal», CERN, 1989",
+  a:"CERN губить знання, бо люди приходять і йдуть, а інформація лежить у деревах папок. Потрібна не ієрархія, а павутина вузлів і посилань, яку можна читати з будь-якого комп'ютера.",
+  c:"Записку майже не помітили: начальник Майк Сендолл написав на ній «Vague but exciting». Двобічні посилання й версії, які були в Xanadu, Бернерс-Лі свідомо відкинув заради простоти.",
+  w:"З цієї записки виріс веб. Схема на першій сторінці, кульки й стрілки, сама є маленьким графом знань і предком мапи, яку ти зараз дивишся."},
+ google:{m:"the-anatomy-of-a-large-scale-hypertextual-web-search-engine",cap:"Перша сторінка статті Бріна і Пейджа, 1998",
+  a:"Посилання — це голоси: сторінка важлива, якщо на неї посилаються інші важливі сторінки. Так структуру самого вебу можна використати, щоб шукати краще, ніж каталоги й підрахунок слів.",
+  c:"У додатку до тієї ж статті Брін і Пейдж попереджали, що пошуковик, який живе з реклами, схилятиметься на бік рекламодавців. Згодом Google став саме таким, а пошук перетворився на поле боротьби за SEO.",
+  w:"PageRank зробив із чужих посилань карту довіри. Пошук витіснив каталоги на кшталт Yahoo, а рядок запиту замінив стежки Буша: ми вже не ходимо від документа до документа, а питаємо."},
+};
+const EVENTS=[
+ [1825,"перша залізниця"],[1839,"фотографія (дагеротип)"],[1859,"Дарвін «Походження видів»"],[1865,"скасування рабства у США"],[1869,"періодична таблиця Менделєєва"],[1882,"Ніцше: «Бог помер»"],[1895,"кіно братів Люм'єр"],
+ [1900,"Фройд «Тлумачення сновидінь»"],[1903,"політ братів Райт"],[1905,"Ейнштейн, теорія відносності"],[1908,"Ford Model T"],[1913,"конвеєр Форда"],[1914,"Перша світова"],[1920,"радіомовлення"],[1927,"звукове кіно"],[1933,"Гітлер при владі"],[1936,"телебачення"],[1939,"Друга світова"],[1945,"кінець війни"],[1947,"транзистор"],[1957,"Супутник"],[1964,"Маклюен «Розуміння медіа»"],
+ [1968,"травень 68"],[1969,"Аполлон-11"],[1971,"email, Intel 4004"],[1977,"Apple II"],[1981,"IBM PC"],[1983,"TCP/IP"],
+ [1989,"падіння Берлінського муру"],[1991,"незалежність України"],[1995,"Windows 95, Amazon"],[1997,"Deep Blue обіграє Каспарова"],[2000,"доткомова криза"],
+ [2004,"Facebook"],[2007,"iPhone"],[2010,"iPad"],[2016,"AlphaGo"],[2020,"пандемія"]
+];
+
+const YR=n=>n.yl||n.y;
+const byId={};N.forEach(n=>{byId[n.id]=n;n.f=n.f||[];n.kids=[]});
+N.forEach(n=>n.f.forEach(p=>byId[p]&&byId[p].kids.push(n.id)));
+const Y0=1800,Y1=2044,NOW=2026,AX=74,H=58,ROW=76;
+const mob=()=>innerWidth<=760;
+let PX=34, sel=null, hover=null, seam=null, show={text:true,prog:true,edges:true};
+
+const $=s=>document.querySelector(s);
+const scroll=$("#scroll"),canvas=$("#canvas"),lanesEl=$("#lanes"),nodesEl=$("#nodes"),edgesEl=$("#edges"),axis=$("#axis"),cursor=$("#cursor"),status=$("#status");
+const GUT=()=>mob()?96:150, NW=()=>mob()?132:150;
+// шкала рівномірна від Y0; ліворуч від неї — стиснута «давня» зона з розривом шкали (commonplace books, давні події)
+const OLD0=1500, ZONE=()=>mob()?300:380;
+const X=y=>GUT()+12+(y>=Y0?ZONE()+(y-Y0)*PX:(Math.max(y,OLD0)-OLD0)/(Y0-OLD0)*(ZONE()-44));
+const yearAt=x=>{const d=x-GUT()-12-ZONE();return d<0?null:Y0+d/PX};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function layout(){
+  const W=NW(), total=X(Y1)+W;
+  canvas.style.width=total+"px";
+  // axis
+  let ah=`<div class="corner">рік →<br>поруч у світі ◆</div><div class="future" style="left:${X(NOW)}px">✦ сьогодні → далі</div>`;
+  const zx=GUT()+12, bx=X(Y0)-12;
+  const k=Math.round((Y0-OLD0)*PX/(ZONE()-44)), m10=k%10, m100=k%100;
+  const raz=m10===1&&m100!==11?"раз":m10>=2&&m10<=4&&(m100<12||m100>14)?"рази":"разів";
+  ah+=`<div class="oldzone${EVENTS.some(e=>e[0]<Y0)?" low":""}" style="left:${GUT()}px;width:${bx-GUT()}px">XVI ст. — ${Y0} · шкала стиснута у ${k} ${raz}</div>`;
+  for(let y=Y0;y<=Y1;y++){
+    const f=y>NOW?" fut":"";
+    if(y%10===0) ah+=`<div class="tick${f}" style="left:${X(y)}px">${y}</div>`;
+    else if(y%5===0) ah+=`<div class="tick minor${f}" style="left:${X(y)}px"></div>`;
+  }
+  const evEnd=[-1e9,-1e9,-1e9], olds=EVENTS.filter(e=>e[0]<Y0), step=(ZONE()-40)/Math.max(1,olds.length);
+  EVENTS.forEach(e=>{
+    const old=e[0]<Y0, label=(old?e[0]+" · ":"")+e[1], x=old?zx+6+olds.indexOf(e)*step:X(e[0]), w=label.length*6.6+16;
+    let row=evEnd.findIndex(end=>end+6<=x); if(row<0)row=evEnd.indexOf(Math.min(...evEnd));
+    evEnd[row]=x+w;
+    ah+=`<div class="ev" data-y="${e[0]}" style="left:${x}px;top:${24+row*16}px" title="${e[0]}">${esc(label)}</div>`;
+  });
+  axis.innerHTML=ah; axis.style.width=total+"px";
+  // lanes
+  let top=AX, lh="";
+  const BAND=mob()?26:30;
+  LANES.forEach((L,i)=>{
+    const prev=LANES[i-1], next=LANES[i+1];
+    if(L.fam&&prev?.fam!==L.fam) lh+=`<div class="family"><div class="fwrap" aria-hidden="true"><span class="fname"><b>${FAMS[L.fam]}</b></span></div>`;
+    const rows=[];
+    N.filter(n=>n.l===L.k&&show[n.t]).sort((a,b)=>a.y-b.y).forEach(n=>{
+      const x=n.y<Y0?Math.min(X(n.y),X(Y0)-20-W):X(n.y); let r=rows.findIndex(end=>end+14<=x); if(r<0){r=rows.length;rows.push(0)}
+      rows[r]=x+W; n.x=x; n.r=r;
+    });
+    const h=Math.max(1,rows.length)*ROW+20;
+    N.filter(n=>n.l===L.k).forEach(n=>n.yy=top+14+n.r*ROW);
+    lh+=`<div class="lane${L.fam?" fam":""}" style="height:${h}px"><span class="lane-label">${L.t}<small>${L.s}</small></span></div>`;
+    top+=h;
+    if(L.fam&&next?.fam===L.fam){
+      const si=SEAMS.findIndex(S=>S.a===L.k&&S.b===next.k), S=SEAMS[si];
+      lh+=`<div class="band" style="height:${BAND}px"><span class="bl">${S?`<button class="seam" data-s="${si}" title="${esc(L.t+" ↔ "+next.t+": "+S.t)}"><span class="full">${esc(S.t)}</span><span class="short" aria-hidden="true">↔</span></button>`:""}</span></div>`;
+      top+=BAND;
+    }
+    if(L.fam&&next?.fam!==L.fam) lh+=`</div>`;
+  });
+  lanesEl.innerHTML=lh; canvas.style.height=top+"px";
+  const brk=$("#brk"); brk.style.left=(X(Y0)-8)+"px"; brk.style.height=top+"px";
+  warnBot.bounds(GUT()+14,AX+8,X(Y0)-14,top-10);
+  cursor.style.height=top+"px";
+  drawSpace(total,top);
+  // nodes
+  nodesEl.innerHTML=N.map(n=>{
+    const k=Math.min(5,n.kids.length);
+    const kids=n.t==="text"&&k?`<span class="kids">${"<i></i>".repeat(k)}</span>`:"";
+    const h=n.t==="text"?`<div class="h">¶ ${esc(n.n)}</div>`:`<div class="h"><span>${esc(n.n)}</span></div>`;
+    return `<button class="node ${n.t}${show[n.t]?"":" off"}" data-id="${n.id}" style="left:${n.x}px;top:${n.yy}px;--w:${W}px" aria-label="${esc(n.n)}, ${YR(n)}, ${n.t==="text"?"текст":"програма"}">${h}<div class="b"><span class="yr">${YR(n)}</span><span class="who">${esc(n.w)}</span>${kids}</div></button>`;
+  }).join("");
+  nodesEl.style.width=total+"px";
+  drawEdges(); paint();
+}
+
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+// майбутнє: мапа розчиняється в 1-бітний космос із галактикою
+function drawSpace(total,h){
+  const sv=$("#space"); sv.setAttribute("width",total); sv.setAttribute("height",h);
+  const xs=X(NOW), bw=PX*.9, x0=xs-bw*4, W2=total-xs, r=rng(1945);
+  const pat=(id,w,cells,fill="#000")=>`<pattern id="${id}" width="${w}" height="${w}" patternUnits="userSpaceOnUse">${cells.map(([x,y])=>`<rect x="${x}" y="${y}" width="1" height="1" fill="${fill}"/>`).join("")}</pattern>`;
+  let g=`<defs>${pat("d1",4,[[0,0]])}${pat("d2",4,[[0,0],[2,2]])}${pat("d3",2,[[0,0],[1,1]])}${pat("d4",2,[[0,0],[1,0],[0,1]])}
+    ${pat("w1",4,[[0,0],[2,2]],"#fff")}${pat("w2",2,[[0,0],[1,1]],"#fff")}${pat("w3",2,[[0,0],[1,0],[0,1]],"#fff")}
+    </defs>`;
+  ["d1","d2","d3","d4"].forEach((d,i)=>g+=`<rect x="${x0+i*bw}" y="${AX}" width="${bw+1}" height="${h-AX}" fill="url(#${d})"/>`);
+  g+=`<rect x="${xs}" y="${AX}" width="${W2}" height="${h-AX}" fill="#000"/>`;
+  // зорі
+  const n=Math.round((W2+bw*3)*(h-AX)/1400);
+  for(let i=0;i<n;i++){
+    const x=x0+bw*1.5+r()*(total-x0-bw*1.5), y=AX+4+r()*(h-AX-8);
+    if(x<xs&&r()>(x-x0)/(xs-x0))continue;
+    const k=r();
+    if(k<.05) g+=`<path d="M${x-5},${y}h11M${x},${y-5}v11" stroke="#fff" stroke-width="1"/><rect x="${x-1}" y="${y-1}" width="3" height="3" fill="#fff"/>`;
+    else g+=`<rect x="${x}" y="${y}" width="${k<.35?2:1}" height="${k<.35?2:1}" fill="#fff"/>`;
+  }
+  // галактика: спіральні рукави з пікселів, щільне ядро
+  const gauss=()=>(r()+r()+r()+r()-2)/2;
+  const galaxy=(gx,gy,Rg,arms,wind,tilt,rot,n)=>{
+    let d="";const c=Math.cos(rot),sn=Math.sin(rot);
+    const dot=(x,y,sz)=>{y*=tilt;const X=gx+x*c-y*sn,Y=gy+x*sn+y*c;if(X>xs-bw&&X<total&&Y>AX&&Y<h)d+=`M${X|0},${Y|0}h${sz}v${sz}h-${sz}z`};
+    for(let i=0;i<n*.35;i++){const th=r()*6.283,rr=Rg*.2*Math.abs(gauss());dot(Math.cos(th)*rr,Math.sin(th)*rr,r()<.5?2:1)}
+    for(let k=0;k<arms;k++)for(let i=0;i<n*.5/arms;i++){
+      const t=Math.pow(r(),.8), th=k*6.283/arms+t*wind, rr=Rg*(.1+.9*t), j=Rg*(.025+.07*t);
+      dot(Math.cos(th)*rr+gauss()*j,Math.sin(th)*rr+gauss()*j,r()<.25*(1-t)+.08?2:1);
+    }
+    for(let i=0;i<n*.15;i++){const th=r()*6.283,rr=Rg*Math.sqrt(r());dot(Math.cos(th)*rr,Math.sin(th)*rr,1)}
+    return `<path d="${d}" fill="#fff"/>`;
+  };
+  const Rg=Math.max(120,Math.min(W2*.4,290)), gx=xs+W2*.62, gy=AX+Rg*.62+150;
+  g+=galaxy(gx,gy,Rg,2,8.6,.48,-.38,2600);
+  g+=`<rect x="${gx-3}" y="${gy-3}" width="6" height="6" fill="#fff"/><path d="M${gx-12},${gy}h25M${gx},${gy-12}v25" stroke="#fff"/>`;
+  g+=galaxy(xs+Math.max(80,W2*.22),gy+Rg*.9+120,Rg*.28,3,5,.7,.5,420);
+  g+=galaxy(xs+W2*.88,gy+Rg*1.3+160,Rg*.18,2,6,.35,.9,220);
+  // падаюча зірка
+  const sx=xs+W2*.9, sy=AX+60;
+  g+=`<path d="M${sx-90},${sy-30}L${sx},${sy}" stroke="#fff" stroke-dasharray="1 3"/><path d="M${sx-30},${sy-10}L${sx},${sy}" stroke="#fff" stroke-width="2"/>`;
+  // напис
+  const tx=xs+28, ty=AX+80;
+  g+=`<text x="${tx}" y="${ty}" fill="#fff" style="font:600 30px 'Pixelify Sans',monospace">далі — ?</text>
+    <text x="${tx}" y="${ty+28}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Мапа закінчується сьогоднішнім днем.</text>
+    <text x="${tx}" y="${ty+48}" fill="#fff" style="font:14px 'IBM Plex Sans',Arial,sans-serif">Наступний інструмент для думання ще не написаний.</text>`;
+  sv.innerHTML=g;
+  sky.setup({x0:xs-bw*2,xs,total,top:AX,h,gx,gy,Rg,text:{x:xs+20,y:AX+40,w:420,h:110}});
+}
+// живе небо: падають зорі й народжуються галактики
+const sky=(()=>{
+  const cv=$("#sky"), ctx=cv.getContext("2d"), still=matchMedia("(prefers-reduced-motion: reduce)");
+  let S=null, stars=[], gals=[], nextStar=0, nextGal=0, raf=0, seen=false, started=false, r=Math.random;
+  const sc=$("#scroll");
+  const view=()=>{const L=Math.max(S.xs,sc.scrollLeft),T=Math.max(S.top,sc.scrollTop+S.top),R=Math.min(S.total,sc.scrollLeft+sc.clientWidth),B=Math.min(S.h,sc.scrollTop+sc.clientHeight);return R-L>60&&B-T>60?{L,T,R,B}:{L:S.xs,T:S.top,R:S.total,B:S.h}};
+  const ga=()=>(r()+r()+r()-1.5)/1.5;
+  function setup(o){
+    S=o; const dpr=Math.min(2,devicePixelRatio||1), w=o.total-o.x0, h=o.h-o.top;
+    Object.assign(cv.style,{left:o.x0+"px",top:o.top+"px",width:w+"px",height:h+"px"});
+    cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    stars=[]; gals=[]; nextStar=performance.now()+800; nextGal=performance.now()+1500;
+    if(!started)start();
+  }
+  function place(rad){
+    for(let k=0;k<30;k++){
+      const V=view(), x=V.L+rad+r()*Math.max(1,V.R-V.L-rad*2), y=V.T+rad+r()*Math.max(1,V.B-V.T-rad*2), T=S.text;
+      if(x+rad>T.x&&x-rad<T.x+T.w&&y+rad>T.y&&y-rad<T.y+T.h)continue;
+      if(Math.hypot(x-S.gx,(y-S.gy)*1.8)<S.Rg+rad)continue;
+      if(gals.some(g=>Math.hypot(g.x-x,g.y-y)<g.R+rad+20))continue;
+      return [x,y];
+    }
+  }
+  function newGal(now){
+    const R=24+r()*46, p=place(R); if(!p)return;
+    const arms=2+(r()<.35), wind=4+r()*5, tilt=.35+r()*.6, rot=r()*6.28, n=Math.round(R*7);
+    const pts=[];
+    for(let i=0;i<n*.3;i++){const th=r()*6.283;pts.push([th,R*.2*Math.abs(ga()),0,r(),r()<.5?2:1])}
+    for(let k=0;k<arms;k++)for(let i=0;i<n*.7/arms;i++){const t=Math.pow(r(),.8);pts.push([k*6.283/arms+t*wind,R*(.1+.9*t),t,r(),r()<.2*(1-t)+.05?2:1,ga()*R*(.03+.08*t),ga()*R*(.03+.08*t)])}
+    gals.push({x:p[0],y:p[1],R,tilt,rot,pts,born:now,grow:5000+r()*3000,life:16000+r()*12000,fade:3500,spin:(r()<.5?-1:1)*(.00004+r()*.00005)});
+  }
+  function newStar(now){
+    const V=view(), x=V.L+r()*(V.R-V.L), y=V.T+10+r()*(V.B-V.T)*.6, a=.35+r()*.5, dir=r()<.5?1:-1;
+    stars.push({x,y,dx:Math.cos(a)*dir,dy:Math.sin(a),len:140+r()*220,born:now,dur:600+r()*600});
+  }
+  const px=(x,y,z)=>ctx.fillRect(Math.round(x-S.x0),Math.round(y-S.top),z,z);
+  function frame(now){
+    raf=0; if(!S||!seen||document.hidden)return;
+    ctx.clearRect(0,0,cv.width,cv.height); ctx.fillStyle="#fff";
+    if(now>nextStar){newStar(now);nextStar=now+1800+r()*4200}
+    if(now>nextGal&&gals.length<4){newGal(now);nextGal=now+3000+r()*5000}
+    stars=stars.filter(s=>{
+      const t=(now-s.born)/s.dur; if(t>1.25)return false;
+      const head=Math.min(1,t)*s.len, tail=Math.max(0,head-70*(t>1?1-(t-1)*4:1));
+      for(let d=tail;d<head;d+=3)if(r()>(head-d)/90)px(s.x+s.dx*d,s.y+s.dy*d,1);
+      if(t<1){px(s.x+s.dx*head-1,s.y+s.dy*head-1,2)}
+      return true;
+    });
+    gals=gals.filter(g=>{
+      const age=now-g.born; if(age>g.life)return false;
+      const grow=Math.min(1,age/g.grow), out=Math.max(0,(age-(g.life-g.fade))/g.fade);
+      const ease=1-Math.pow(1-grow,3), c=Math.cos(g.rot+age*g.spin), sn=Math.sin(g.rot+age*g.spin);
+      for(const q of g.pts){
+        if(q[2]>ease||q[3]<out)continue;
+        const th=q[0]-(1-ease)*2.2, rr=q[1]*(.35+.65*ease);
+        let x=Math.cos(th)*rr+(q[5]||0), y=(Math.sin(th)*rr+(q[6]||0))*g.tilt;
+        px(g.x+x*c-y*sn,g.y+x*sn+y*c,q[4]);
+      }
+      if(age<900){const k=1-age/900, L=Math.round(4+k*10);ctx.fillRect(Math.round(g.x-S.x0-L),Math.round(g.y-S.top),L*2+1,1);ctx.fillRect(Math.round(g.x-S.x0),Math.round(g.y-S.top-L),1,L*2+1)}
+      return true;
+    });
+    raf=requestAnimationFrame(frame);
+  }
+  function start(){
+    started=true; if(still.matches)return;
+    new IntersectionObserver(es=>{seen=es[0].isIntersecting;if(seen&&!raf)raf=requestAnimationFrame(frame)},{root:$("#scroll")}).observe(cv);
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden&&seen&&!raf)raf=requestAnimationFrame(frame)});
+    seen=true;
+  }
+  return {setup};
+})();
+// плашка «шкала стиснута»: плавно блукає стиснутою зоною і тікає від мишки
+const warnBot=(()=>{
+  const el=$("#warn"), still=matchMedia("(prefers-reduced-motion: reduce)");
+  let B=null, x=0, y=0, vx=0, vy=0, rot=0, head=Math.PI/2, turn=0, mx=-1e4, my=-1e4, raf=0, last=0, placed=false;
+  const draw=()=>{el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`};
+  function bounds(l,t,r,b){
+    B={l,t,r:r-el.offsetWidth,b:b-el.offsetHeight};
+    if(!placed){x=B.r;y=B.t+10;placed=true}
+    x=Math.max(B.l,Math.min(B.r,x));y=Math.max(B.t,Math.min(B.b,y));draw();
+    if(!still.matches&&!raf){last=0;raf=requestAnimationFrame(step)}
+  }
+  function step(now){
+    raf=0; if(!B)return;
+    if(document.hidden){setTimeout(()=>{if(!raf){last=0;raf=requestAnimationFrame(step)}},500);return}
+    const dt=last?Math.min(3,(now-last)/16.7):1; last=now;
+    // напрямок повільно «пливе»: швидкість повороту теж змінюється плавно
+    turn+=(Math.random()-.5)*.012*dt; turn*=Math.pow(.97,dt); turn=Math.max(-.05,Math.min(.05,turn));
+    head+=turn*dt;
+    let tx=Math.cos(head)*1.3, ty=Math.sin(head)*1.3+.25;
+    const cx=x+el.offsetWidth/2, cy=y+el.offsetHeight/2, dx=cx-mx, dy=cy-my, d=Math.hypot(dx,dy)||1;
+    if(d<180){const f=Math.pow((180-d)/180,1.5)*7;tx+=dx/d*f;ty+=dy/d*f;head=Math.atan2(dy,dx)}
+    const k=1-Math.pow(1-(d<180?.12:.03),dt); vx+=(tx-vx)*k; vy+=(ty-vy)*k;
+    x+=vx*dt; y+=vy*dt;
+    if(x<B.l){x=B.l;head=Math.PI-head;vx=Math.abs(vx)}else if(x>B.r){x=B.r;head=Math.PI-head;vx=-Math.abs(vx)}
+    if(y<B.t){y=B.t;head=-head;vy=Math.abs(vy)}else if(y>B.b){y=B.b;head=-head;vy=-Math.abs(vy)}
+    rot+=(Math.max(-6,Math.min(6,vx*1.4))-rot)*(1-Math.pow(.9,dt));
+    draw(); raf=requestAnimationFrame(step);
+  }
+  $("#scroll").addEventListener("mousemove",e=>{const r=$("#canvas").getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top});
+  $("#scroll").addEventListener("mouseleave",()=>{mx=my=-1e4});
+  return {bounds};
+})();
+function drawEdges(){
+  const W=NW(); let s="";
+  N.forEach(b=>b.f.forEach(aid=>{
+    const a=byId[aid]; if(!a||!show[a.t]||!show[b.t])return;
+    let sx,sy,tx,ty,c1x,c1y,c2x,c2y;
+    if(b.x>=a.x+W+24){
+      sx=a.x+W; sy=a.yy+H/2; tx=b.x-2; ty=b.yy+H/2;
+      const d=Math.max(30,(tx-sx)*.45); c1x=sx+d;c1y=sy;c2x=tx-d;c2y=ty;
+    }else{
+      const down=b.yy>a.yy;
+      sx=a.x+W*.6; sy=down?a.yy+H:a.yy; tx=b.x+W*.3; ty=down?b.yy-2:b.yy+H+2;
+      const d=Math.max(20,Math.abs(ty-sy)*.5)*(down?1:-1); c1x=sx;c1y=sy+d;c2x=tx;c2y=ty-d;
+    }
+    const ang=Math.atan2(ty-c2y,tx-c2x), L=11, ex=tx-Math.cos(ang)*L*.8, ey=ty-Math.sin(ang)*L*.8;
+    const p=`M${sx},${sy} C${c1x},${c1y} ${c2x},${c2y} ${ex},${ey}`;
+    const p1=`${tx},${ty}`, p2=`${tx-L*Math.cos(ang-.45)},${ty-L*Math.sin(ang-.45)}`, p3=`${tx-L*Math.cos(ang+.45)},${ty-L*Math.sin(ang+.45)}`;
+    s+=`<g data-a="${a.id}" data-b="${b.id}"><path class="o" d="${p}"/><path class="i" d="${p}"/><polygon points="${p1} ${p2} ${p3}"/></g>`;
+  }));
+  edgesEl.innerHTML=s;
+  edgesEl.setAttribute("width",canvas.style.width);edgesEl.setAttribute("height",canvas.style.height);
+  edgesEl.classList.toggle("hide",!show.edges);
+}
+
+function lineage(id){
+  const up=new Set(),down=new Set();
+  const goU=i=>byId[i].f.forEach(p=>{if(!up.has(p)){up.add(p);goU(p)}});
+  const goD=i=>byId[i].kids.forEach(c=>{if(!down.has(c)){down.add(c);goD(c)}});
+  goU(id);goD(id);return {up,down};
+}
+function paint(){
+  lanesEl.querySelectorAll(".seam").forEach(b=>b.classList.toggle("on",+b.dataset.s===seam));
+  if(seam!=null&&!hover){
+    // шов між партнерами: лишаються лише стрілки-мости між двома лінійками
+    const S=SEAMS[seam], on=new Set(); let k=0;
+    edgesEl.querySelectorAll("g").forEach(g=>{
+      const a=byId[g.dataset.a], b=byId[g.dataset.b];
+      const ok=a.l!==b.l&&[S.a,S.b].includes(a.l)&&[S.a,S.b].includes(b.l);
+      g.classList.toggle("dim",!ok);
+      if(ok){k++;on.add(a.id);on.add(b.id);g.parentNode.appendChild(g)}
+    });
+    nodesEl.querySelectorAll(".node").forEach(e=>{e.classList.remove("self");e.classList.toggle("dim",!on.has(e.dataset.id))});
+    status.textContent=mob()?`${S.t} · мостів: ${k}`:`${LANES.find(l=>l.k===S.a).t} ↔ ${LANES.find(l=>l.k===S.b).t}: ${S.t} · мостів: ${k}`;
+    return;
+  }
+  const id=hover||sel;
+  const nodes=nodesEl.querySelectorAll(".node");
+  if(!id){
+    nodes.forEach(e=>e.classList.remove("dim","self"));
+    edgesEl.querySelectorAll("g").forEach(g=>g.classList.remove("dim"));
+    return;
+  }
+  const {up,down}=lineage(id), on=new Set([id,...up,...down]);
+  nodes.forEach(e=>{const i=e.dataset.id;e.classList.toggle("self",i===id||i===sel);e.classList.toggle("dim",!on.has(i))});
+  edgesEl.querySelectorAll("g").forEach(g=>{
+    const a=g.dataset.a,b=g.dataset.b;
+    const ok=(on.has(a)&&on.has(b))&&((up.has(a)||a===id)&&(up.has(b)||b===id)||(down.has(b)||b===id)&&(down.has(a)||a===id));
+    g.classList.toggle("dim",!ok);
+    if(ok)g.parentNode.appendChild(g);
+  });
+  const n=byId[id];
+  status.textContent=`${YR(n)} · ${n.n} — спирається на ${up.size}, вплинуло на ${down.size}`;
+}
+
+function near(y){
+  return {
+    nodes:N.filter(n=>!n.yl&&Math.abs(n.y-y)<=2&&show[n.t]),
+    ev:EVENTS.filter(e=>Math.abs(e[0]-y)<=2)
+  };
+}
+
+// піксельні значки замість символів: ↗ на iPhone малюється як емодзі
+const ARR=(()=>{let r="";for(let y=0;y<8;y++)for(let x=0;x<8;x++)
+  if((y<=1&&x>=2)||(x>=6&&y<=5)||((x+y===7||x+y===8)&&x<=6&&y>=1))r+=`<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  return `<svg class="arr" viewBox="0 0 8 8" aria-hidden="true">${r}</svg>`})();
+const CURSOR=(()=>{const m=["X.......","XX......","XoX.....","XooX....","XoooX...","XooooX..","XoooooX.","XooooooX","XoooXXXX","XoXooX..","XX.XooX.","X...XX.."];
+  let r="";m.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!==".")r+=`<rect x="${x}" y="${y}" width="1" height="1" class="${c==="X"?"k":"w"}"/>`}));
+  return `<svg class="cur" viewBox="0 0 8 12" aria-hidden="true">${r}</svg>`})();
+function wf(id){const n=byId[id];return `<button class="wf" data-go="${id}">${n.t==="text"?"¶ ":""}${esc(n.n)} <small>${YR(n)}</small></button>`}
+function open(id,{center=false}={}){
+  sel=id; seam=null; const n=byId[id], C=CARD[id];
+  $("#textName").textContent=(n.t==="text"?"¶ ":"")+n.n;
+  const nb=near(n.yl?-1e4:n.y);
+  const around=nb.nodes.filter(m=>m.id!==id&&!n.f.includes(m.id)&&!n.kids.includes(m.id));
+  $("#textBody").innerHTML=`
+    <div class="kind"><span class="tag">${n.kind||(n.t==="text"?"¶ текст":'<i class="ico"></i>програма')}</span><span>${YR(n)}</span><span>· ${esc(LANES.find(l=>l.k===n.l).t)}</span></div>
+    <h2>${esc(n.n)}</h2><p class="who">${esc(n.w)}</p>
+    ${C&&C.cap?`<figure class="obj"><div class="stage" title="Торкнися, щоб побачити в кольорі"><div class="mat"><canvas data-img="ideas-${id}.webp" width="1" height="1"></canvas><img src="ideas-${id}.webp" alt="${esc(C.cap)}"></div><span class="tap" aria-hidden="true">${CURSOR}клік</span></div><figcaption><span>${esc(C.cap)}</span>${C.m?`<a href="${MUSEUM}${C.m}" target="_blank" rel="noopener">Parallel Museum${ARR}</a>`:""}</figcaption></figure>`
+      :`<div class="pic" aria-hidden="true"><span>${YR(n)}</span></div>`}
+    ${C?.a?`<div class="arg"><span class="lab">Ключовий аргумент</span><p>${esc(C.a)}</p></div>`:""}
+    <p>${esc(n.d)}</p>
+    ${C?.c?`<details><summary>Критика</summary><p>${esc(C.c)}</p></details>`:""}${C?.w?`<details><summary>Чому це важливо</summary><p>${esc(C.w)}</p></details>`:""}
+    ${n.f.length?`<h3>← спирається на</h3>${n.f.map(wf).join("")}`:""}
+    ${n.kids.length?`<h3>→ вплинуло на</h3>${n.kids.map(wf).join("")}`:""}
+    ${n.more?`<h3>читати далі</h3>${n.more.map(m=>`<a class="wf" href="${esc(m[2])}" target="_blank" rel="noopener">${esc(m[0])} <small>${esc(m[1])}</small>${ARR}</a>`).join("")}`:""}
+    ${(around.length||nb.ev.length)?`<h3>поруч у часі · ±2 роки</h3>${around.map(m=>wf(m.id)).join("")}${nb.ev.map(e=>`<span class="wf ev">◆ ${esc(e[1])} <small>${e[0]}</small></span>`).join("")}`:""}
+    ${n.u?`<p><a class="go" href="${esc(n.u)}" target="_blank" rel="noopener">відкрити${ARR}</a></p>`:""}`;
+  $("#text").classList.add("open");document.body.classList.add("reading"); $("#textBody").scrollTop=0;
+  ditherAll();
+  history.replaceState(null,"","#"+id);
+  paint();
+  if(center)focusNode(id);
+}
+function focusNode(id,behavior="smooth"){
+  const n=byId[id]; if(!n||n.x==null)return;
+  if(mob()){scroll.scrollTo({left:Math.max(0,n.x-GUT()-16),top:Math.max(0,n.yy-AX-16),behavior});return}
+  const tw=$("#text"), sr=scroll.getBoundingClientRect();
+  const from=Math.max(GUT(),tw.classList.contains("open")?tw.getBoundingClientRect().right-sr.left+20:0);
+  const room=Math.max(NW(),scroll.clientWidth-from);
+  scroll.scrollTo({left:Math.max(0,n.x-from-(room-NW())/2),top:Math.max(0,n.yy-AX-scroll.clientHeight/3),behavior});
+}
+function closeText(){sel=null;$("#text").classList.remove("open");document.body.classList.remove("reading");history.replaceState(null,"",location.pathname);paint()}
+
+// events
+nodesEl.addEventListener("click",e=>{const b=e.target.closest(".node");if(b)open(b.dataset.id)});
+nodesEl.addEventListener("mouseover",e=>{const b=e.target.closest(".node");if(b&&!mob()){hover=b.dataset.id;paint()}});
+nodesEl.addEventListener("mouseout",e=>{const b=e.target.closest(".node");if(b&&!b.contains(e.relatedTarget)){hover=null;paint();if(!sel)status.textContent=defStatus}});
+nodesEl.addEventListener("focusin",e=>{const b=e.target.closest(".node");if(b){hover=b.dataset.id;paint()}});
+nodesEl.addEventListener("focusout",()=>{hover=null;paint()});
+const seamOf=e=>e.target.closest(".seam");
+lanesEl.addEventListener("mouseover",e=>{const b=seamOf(e);if(b&&!mob()){seam=+b.dataset.s;paint()}});
+lanesEl.addEventListener("mouseout",e=>{const b=seamOf(e);if(b&&!b.contains(e.relatedTarget)&&!b.matches(":focus")){seam=null;paint();if(!sel)status.textContent=defStatus}});
+lanesEl.addEventListener("focusin",e=>{const b=seamOf(e);if(b){seam=+b.dataset.s;paint()}});
+lanesEl.addEventListener("focusout",e=>{if(seamOf(e)){seam=null;paint();if(!sel)status.textContent=defStatus}});
+let seamWas=null;
+lanesEl.addEventListener("pointerdown",e=>{if(seamOf(e))seamWas=seam});
+lanesEl.addEventListener("click",e=>{const b=seamOf(e);if(!b)return;const s=+b.dataset.s;seam=seamWas===s&&mob()?null:s;seamWas=seam;paint();if(seam==null&&!sel)status.textContent=defStatus});
+$("#textBody").addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)open(b.dataset.go,{center:true});
+  const st=e.target.closest(".obj .stage");if(st)st.parentNode.classList.toggle("colour")});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>ditherAll());
+$("#closeText").onclick=closeText;
+$("#markBtn").onclick=()=>open("bush",{center:true});
+$("#aboutBtn").onclick=()=>$("#about").classList.toggle("open");
+$("#closeAbout").onclick=()=>$("#about").classList.remove("open");
+addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#about").classList.contains("open"))$("#about").classList.remove("open");else closeText()}});
+if(matchMedia("(pointer:coarse)").matches)status.textContent="Торкнися тексту чи програми, щоб побачити, з чого виросла ідея і що виросло з неї.";
+const defStatus=status.textContent;
+
+// time cursor: what happened nearby
+const nearEls=new Set();
+scroll.addEventListener("mousemove",e=>{
+  const r=canvas.getBoundingClientRect(), x=e.clientX-r.left;
+  const ya=yearAt(x);
+  if(x<GUT()||ya==null){cursor.style.display="none";return}
+  const y=Math.round(ya);
+  cursor.style.display="block";cursor.style.left=x+"px";cursor.querySelector("b").textContent=y;cursor.classList.toggle("fut",y>=NOW);
+  nearEls.forEach(el=>el.classList.remove("near"));nearEls.clear();
+  const nb=near(y);
+  nb.nodes.forEach(n=>{const el=nodesEl.querySelector(`[data-id="${n.id}"]`);el&&(el.classList.add("near"),nearEls.add(el))});
+  axis.querySelectorAll(".ev").forEach(el=>{if(Math.abs(+el.dataset.y-y)<=2){el.classList.add("near");nearEls.add(el)}});
+  if(!hover&&seam==null){
+    const names=nb.nodes.map(n=>n.n).slice(0,4).join(", ");
+    status.textContent=y>NOW?`${y}: ще не написано ✦`:`${y-2}–${y+2}: `+(names||"тиша")+(nb.ev.length?" · ◆ "+nb.ev.map(e=>e[1]).join(", "):"");
+  }
+});
+scroll.addEventListener("mouseleave",()=>{cursor.style.display="none";nearEls.forEach(el=>el.classList.remove("near"));if(!hover&&!sel)status.textContent=defStatus;else paint()});
+
+// tools
+$("#tools").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;const t=b.dataset.t;
+  if(t in show){show[t]=!show[t];b.setAttribute("aria-pressed",show[t]);
+    if(t==="edges")edgesEl.classList.toggle("hide",!show.edges);else{const keep=scroll.scrollLeft/canvas.offsetWidth;layout();scroll.scrollLeft=keep*canvas.offsetWidth}}
+  if(t==="bush")open("bush",{center:true});
+  if(t==="in"||t==="out"){
+    const mid=yearAt(scroll.scrollLeft+scroll.clientWidth/2)??Y0;
+    PX=Math.max(16,Math.min(70,PX+(t==="in"?12:-12)));layout();
+    scroll.scrollLeft=X(mid)-scroll.clientWidth/2;
+  }
+  if(t==="find"&&sel)focusNode(sel);
+});
+
+// draggable windows
+document.querySelectorAll(".drag").forEach(w=>{
+  const bar=w.querySelector(".tbar");
+  bar.addEventListener("pointerdown",e=>{
+    if(mob()||e.target.closest("button"))return;
+    const sx=e.clientX-w.offsetLeft, sy=e.clientY-w.offsetTop;
+    const mv=ev=>{w.style.left=Math.max(0,ev.clientX-sx)+"px";w.style.top=Math.max(28,ev.clientY-sy)+"px";w.style.right="auto"};
+    const up=()=>{removeEventListener("pointermove",mv);removeEventListener("pointerup",up)};
+    addEventListener("pointermove",mv);addEventListener("pointerup",up);
+  });
+});
+
+// theme
+const root=document.documentElement;
+// 1-бітне фото в картці: Atkinson dithering, 1 CSS-піксель = 1 крапка
+const imgCache={};
+function rgbOf(c){const d=document.createElement("canvas").getContext("2d");d.fillStyle=c;const h=d.fillStyle;
+  return h.startsWith("#")?[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)):h.match(/\d+/g).slice(0,3).map(Number)}
+function dither(cv,img){
+  const maxW=Math.min(380,($("#textBody").clientWidth||420)-90), s=Math.min(maxW/img.naturalWidth,260/img.naturalHeight,1);
+  const w=Math.max(1,Math.round(img.naturalWidth*s)),h=Math.max(1,Math.round(img.naturalHeight*s));
+  cv.width=w;cv.height=h;cv.style.width=w+"px";
+  const x=cv.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);
+  let id;try{id=x.getImageData(0,0,w,h)}catch(e){return} // file:// — лишається звичайне фото
+  const d=id.data,g=new Float32Array(w*h);
+  for(let i=0;i<w*h;i++)g[i]=.299*d[i*4]+.587*d[i*4+1]+.114*d[i*4+2];
+  const srt=Float32Array.from(g).sort(),lo=srt[Math.floor(srt.length*.02)],hi=Math.max(lo+1,srt[Math.floor(srt.length*.98)]);
+  for(let i=0;i<w*h;i++)g[i]=Math.min(255,Math.max(0,(g[i]-lo)/(hi-lo)*255));
+  const cs=getComputedStyle(root),ink=rgbOf(cs.getPropertyValue("--ink").trim()),paper=rgbOf(cs.getPropertyValue("--paper").trim());
+  const lum=c=>c[0]+c[1]+c[2], light=lum(ink)>lum(paper)?ink:paper, dark=light===ink?paper:ink; // фото не стає негативом у темній темі
+  for(let y=0;y<h;y++)for(let x0=0;x0<w;x0++){
+    const i=y*w+x0,o=g[i]<128?0:255,e=(g[i]-o)/8;g[i]=o;
+    if(x0+1<w)g[i+1]+=e; if(x0+2<w)g[i+2]+=e;
+    if(y+1<h){if(x0>0)g[i+w-1]+=e;g[i+w]+=e;if(x0+1<w)g[i+w+1]+=e}
+    if(y+2<h)g[i+2*w]+=e;
+    const c=o?light:dark;d[i*4]=c[0];d[i*4+1]=c[1];d[i*4+2]=c[2];d[i*4+3]=255;
+  }
+  x.putImageData(id,0,0);
+  cv.closest(".obj").classList.add("dithered");
+}
+function ditherAll(){
+  document.querySelectorAll("#textBody canvas[data-img]").forEach(cv=>{
+    const u=cv.dataset.img;let im=imgCache[u];
+    if(!im){im=imgCache[u]=new Image();im.src=u}
+    if(im.complete&&im.naturalWidth)dither(cv,im);else im.addEventListener("load",()=>dither(cv,im),{once:true});
+  });
+}
+
+try{const t=localStorage.getItem("theme");if(t)root.dataset.theme=t}catch(e){}
+$("#themeBtn").onclick=()=>{
+  const dark=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme=dark?"light":"dark";try{localStorage.setItem("theme",root.dataset.theme)}catch(e){}
+  ditherAll();
+};
+
+
+// Галактика: 1-бітна картинка для поради на телефоні.
+// Похила спіральна галактика з яскравим ядром і пиловими смугами повільно обертається, зорі мерехтять.
+// Яскравість передано впорядкованим растром (Bayer 8×8); строго чорно-біла, однакова в обох темах.
+function galaxy(cv){
+  const W=168,H=120; cv.width=W; cv.height=H;
+  const s=Math.max(1,Math.floor(cv.parentNode.clientWidth/W)); cv.style.width=W*s+"px"; cv.style.height=H*s+"px";
+  const x=cv.getContext("2d"), img=x.createImageData(W,H), d=img.data;
+  let seed=9; const rnd=()=>(seed=seed*16807%2147483647)/2147483647;
+  const G=32, grid=Array.from({length:G*G},rnd);
+  const noise=(u,v)=>{u=(u%G+G)%G;v=(v%G+G)%G;const i=Math.floor(u),j=Math.floor(v),fu=u-i,fv=v-j,sm=t=>t*t*(3-2*t);
+    const g=(a,b)=>grid[((b+G)%G)*G+((a+G)%G)],a=g(i,j)+(g(i+1,j)-g(i,j))*sm(fu),b=g(i,j+1)+(g(i+1,j+1)-g(i,j+1))*sm(fu);return a+(b-a)*sm(fv)};
+  const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5], BY=[];
+  for(let j=0;j<8;j++)for(let i=0;i<8;i++)BY.push((4*B4[(j&3)*4+(i&3)]+[0,2,3,1][(j>>2)*2+(i>>2)]+.5)/64); // Bayer 8×8
+  const CX=W*.5, CY=H*.52, TILT=-.34, INC=.42, cT=Math.cos(TILT), sT=Math.sin(TILT);
+  const bright=(px,py,rot)=>{
+    const dx=px-CX, dy=py-CY, u=dx*cT+dy*sT, v=(-dx*sT+dy*cT)/INC, r=Math.hypot(u,v), th=Math.atan2(v,u);
+    const sp=th-rot-Math.log(r+1)*1.35;                                    // координата вздовж рукава
+    const arm=Math.pow(.5+.5*Math.cos(2*sp+noise(r*.18,(sp*3+50))*1.6),1.5);
+    let b=1.5*Math.exp(-r/36)*(.18+1.15*arm)*(.75+.5*noise(u*.15+9,v*.15+9));
+    // пил: темні рвані смуги вздовж рукавів на ближньому (нижньому) боці диска
+    const dust=noise(r*.35+3,(sp*4%G+G)%G)*(v>-4?1:.35)*(r>16&&r<62?1:0);
+    if(dust>.6)b*=Math.max(0,1-(dust-.6)*6);
+    const rs=Math.hypot(dx,dy*1.25);                                      // ядро кругле, не сплющене
+    return b*(1-Math.min(1,Math.max(0,(r-70)/14)))+1.4*Math.exp(-rs/6.5);                      // м'який край диска
+  };
+  const stars=Array.from({length:70},()=>({x:Math.floor(rnd()*W),y:Math.floor(rnd()*H),ph:rnd()*6.3,big:rnd()<.08}));
+  const put=(px,py,on)=>{if(px<0||py<0||px>=W||py>=H)return;const o=(py*W+px)*4,c=on?255:0;d[o]=d[o+1]=d[o+2]=c;d[o+3]=255};
+  let t=0, timer=null;
+  const frame=()=>{
+    const rot=t*.006;
+    for(let py=0;py<H;py++)for(let px=0;px<W;px++)put(px,py,bright(px,py,rot)>BY[(py&7)*8+(px&7)]);
+    stars.forEach(o=>{if(bright(o.x,o.y,rot)>.12)return; const tw=Math.sin(t*.08+o.ph);
+      if(tw>-.6)put(o.x,o.y,1);
+      if(o.big&&tw>.3){put(o.x+1,o.y,1);put(o.x-1,o.y,1);put(o.x,o.y+1,1);put(o.x,o.y-1,1)}});
+    x.putImageData(img,0,0);
+  };
+  frame();
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches)timer=setInterval(()=>{t++;frame()},125);
+  return ()=>clearInterval(timer);
+}
+
+// турботлива порада лише для телефонів, один раз
+(()=>{
+  const phone=matchMedia("(max-width:760px)").matches&&matchMedia("(pointer:coarse)").matches;
+  let seen=false;try{seen=localStorage.getItem("ideas-phone-note")==="1"}catch(e){}
+  if(!phone||seen)return;
+  const el=$("#phone");el.classList.add("open");setTimeout(()=>$("#phoneOk").focus(),50);
+  const stop=galaxy($("#art"));
+  $("#phoneOk").onclick=()=>{stop();el.classList.remove("open");try{localStorage.setItem("ideas-phone-note","1")}catch(e){}};
+})();
+
+let rw;addEventListener("resize",()=>{clearTimeout(rw);rw=setTimeout(layout,150)});
+layout();
+const start=location.hash.slice(1);
+if(byId[start])open(start,{center:true});
+else focusNode("bush","instant"); // за замовчуванням — поруч з As We May Think
+
+</script>
+<script>
+// ── вигляд «Список» ──
+(()=>{
+const body=$("#lbody"), lst=$("#lstatus"), q=$("#lq");
+const FOLDER=`<svg viewBox="0 0 18 14" aria-hidden="true"><path d="M0 2h7l2 2h9v10H0z M2 6v6h14V6z" fill-rule="evenodd"/></svg>`;
+let group="lane", closed=new Set(), lshow={text:true,prog:true};
+try{group=localStorage.getItem("ideas-list-group")||"lane"}catch(e){}
+const laneT=k=>LANES.find(l=>l.k===k).t;
+const decOf=n=>n.y<Y0?"old":Math.floor(n.y/10)*10;
+const hl=(s,t)=>{s=esc(s);if(!t)return s;const i=s.toLowerCase().indexOf(esc(t).toLowerCase());return i<0?s:s.slice(0,i)+"<mark>"+s.slice(i,i+t.length)+"</mark>"+s.slice(i+t.length)};
+const match=(n,t)=>!t||[n.n,n.w,n.d,YR(n)].join(" ").toLowerCase().includes(t);
+function row(n,t){
+  const c=(v)=>`<span class="c${v?"":" z"}">${v||"·"}</span>`;
+  return `<button class="row" role="treeitem" data-id="${n.id}" tabindex="-1">
+    <span class="ic${n.t==="prog"?" p":""}">${n.t==="text"?"¶":""}</span>
+    <span class="nm">${hl(n.n,t)}<em>${esc(n.w)}</em></span>
+    <span class="yr">${esc(YR(n))}</span>
+    <span class="wh">${hl(n.w,t)}</span><span class="lane-t">${esc(laneT(n.l))}</span>
+    ${c(n.f.length)}${c(n.kids.length)}</button>`;
+}
+function render(){
+  const t=q.value.trim().toLowerCase();
+  const items=N.filter(n=>lshow[n.t]&&match(n,t)).sort((a,b)=>a.y-b.y);
+  body.classList.toggle("time",group==="time");
+  $("#hWho").textContent=group==="time"?"Тема":"Хто";
+  $("#listName").textContent=`Список · ${items.length} ${items.length===N.length?"ідей":"з "+N.length}`;
+  if(!items.length){body.innerHTML=`<div class="empty">Нічого не знайшлося. Спробуй інше слово.</div>`;return paintL()}
+  let h="";
+  if(group==="lane"){
+    let fam=null;
+    LANES.forEach((L,i)=>{
+      const its=items.filter(n=>n.l===L.k); if(!its.length)return;
+      if(L.fam!==fam){ if(fam)h+=`</div>`; fam=L.fam||null;
+        if(fam){const mates=LANES.filter(x=>x.fam===fam).map(x=>x.t).join(" · ");h+=`<div class="fam-h">${esc(FAMS[fam])}<small>${esc(mates)}</small></div><div class="fam-b">`} }
+      const open=!!t||!closed.has(L.k);
+      h+=`<button class="folder" role="treeitem" aria-expanded="${open}" data-k="${L.k}" tabindex="-1"><i class="tri"></i>${FOLDER}<b>${esc(L.t)}</b><small>${esc(L.s)}</small><span class="n">${its.length}</span></button>
+      <div class="kids-of" role="group"${open?"":" hidden"}>${its.map(n=>row(n,t)).join("")}</div>`;
+    });
+    if(fam)h+=`</div>`;
+  }else{
+    const decs=[...new Set(items.map(decOf))];
+    decs.forEach(d=>{
+      const its=items.filter(n=>decOf(n)===d);
+      const ev=EVENTS.filter(e=>d==="old"?e[0]<Y0:e[0]>=d&&e[0]<d+10).map(e=>"◆ "+e[1]).join(" · ");
+      h+=`<div class="dec">`+`<div class="dec-h${d!=="old"&&d+10>NOW?" fut":""}">${d==="old"?"XVI ст. — 1800":d+"-ті"}<small>${its.length}</small>${ev?`<span class="ev">${esc(ev)}</span>`:""}</div>${its.map(n=>row(n,t)).join("")}</div>`;
+    });
+  }
+  body.innerHTML=h; paintL();
+}
+function paintL(){
+  const id=sel, L=id?lineage(id):null;
+  body.querySelectorAll(".row").forEach(r=>{const i=r.dataset.id;
+    r.classList.toggle("self",i===id);
+    r.classList.toggle("up",!!id&&byId[id].f.includes(i));
+    r.classList.toggle("down",!!id&&byId[id].kids.includes(i));
+    r.classList.toggle("hit",!!q.value.trim());
+    r.setAttribute("aria-selected",i===id);
+  });
+  if(id){const n=byId[id];lst.textContent=`${YR(n)} · ${n.n} — ← спирається на ${n.f.length} (усього предків ${L.up.size}) · → вплинуло на ${n.kids.length} (усього ${L.down.size})`}
+  else lst.textContent="Клік — картка; ← → поруч із назвою позначають, на що ідея спирається і що з неї виросло. ↑↓ ←→ Enter — з клавіатури.";
+  const first=body.querySelector(".row.self")||body.querySelector("[role=treeitem]");
+  body.querySelectorAll("[tabindex='0']").forEach(e=>e.tabIndex=-1); if(first)first.tabIndex=0;
+}
+// open() і closeText() викликають paint() — заодно оновлюємо позначки в списку
+const _paint=paint;
+paint=function(){_paint();paintL();if(document.body.classList.contains("list")){const r=body.querySelector(".row.self");r&&r.scrollIntoView({block:"nearest"})}};
+body.addEventListener("click",e=>{
+  const f=e.target.closest(".folder");
+  if(f){const k=f.dataset.k,op=f.getAttribute("aria-expanded")!=="true";op?closed.delete(k):closed.add(k);
+    f.setAttribute("aria-expanded",op);f.nextElementSibling.hidden=!op;return}
+  const r=e.target.closest(".row"); if(r)open(r.dataset.id);
+});
+body.addEventListener("keydown",e=>{
+  const all=[...body.querySelectorAll("[role=treeitem]")].filter(x=>x.offsetParent);
+  const cur=document.activeElement, i=all.indexOf(cur); if(i<0)return;
+  const go=j=>{const x=all[Math.max(0,Math.min(all.length-1,j))];x.focus();x.scrollIntoView({block:"nearest"})};
+  if(e.key==="ArrowDown"){e.preventDefault();go(i+1)}
+  else if(e.key==="ArrowUp"){e.preventDefault();go(i-1)}
+  else if(e.key==="ArrowRight"&&cur.classList.contains("folder")&&cur.getAttribute("aria-expanded")==="false"){cur.click()}
+  else if(e.key==="ArrowLeft"){if(cur.classList.contains("folder")){if(cur.getAttribute("aria-expanded")==="true")cur.click()}else{const f=cur.closest(".kids-of")?.previousElementSibling;f&&f.focus()}}
+});
+$("#list .lbar").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.g){group=b.dataset.g;try{localStorage.setItem("ideas-list-group",group)}catch(e){}
+    $("#list .lbar").querySelectorAll("[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===group));render()}
+  if(b.dataset.t){lshow[b.dataset.t]=!lshow[b.dataset.t];b.setAttribute("aria-pressed",lshow[b.dataset.t]);render()}
+});
+q.addEventListener("input",render);
+$("#list .lbar").querySelectorAll("[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===group));
+// перемикач Мапа / Список
+function view(v){
+  document.body.classList.toggle("list",v==="list");
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));
+  try{localStorage.setItem("ideas-view",v)}catch(e){}
+  if(v==="map"){layout();if(sel)focusNode(sel,"instant")}else{render();const r=body.querySelector(".row.self");r&&r.scrollIntoView({block:"center"})}
+}
+document.querySelector(".seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)view(b.dataset.v)});
+$("#onmap").onclick=()=>view("map");
+let v0="map";try{v0=localStorage.getItem("ideas-view")||"map"}catch(e){}
+render(); view(v0);
+})();
+</script>
+</body>
+</html>
