@@ -73,21 +73,20 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .svc figcaption b{font-weight:500}
 @media (max-width:760px){.svc{height:auto}.svc-in{grid-template-columns:1fr;height:auto}.svc-txt{border-right:0;overflow:visible}.svc figure{order:-1;height:62vh}}
 
-/* «Написати мені» — смуга-поле повідомлення: у ній самі собою друкуються можливі листи до мене */
-.tg{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:20px;padding:20px var(--g);background:var(--ink);color:var(--bg);text-decoration:none;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);transition:background .25s,color .25s;cursor:pointer}
-.tg-l{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.6;white-space:nowrap}
-.tg-msg{font-family:var(--f-display);font-weight:500;font-size:clamp(20px,2.8vw,38px);letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:clip;min-height:1.2em}
-.tg-msg::after{content:"";display:inline-block;width:.08em;height:1em;margin-left:.06em;vertical-align:-.12em;background:currentColor;animation:caret 1s steps(1) infinite}
+/* «Написати мені» — бульбашка повідомлення біля обличчя на фото; в ній по черзі друкуються листи до мене */
+.tg{position:absolute;z-index:2;width:min(300px,58%);display:block;padding:12px 16px 14px;background:#fff;color:#141414;text-decoration:none;border-radius:20px 20px 4px 20px;box-shadow:0 10px 30px rgba(0,0,0,.28);transform-origin:100% 100%;transition:background .25s,color .25s,transform .35s cubic-bezier(.2,.7,.2,1);animation:pop .6s cubic-bezier(.2,1.4,.4,1) .4s both}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.tg-l{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.55;margin-bottom:6px}
+.tg-msg{display:block;font-family:var(--f-display);font-weight:500;font-size:clamp(17px,1.6vw,21px);line-height:1.22;letter-spacing:-.01em;min-height:2.44em}
+.tg-msg::after{content:"";display:inline-block;width:2px;height:1em;margin-left:2px;vertical-align:-.14em;background:currentColor;animation:caret 1s steps(1) infinite}
 @keyframes caret{50%{opacity:0}}
-.tg-r{display:flex;align-items:center;gap:14px;font-size:clamp(12px,1.1vw,15px);white-space:nowrap}
-.tg-send{display:grid;place-items:center;width:clamp(44px,4.4vw,60px);aspect-ratio:1;border-radius:50%;background:var(--bg);color:var(--ink);transition:background .25s,color .25s,transform .35s cubic-bezier(.2,.7,.2,1)}
-.tg-send svg{width:46%;height:46%;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
-.tg:hover,.tg:focus-visible{background:var(--bg);color:var(--ink);outline:none}
-.tg:hover .tg-send,.tg:focus-visible .tg-send{background:var(--ink);color:var(--bg);transform:scale(1.08)}
-.tg:hover .tg-send svg,.tg:focus-visible .tg-send svg{transform:translate(18%,-18%) rotate(-8deg)}
-.tg:focus-visible{box-shadow:inset 0 0 0 2px var(--ink)}
-@media (max-width:760px){.tg{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}.tg-l{grid-column:1/-1}.tg-at{display:none}.tg-msg{white-space:normal;font-size:20px;min-height:2.4em;line-height:1.2}}
-@media (prefers-reduced-motion:reduce){.tg-msg::after{animation:none}}
+.tg-send{display:inline-grid;place-items:center;width:22px;height:22px}
+.tg-send svg{width:16px;height:16px;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.tg:hover,.tg:focus-visible{background:#141414;color:#fff;transform:scale(1.04);outline:none}
+.tg:hover .tg-send svg,.tg:focus-visible .tg-send svg{transform:translate(4px,-4px) rotate(-8deg)}
+.tg:focus-visible{box-shadow:0 0 0 2px #fff,0 0 0 4px #141414}
+@media (max-width:760px){.tg-at{display:none}}
+@media (prefers-reduced-motion:reduce){.tg,.tg-msg::after{animation:none}}
 
 /* для читачів екрана та клавіатури */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -144,16 +143,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
       </div>
       </div>
     </div>
-    <figure><img src="project-me.webp" alt="Олександра Майборода за столом у кафе" decoding="async"><figcaption><b>Олександра Майборода</b> · арт-директорка і дослідниця</figcaption></figure>
+    <figure id="me"><a class="tg" id="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener" aria-label="Написати мені в Телеграм, @ardnasroxela"><span class="tg-l" aria-hidden="true"><span>написати мені<span class="tg-at"> · @ardnasroxela</span></span><span class="tg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z"/><path d="m10 13 4.5-4.5"/></svg></span></span><span class="tg-msg" id="tgmsg" aria-hidden="true">Привіт! Хочу сайт для свого проєкту…</span></a><img src="project-me.webp" alt="Олександра Майборода за столом у кафе" decoding="async"><figcaption><b>Олександра Майборода</b> · арт-директорка і дослідниця</figcaption></figure>
   </div>
 </section>
-
-<a class="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener" aria-label="Написати мені в Телеграм, @ardnasroxela">
-  <span class="tg-l" aria-hidden="true">написати мені →</span>
-  <span class="tg-msg" id="tgmsg" aria-hidden="true">Привіт! Хочу сайт для свого проєкту…</span>
-  <span class="tg-r" aria-hidden="true"><span class="tg-at">@ardnasroxela</span><span class="tg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z"/><path d="m10 13 4.5-4.5"/></svg></span></span>
-</a>
-
 <section class="work" id="projects" aria-label="Проєкти">
   <div class="work-top"><h2>проєкти</h2><span class="sp"></span><a href="#services" id="up">↑ до послуг</a></div>
   <div class="field" id="field" aria-hidden="true"></div>
@@ -357,6 +349,22 @@ function sync(){
 addEventListener("scroll", sync, {passive:true});
 addEventListener("resize", sync);
 sync();
+
+/* бульбашка стоїть ліворуч і трохи вище обличчя: де саме — рахуємо з object-fit: cover */
+(() => {
+  const fig = document.getElementById("me"), img = fig.querySelector("img"), tg = document.getElementById("tg");
+  const FACE = [0.50, 0.25];           // маківка на фото, частки ширини й висоти: кут бульбашки дивиться сюди
+  const place = () => {
+    const W = fig.clientWidth, H = fig.clientHeight, iw = img.naturalWidth || 1100, ih = img.naturalHeight || 1112;
+    const k = Math.max(W / iw, H / ih), dx = (W - iw*k) / 2, dy = (H - ih*k) / 2;
+    const fx = dx + FACE[0]*iw*k, fy = dy + FACE[1]*ih*k;
+    const bw = tg.offsetWidth, bh = tg.offsetHeight;
+    tg.style.right = Math.min(W - bw - 12, Math.max(12, W - fx + 6)) + "px";
+    tg.style.bottom = Math.min(H - bh - 12, Math.max(12, H - fy + 8)) + "px";
+  };
+  img.complete ? place() : img.addEventListener("load", place);
+  addEventListener("resize", place); place();
+})();
 
 /* «Написати мені»: листи друкуються й стираються по черзі */
 (() => {
