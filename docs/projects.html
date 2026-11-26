@@ -20,11 +20,12 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0e;--surface:#181818;--ink:#f2f2ee;--muted:#8d8d86;--rule:#2a2a2a;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0e0e0e;--surface:#181818;--ink:#f2f2ee;--muted:#8d8d86;--rule:#2a2a2a;color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-snap-type:y proximity;scroll-padding-top:var(--hb)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);padding-top:var(--hb)}
 
 /* хедер — як на сайті */
-.bar{position:fixed;inset:0 0 auto 0;z-index:10;display:flex;align-items:center;gap:16px 24px;padding:14px var(--g);border-bottom:1px solid var(--rule);background:var(--bg);font-size:14px}
+.bar{position:fixed;inset:0 0 auto 0;z-index:60;display:flex;align-items:center;gap:16px 24px;padding:14px var(--g);border-bottom:1px solid var(--rule);background:var(--bg);font-size:14px}
 .bar a{color:inherit;text-decoration:none}
 .bar a:hover{text-decoration:underline;text-underline-offset:3px}
 .bar nav{display:flex;gap:18px}
@@ -34,6 +35,20 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .bar nav.site a{color:var(--ink)}
 .bar{white-space:nowrap}
 @media (max-width:480px){.bar{gap:12px;font-size:13px}.bar nav{gap:12px}}
+/* крейда: малювати поверх усієї сторінки */
+.chalk-btn{all:unset;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;color:var(--ink)}
+.chalk-btn[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.chalk-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#chalk{position:absolute;left:0;top:0;z-index:55;pointer-events:none}
+.chalking #chalk{pointer-events:auto;touch-action:none}
+.chalk-pal{position:fixed;z-index:61;top:calc(var(--hb) + 10px);right:var(--g);display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid var(--rule);border-radius:999px;font-size:12px}
+.chalk-pal button{all:unset;cursor:pointer}
+.chalk-pal .sw{width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.chalk-pal .sw[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:2px}
+.chalk-pal .sw:focus-visible,.chalk-pal .clr:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.chalk-pal .clr{color:var(--muted);padding:0 4px 0 6px;border-left:1px solid var(--rule)}
+.chalk-pal .clr:hover{color:var(--ink)}
+@media (max-width:480px){.bar{gap:10px}.bar nav{gap:10px}}
 .mode{all:unset;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:50%}
 .mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .mode svg{transition:transform .4s}
@@ -135,7 +150,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .sr button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 
 /* відкритий проєкт */
-.lb{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:72px var(--g) 32px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.lb{position:fixed;inset:0;z-index:70;display:none;place-items:center;padding:72px var(--g) 32px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .lb.on{display:grid}
 .lb figure{margin:0;display:flex;flex-direction:column;align-items:center;max-width:100%;max-height:100%}
 .lb .m{display:block;max-width:min(100%,1100px);max-height:calc(100dvh - 160px);width:auto;height:auto;object-fit:contain}
@@ -153,6 +168,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   <nav aria-label="Розділи"><a href="#services" data-v="services" aria-current="page">послуги</a><a href="#projects" data-v="projects">проєкти</a></nav>
   <span class="sp"></span>
   <nav class="site" aria-label="Сайт"><a href="index.html#garden">сад</a><a href="index.html#map">мапа</a></nav>
+  <button class="chalk-btn" id="chalk-btn" aria-pressed="false" aria-label="Малювати крейдою поверх сторінки" title="Крейда — малювати поверх сторінки (Esc — вийти)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 3.5 20.5 8.5 9 20H4v-5L15.5 3.5Z"/><path d="m13 6 5 5"/></svg></button>
   <button class="mode" id="mode" aria-label="Перемкнути світлу чи темну тему" title="Світла / темна тема">
     <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 6a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
   </button>
@@ -208,6 +224,16 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   <nav class="sr" aria-label="Список проєктів"><ul id="list"></ul></nav>
   <div class="hint" id="hint" aria-hidden="true">тягніть, щоб роздивитися</div>
 </section>
+
+<canvas id="chalk" aria-hidden="true"></canvas>
+<div class="chalk-pal" id="chalk-pal" hidden role="toolbar" aria-label="Крейда">
+  <button class="sw" data-c="#ff8fb1" style="background:#ff8fb1" aria-label="Рожева крейда" aria-pressed="true"></button>
+  <button class="sw" data-c="#ffd45e" style="background:#ffd45e" aria-label="Жовта крейда" aria-pressed="false"></button>
+  <button class="sw" data-c="#7cc4ff" style="background:#7cc4ff" aria-label="Блакитна крейда" aria-pressed="false"></button>
+  <button class="sw" data-c="#8be0a4" style="background:#8be0a4" aria-label="Зелена крейда" aria-pressed="false"></button>
+  <button class="sw" data-c="#f6f3ea" style="background:#f6f3ea" aria-label="Біла крейда" aria-pressed="false"></button>
+  <button class="clr" id="chalk-clr">стерти</button>
+</div>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Проєкт">
   <button class="x" id="lbx">закрити ✕</button>
@@ -467,6 +493,58 @@ sync();
   reset.onclick = () => { pos = {}; save(); apply(); };
   addEventListener("resize", apply); wide.addEventListener?.("change", apply);
   apply();
+})();
+
+/* крейда: полотно на всю висоту документа, лінії — з дрібних напівпрозорих крупинок, як дитяча крейда на асфальті */
+(() => {
+  const cv = document.getElementById("chalk"), ctx = cv.getContext("2d"), btn = document.getElementById("chalk-btn");
+  const pal = document.getElementById("chalk-pal"), dpr = Math.min(1.5, devicePixelRatio || 1);
+  let col = "#ff8fb1", on = false, last = null;
+  function size(){
+    const W = document.documentElement.clientWidth, H = document.documentElement.scrollHeight;
+    if (cv.width === Math.round(W*dpr) && cv.height === Math.round(H*dpr)) return;
+    const old = cv.width ? (() => { const c = document.createElement("canvas"); c.width = cv.width; c.height = cv.height; c.getContext("2d").drawImage(cv, 0, 0); return c; })() : null;
+    cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr); cv.style.width = W + "px"; cv.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); if (old) ctx.drawImage(old, 0, 0, old.width/dpr, old.height/dpr);
+  }
+  function cursor(){
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><circle cx='12' cy='12' r='5' fill='${col}' stroke='%23141414' stroke-width='1'/></svg>`;
+    cv.style.cursor = `url("data:image/svg+xml,${svg.replace(/#/g, "%23").replace(/%23141414/, "%23141414")}") 12 12, crosshair`;
+  }
+  function seg(x0, y0, x1, y1, pr){
+    const w = 7 + 5*pr, d = Math.hypot(x1-x0, y1-y0), n = Math.max(1, d / 1.1);
+    ctx.fillStyle = col;
+    for (let i = 0; i <= n; i++){
+      const x = x0 + (x1-x0)*i/n, y = y0 + (y1-y0)*i/n;
+      for (let k = 0; k < 7; k++){
+        if (Math.random() < .2) continue;                 // пропуски — зерно крейди
+        const a = Math.random()*6.283, r = Math.random()*w/2;
+        ctx.globalAlpha = .18 + Math.random()*.5;
+        const s = .8 + Math.random()*1.8;
+        ctx.fillRect(x + Math.cos(a)*r, y + Math.sin(a)*r*.8, s, s);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  function set(v){
+    on = v; document.body.classList.toggle("chalking", on); btn.setAttribute("aria-pressed", on); pal.hidden = !on;
+    if (on){ size(); cursor(); }
+  }
+  btn.onclick = () => set(!on);
+  pal.addEventListener("click", e => {
+    const b = e.target.closest(".sw");
+    if (b){ col = b.dataset.c; pal.querySelectorAll(".sw").forEach(x => x.setAttribute("aria-pressed", x === b)); cursor(); }
+  });
+  document.getElementById("chalk-clr").onclick = () => ctx.clearRect(0, 0, cv.width, cv.height);
+  cv.addEventListener("pointerdown", e => { if (!on) return; size(); cv.setPointerCapture(e.pointerId); last = [e.pageX, e.pageY]; seg(e.pageX, e.pageY, e.pageX + .1, e.pageY, e.pressure || .5); e.preventDefault(); });
+  cv.addEventListener("pointermove", e => {
+    if (!last) return;
+    (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(p => { seg(last[0], last[1], p.pageX, p.pageY, p.pressure || .5); last = [p.pageX, p.pageY]; });
+  });
+  const stop = () => { last = null; };
+  cv.addEventListener("pointerup", stop); cv.addEventListener("pointercancel", stop);
+  addEventListener("keydown", e => { if (e.key === "Escape" && on && !document.getElementById("lb").classList.contains("on")) set(false); });
+  addEventListener("resize", () => { if (cv.width) size(); });
 })();
 
 /* бульбашка стоїть ліворуч і трохи вище обличчя: де саме — рахуємо з object-fit: cover */
