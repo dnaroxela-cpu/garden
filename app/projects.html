@@ -73,11 +73,21 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .svc figcaption b{font-weight:500}
 @media (max-width:760px){.svc{height:auto}.svc-in{grid-template-columns:1fr;height:auto}.svc-txt{border-right:0;overflow:visible}.svc figure{order:-1;height:62vh}}
 
-/* «Написати мені» — смуга на всю ширину після першого екрана */
-.tg{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:22px var(--g);background:var(--ink);color:var(--bg);text-decoration:none;font-family:var(--f-display);font-weight:500;font-size:clamp(22px,3vw,40px);letter-spacing:-.015em;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);transition:background .25s,color .25s}
-.tg .tg-h{font-family:var(--f-mono);font-weight:400;font-size:clamp(13px,1.2vw,16px);letter-spacing:0}
+/* «Написати мені» — смуга-поле повідомлення: у ній самі собою друкуються можливі листи до мене */
+.tg{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:20px;padding:20px var(--g);background:var(--ink);color:var(--bg);text-decoration:none;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);transition:background .25s,color .25s;cursor:pointer}
+.tg-l{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.6;white-space:nowrap}
+.tg-msg{font-family:var(--f-display);font-weight:500;font-size:clamp(20px,2.8vw,38px);letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:clip;min-height:1.2em}
+.tg-msg::after{content:"";display:inline-block;width:.08em;height:1em;margin-left:.06em;vertical-align:-.12em;background:currentColor;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.tg-r{display:flex;align-items:center;gap:14px;font-size:clamp(12px,1.1vw,15px);white-space:nowrap}
+.tg-send{display:grid;place-items:center;width:clamp(44px,4.4vw,60px);aspect-ratio:1;border-radius:50%;background:var(--bg);color:var(--ink);transition:background .25s,color .25s,transform .35s cubic-bezier(.2,.7,.2,1)}
+.tg-send svg{width:46%;height:46%;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
 .tg:hover,.tg:focus-visible{background:var(--bg);color:var(--ink);outline:none}
+.tg:hover .tg-send,.tg:focus-visible .tg-send{background:var(--ink);color:var(--bg);transform:scale(1.08)}
+.tg:hover .tg-send svg,.tg:focus-visible .tg-send svg{transform:translate(18%,-18%) rotate(-8deg)}
 .tg:focus-visible{box-shadow:inset 0 0 0 2px var(--ink)}
+@media (max-width:760px){.tg{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}.tg-l{grid-column:1/-1}.tg-at{display:none}.tg-msg{white-space:normal;font-size:20px;min-height:2.4em;line-height:1.2}}
+@media (prefers-reduced-motion:reduce){.tg-msg::after{animation:none}}
 
 /* для читачів екрана та клавіатури */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -138,7 +148,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   </div>
 </section>
 
-<a class="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener"><span>Написати мені</span><span class="tg-h">@ardnasroxela ↗</span></a>
+<a class="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener" aria-label="Написати мені в Телеграм, @ardnasroxela">
+  <span class="tg-l" aria-hidden="true">написати мені →</span>
+  <span class="tg-msg" id="tgmsg" aria-hidden="true">Привіт! Хочу сайт для свого проєкту…</span>
+  <span class="tg-r" aria-hidden="true"><span class="tg-at">@ardnasroxela</span><span class="tg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z"/><path d="m10 13 4.5-4.5"/></svg></span></span>
+</a>
 
 <section class="work" id="projects" aria-label="Проєкти">
   <div class="work-top"><h2>проєкти</h2><span class="sp"></span><a href="#services" id="up">↑ до послуг</a></div>
@@ -343,6 +357,28 @@ function sync(){
 addEventListener("scroll", sync, {passive:true});
 addEventListener("resize", sync);
 sync();
+
+/* «Написати мені»: листи друкуються й стираються по черзі */
+(() => {
+  const el = document.getElementById("tgmsg"); if (!el || reduce) return;
+  const MSG = [
+    "Привіт! Хочу сайт для свого проєкту…",
+    "Потрібен арт-дірекшен для кампанії…",
+    "Можеш допомогти зібрати базу в Notion?",
+    "Хочу випускний альбом для класу…",
+    "Є застосунок, якому бракує дизайну…",
+    "Маю дивну ідею. Поговоримо?",
+  ];
+  let m = 0, i = MSG[0].length, del = true;
+  const tick = () => {
+    const t = MSG[m];
+    if (del){ i--; if (i <= 0){ del = false; m = (m + 1) % MSG.length; } }
+    else { i++; if (i >= MSG[m].length){ del = true; el.textContent = MSG[m]; return setTimeout(tick, 2200); } }
+    el.textContent = MSG[m].slice(0, Math.max(0, i));
+    setTimeout(tick, del ? 22 : 45 + Math.random()*60);
+  };
+  setTimeout(tick, 2600);
+})();
 
 /* почати з середини плитки */
 scale();
