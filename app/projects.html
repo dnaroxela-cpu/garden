@@ -7,7 +7,7 @@
 <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@400;500;700&family=Literata:opsz,wght@7..72,400;7..72,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@400;500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap">
 <style>
 :root{
   --bg:#f5f5f0;--surface:#ebebe4;--ink:#141414;--muted:#6d6d66;--rule:#dcdcd3;
@@ -91,6 +91,23 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 @media (max-width:760px){.tg-at{display:none}}
 @media (prefers-reduced-motion:reduce){.tg,.tg-msg::after{animation:none}}
 
+/* другий екран: «Я люблю ідеї…» по центру, навколо — три мої ідеї */
+.ideas{position:relative;height:calc(100dvh - var(--hb));border-top:1px solid var(--rule);scroll-snap-align:start;overflow:hidden;background:var(--bg)}
+.love{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(50vw,900px);margin:0;text-align:center;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,min(3.6vw,5.2vh),64px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
+.love em{font-family:var(--f-body);font-style:italic;font-weight:400;letter-spacing:-.01em}
+.idea{position:absolute;width:min(300px,21vw);margin:0;padding:16px 18px 18px;background:var(--surface);border:1px solid var(--rule);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.idea:hover{transform:rotate(0) scale(1.03)}
+.idea small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.idea h3{font-family:var(--f-display);font-weight:500;font-size:clamp(17px,1.4vw,20px);line-height:1.15;letter-spacing:-.01em;margin:0 0 8px}
+.idea p{font-family:var(--f-body);font-size:14px;line-height:1.5;margin:0}
+.idea.i1{left:var(--g);top:clamp(24px,7vh,70px);transform:rotate(-2deg)}
+.idea.i2{right:var(--g);top:30%;transform:rotate(1.5deg)}
+.idea.i3{left:calc(var(--g) + 1vw);bottom:clamp(20px,5vh,60px);transform:rotate(1deg)}
+@media (max-width:900px){.ideas{height:auto;padding:48px var(--g);display:flex;flex-direction:column;gap:20px}
+  .love{position:static;transform:none;width:auto;font-size:clamp(28px,7vw,44px);margin-bottom:12px}
+  .idea{position:static;width:auto;transform:none!important}}
+@media (prefers-reduced-motion:reduce){.idea{transition:none}}
+
 /* для читачів екрана та клавіатури */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sr:focus-within{position:fixed;left:var(--g);bottom:20px;width:auto;height:auto;clip:auto;z-index:20;background:var(--bg);border:1px solid var(--rule);padding:10px 14px;white-space:normal;max-width:calc(100% - 2*var(--g))}
@@ -150,6 +167,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
     <figure id="me"><a class="tg" id="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener" aria-label="Написати мені в Телеграм, @ardnasroxela"><span class="tg-l" aria-hidden="true"><span>написати мені<span class="tg-at"> · @ardnasroxela</span></span><span class="tg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z"/><path d="m10 13 4.5-4.5"/></svg></span></span><span class="tg-msg" id="tgmsg" aria-hidden="true">Привіт! Хочу сайт для свого проєкту…</span></a><img src="project-me.webp" alt="Олександра Майборода за столом у кафе" decoding="async"><figcaption><b>Олександра Майборода</b> · арт-директорка і дослідниця</figcaption></figure>
   </div>
 </section>
+<section class="ideas" id="ideas" aria-label="Ідеї">
+  <p class="love">Я люблю ідеї, бо вони <em>глибокі</em>, бо вони <em>нові</em>, бо вони <em>прояснюють</em>, бо вони <em>суперечливі</em>, бо вони <em>дивні</em></p>
+  <article class="idea i1"><small>ідея</small><h3>Бюро ритуальних послуг третьої хвилі</h3><p>Агенція, яка створює трансцендентний, красивий і не пошлий досвід прощання.</p></article>
+  <article class="idea i2"><small>ідея</small><h3>Awe-birth</h3><p>Спеціальні клініки для народження дітей, які дають незвичний і красивий досвід народження.</p></article>
+  <article class="idea i3"><small>ідея</small><h3>Міська бібліотека для дітей</h3><p>З великою секцією класних і рідкісних дитячих книг та ігор з усього світу. Такий Cabinet of Child's Curiosity. Можна лишити дитину на кілька годин.</p></article>
+</section>
+
 <section class="work" id="projects" aria-label="Проєкти">
   <div class="work-top"><h2>проєкти</h2><span class="sp"></span><a href="#services" id="up">↑ до послуг</a></div>
   <div class="field" id="field" aria-hidden="true"></div>
@@ -167,7 +191,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
    src: картинка (або постер для відео), video: відео (необов'язково),
    x, y: місце на «плитці» TW×TH, w: ширина в пікселях, ratio: висота/ширина,
    title: назва, note: короткий підпис, link: посилання (необов'язково), text: довший опис у відкритому вигляді (необов'язково). */
-const TW = 2800, TH = 2133;
+const TW = 2800, TH = 2172;
 const PROJECTS = [
   {src:"project-5.webp", ratio:1102/1100, x:55, y:81, w:340, title:"Майбутні", note:"обкладинка"},
   {src:"project-1.webp", ratio:734/1100, x:505, y:59, w:400, title:"Майбутні", note:"виїзд"},
@@ -186,11 +210,12 @@ const PROJECTS = [
   {src:"project-4.webp", ratio:964/1000, x:1485, y:951, w:300, title:"Майбутні", note:"випускні альбоми · арт-дірекшен, дизайн"},
   {src:"project-13.webp", ratio:1250/1000, x:1935, y:997, w:280, title:"Майбутні", note:"курс будування мостів · фотографія"},
   {src:"project-2.webp", ratio:734/1100, x:2365, y:1115, w:420, title:"Майбутні", note:"заняття"},
-  {src:"project-15.webp", ratio:1280/1022, x:313, y:1661, w:280, title:"Майбутні", note:"зустріч з нейробіологинею Вірою Єфремовою · курування, дизайн"},
-  {src:"project-v3.webp", video:"project-v3.mp4", ratio:960/540, x:819, y:1530, w:230, title:"Майбутні", note:"стенд"},
-  {src:"project-9.webp", ratio:596/1100, x:1275, y:1546, w:460, title:"Нова житлова політика", note:"сайт"},
-  {src:"project-18.webp", ratio:714/1200, x:1961, y:1582, w:480, title:"Майбутні", note:"додаток комунікаційного відділу · вебдизайн і розробка"},
-  {src:"project-v4.webp", video:"project-v4.mp4", ratio:860/484, x:2667, y:1558, w:220, title:"Майбутні", note:"Notion-платформа для школи"},
+  {src:"project-15.webp", ratio:1280/1022, x:268, y:1661, w:280, title:"Майбутні", note:"зустріч з нейробіологинею Вірою Єфремовою · курування, дизайн"},
+  {src:"project-v3.webp", video:"project-v3.mp4", ratio:960/540, x:682, y:1530, w:230, title:"Майбутні", note:"стенд"},
+  {src:"project-v6.webp", video:"project-v6.mp4", ratio:646/640, x:1048, y:1452, w:320, title:"Цифровий сад", note:"граф моєї особистої системи нотаток"},
+  {src:"project-9.webp", ratio:596/1100, x:1502, y:1534, w:460, title:"Нова житлова політика", note:"сайт"},
+  {src:"project-18.webp", ratio:714/1200, x:2098, y:1558, w:480, title:"Майбутні", note:"додаток комунікаційного відділу · вебдизайн і розробка"},
+  {src:"project-v4.webp", video:"project-v4.mp4", ratio:860/484, x:2712, y:1682, w:220, title:"Майбутні", note:"Notion-платформа для школи"},
 ];
 
 const field = document.getElementById("field"), hint = document.getElementById("hint");
