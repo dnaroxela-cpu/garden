@@ -31,6 +31,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .bar nav a{color:var(--muted)}
 .bar nav a[aria-current="page"]{color:var(--ink)}
 .bar .sp{flex:1}
+.bar nav.site a{color:var(--ink)}
+.bar{white-space:nowrap}
+@media (max-width:480px){.bar{gap:12px;font-size:13px}.bar nav{gap:12px}}
 .mode{all:unset;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:50%}
 .mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .mode svg{transition:transform .4s}
@@ -113,6 +116,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   <a href="index.html">на головну</a>
   <nav aria-label="Розділи"><a href="#services" data-v="services" aria-current="page">послуги</a><a href="#projects" data-v="projects">проєкти</a></nav>
   <span class="sp"></span>
+  <nav class="site" aria-label="Сайт"><a href="index.html#garden">сад</a><a href="index.html#map">мапа</a></nav>
   <button class="mode" id="mode" aria-label="Перемкнути світлу чи темну тему" title="Світла / темна тема">
     <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 6a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
   </button>
