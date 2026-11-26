@@ -89,15 +89,20 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-mono);overflow:hi
    src: картинка (або постер для відео), video: відео (необов'язково),
    x, y: місце на «плитці» TW×TH, w: ширина в пікселях, ratio: висота/ширина,
    title: назва, note: короткий підпис, link: посилання (необов'язково), text: довший опис у відкритому вигляді (необов'язково). */
-const TW = 1700, TH = 1250;
+const TW = 1900, TH = 1600;
 const PROJECTS = [
-  {src:"project-5.webp", ratio:1102/1100, x:80,   y:100, w:340, title:"Майбутні", note:"обкладинка"},
-  {src:"project-1.webp", ratio:734/1100,  x:520,  y:40,  w:400, title:"Майбутні", note:"виїзд"},
-  {src:"project-v2.webp", video:"project-v2.mp4", ratio:800/640, x:1020, y:180, w:280, title:"Колаж", note:"анімація"},
-  {src:"project-3.webp", ratio:447/444,   x:1390, y:60,  w:220, title:"Майбутні", note:"відгуки учнів"},
-  {src:"project-4.webp", ratio:1466/1100, x:220,  y:600, w:300, title:"Майбутні", note:"друкований альбом з картками учасників"},
-  {src:"project-v1.webp", video:"project-v1.mp4", ratio:1, x:640, y:480, w:300, title:"Майбутні", note:"шукають людей у команду"},
-  {src:"project-2.webp", ratio:734/1100,  x:1080, y:700, w:420, title:"Майбутні", note:"заняття"},
+  {src:"project-5.webp", ratio:1102/1100, x:60,   y:100,  w:340, title:"Майбутні", note:"обкладинка"},
+  {src:"project-1.webp", ratio:734/1100,  x:520,  y:40,   w:400, title:"Майбутні", note:"виїзд"},
+  {src:"project-8.webp", ratio:716/1100,  x:1040, y:140,  w:460, title:"Майбутні", note:"сайт Школи тренерства"},
+  {src:"project-3.webp", ratio:447/444,   x:1620, y:60,   w:220, title:"Майбутні", note:"відгуки учнів"},
+  {src:"project-6.webp", ratio:1252/1000, x:200,  y:600,  w:300, title:"Олена Паренюк", note:"зустріч"},
+  {src:"project-v1.webp", video:"project-v1.mp4", ratio:1, x:620, y:540, w:300, title:"Майбутні", note:"шукають людей у команду"},
+  {src:"project-9.webp", ratio:596/1100,  x:1060, y:620,  w:460, title:"Нова житлова політика", note:"сайт"},
+  {src:"project-v2.webp", video:"project-v2.mp4", ratio:800/640, x:1640, y:460, w:280, title:"Колаж", note:"анімація"},
+  {src:"project-4.webp", ratio:1466/1100, x:40,   y:1130, w:300, title:"Майбутні", note:"друкований альбом з картками учасників"},
+  {src:"project-2.webp", ratio:734/1100,  x:480,  y:1180, w:420, title:"Майбутні", note:"заняття"},
+  {src:"project-v3.webp", video:"project-v3.mp4", ratio:960/540, x:1020, y:1040, w:230, title:"Майбутні", note:"стенд"},
+  {src:"project-7.webp", ratio:1388/1100, x:1560, y:1000, w:260, title:"Майбутні", note:"зустріч з азовцями"},
 ];
 
 const field = document.getElementById("field"), hint = document.getElementById("hint");
