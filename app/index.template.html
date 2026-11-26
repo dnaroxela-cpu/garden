@@ -1970,12 +1970,18 @@ renderLegend();
 $("#m-legend").addEventListener("click",e=>{const b=e.target.closest("[data-ft]");if(!b||!bigSim)return;const t=b.dataset.ft;bigSim.focusTag=(!t||bigSim.focusTag===t)?null:t;renderLegend()});
 
 // garden in time: scrub or play from the first note to today
-const T0=Math.min(...NOTES.map(BORN)),T1=Math.max(...NOTES.map(BORN));
-$("#tl-ticks").innerHTML=NOTES.map(n=>`<i data-d="${BORN(n)}" style="left:${(BORN(n)-T0)/(T1-T0||1)*100}%;background:${n.tags.length?rb(tagHue(n.tags[0])):"var(--muted)"}"></i>`).join("");
+// шкала зі стиснутими паузами: проміжок між сусідніми датами рахується не довшим за GAP,
+// тож одна давня нотатка (напр. 2020 року) не з'їдає всю шкалу, і сад росте рівномірно
+const TLD=[...new Set(NOTES.map(BORN))].sort((a,b)=>a-b),GAP=21*864e5,VT=[0];
+for(let i=1;i<TLD.length;i++)VT.push(VT[i-1]+Math.min(TLD[i]-TLD[i-1],GAP));
+const VMAX=VT[VT.length-1]||1,toV=d=>VT[TLD.indexOf(d)]/VMAX*1000;
+function toT(v){const x=v/1000*VMAX;let i=0;while(i<VT.length-2&&VT[i+1]<=x)i++;if(TLD.length<2)return TLD[0];
+  const f=Math.min(1,Math.max(0,(x-VT[i])/((VT[i+1]-VT[i])||1)));return TLD[i]+f*(TLD[i+1]-TLD[i])}
+$("#tl-ticks").innerHTML=NOTES.map(n=>`<i data-d="${BORN(n)}" style="left:${toV(BORN(n))/10}%;background:${n.tags.length?rb(tagHue(n.tags[0])):"var(--muted)"}"></i>`).join("");
 const TICKS=[...document.querySelectorAll("#tl-ticks i")];
 function setTime(v){if(v>=1000&&!playing&&stageAt==="home"){$("#tl-fill").style.width="100%";$("#t-label").innerHTML="як ріс сад";$("#t-range").value=v;if(bigSim){bigSim.time=Infinity;bigSim.energy=1}TICKS.forEach(i=>i.classList.add("on"));return}
-const t=T0+(T1-T0)*v/1000;$("#tl-fill").style.width=(v/10)+"%";TICKS.forEach(i=>i.classList.toggle("on",+i.dataset.d<=t));if(bigSim){bigSim.tmin=T0;bigSim.tmax=T1;bigSim.time=v>=1000?Infinity:t;bigSim.energy=1}
-  const n=NOTES.filter(m=>BORN(m)<=t).length;$("#t-label").innerHTML=`<b>${new Date(t).toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}</b> · ${n} нотаток`;$("#t-range").value=v}
+const t=toT(v);$("#tl-fill").style.width=(v/10)+"%";TICKS.forEach(i=>i.classList.toggle("on",+i.dataset.d<=t));if(bigSim){bigSim.tmin=0;bigSim.tmax=VMAX;bigSim.time=v>=1000?Infinity:t;bigSim.energy=1}
+  const n=NOTES.filter(m=>BORN(m)<=t).length;$("#t-label").innerHTML=`<b>${new Date(t).toLocaleDateString("uk-UA",new Date(t).getFullYear()===new Date(TLD[TLD.length-1]).getFullYear()?{day:"numeric",month:"short"}:{day:"numeric",month:"short",year:"numeric"})}</b> · ${n} нотаток`;$("#t-range").value=v}
 $("#t-range").addEventListener("input",e=>{playing=false;setPlayIcon(false);setTime(+e.target.value)});
 let playing=false;
 function setPlayIcon(on){$("#t-icon").setAttribute("d",on?"M2 1h2v8H2zM6 1h2v8H6z":"M2 1l7 4-7 4z");$("#t-play").setAttribute("aria-label",on?"Пауза":"Програти, як ріс сад")}
