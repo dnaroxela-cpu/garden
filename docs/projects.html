@@ -115,6 +115,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .idea.i5:hover{transform:translateX(-50%) scale(1.03)}
 .idea.i4{right:var(--g);bottom:clamp(16px,4vh,70px);transform:rotate(-1.5deg)}
 .idea.i3{left:calc(var(--g) + 1vw);bottom:clamp(20px,5vh,60px);transform:rotate(1deg)}
+/* картки можна перетягувати (лише на широкому екрані); розкладка пам'ятається в браузері */
+@media (min-width:901px){.idea{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}}
+.idea.drag{cursor:grabbing;transition:none;box-shadow:0 16px 40px rgba(0,0,0,.14)}
+.ideas-reset{all:unset;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:var(--f-mono);font-size:12px;color:var(--muted);cursor:pointer;border-bottom:1px solid currentColor}
+.ideas-reset:hover{color:var(--ink)}
+.ideas-reset:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+@media (max-width:900px){.ideas-reset{display:none!important}}
 @media (max-width:900px){.ideas{height:auto;padding:48px var(--g);display:flex;flex-direction:column;gap:20px}
   .love{position:static;transform:none;width:auto;font-size:clamp(28px,7vw,44px);margin-bottom:12px}
   .idea{position:static;width:auto;transform:none!important}}
@@ -190,8 +197,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   <article class="idea i1"><small>ідея</small><h3>Бюро ритуальних послуг третьої хвилі</h3><p>Агенція, яка створює трансцендентний, красивий і не пошлий досвід прощання.</p></article>
   <article class="idea i2"><small>ідея</small><h3>Awe-birth</h3><p>Спеціальні клініки для народження дітей, які дають незвичний і красивий досвід народження.</p></article>
   <article class="idea i3"><small>ідея</small><h3>Міська бібліотека для дітей</h3><p>З великою секцією класних і рідкісних дитячих книг та ігор з усього світу. Такий Cabinet of Child's Curiosity. Можна лишити дитину на кілька годин.</p></article>
-  <article class="idea i4"><small>ідея</small><h3>Видавництво</h3><p>Перекладає українською ключові тексти з теорії кібернетики та теорії систем, а також з історії й філософії технологій, інтернету та науки.</p></article>
+  <article class="idea i4"><small>ідея</small><h3>Видавництво про кібернетику</h3><p>Перекладає українською ключові тексти з теорії кібернетики та теорії систем, а також з історії й філософії технологій, інтернету та науки.</p></article>
   <article class="idea i5"><small>ідея</small><h3>Конструктори приладів</h3><p>Набори для дітей і дорослих, з яких можна зібрати телевізор, телефон, камеру — і зрозуміти, як влаштовані речі. Дуже красиві, в стилі Apple, з поясненнями механіки, ланцюжків виробництва та історії приладу.</p></article>
+  <button type="button" class="ideas-reset" id="ideas-reset" hidden>повернути ідеї на місця</button>
 </section>
 
 <section class="work" id="projects" aria-label="Проєкти">
@@ -411,6 +419,54 @@ sync();
     b.onclick = () => pick(b);
     b.onkeydown = e => { const d = {ArrowRight:1, ArrowLeft:-1}[e.key]; if (d){ e.preventDefault(); const n = tabs[(i + d + tabs.length) % tabs.length]; pick(n); n.focus(); } };
   });
+})();
+
+/* ідеї: картки перетягуються мишкою чи пальцем; позиції — частки розміру екрана, у localStorage */
+(() => {
+  const box = document.getElementById("ideas"), reset = document.getElementById("ideas-reset");
+  const cards = [...box.querySelectorAll(".idea")], wide = matchMedia("(min-width:901px)"), KEY = "ideas-pos";
+  let pos = {}, z = 2;
+  try { pos = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(pos)); } catch(e){} };
+  const rot = c => ({i1:-2, i2:1.5, i3:1, i4:-1.5, i5:.8})[[...c.classList].find(k => /^i\d$/.test(k))] || 0;
+  function apply(){
+    reset.hidden = !Object.keys(pos).length || !wide.matches;
+    cards.forEach((c, i) => {
+      const p = pos[i];
+      if (!p || !wide.matches){ c.style.left = c.style.top = c.style.right = c.style.bottom = c.style.transform = ""; return; }
+      c.style.left = p[0] * box.clientWidth + "px"; c.style.top = p[1] * box.clientHeight + "px";
+      c.style.right = c.style.bottom = "auto"; c.style.transform = `rotate(${rot(c)}deg)`;
+    });
+  }
+  cards.forEach((c, i) => {
+    let sx, sy, ox, oy, moved;
+    c.addEventListener("pointerdown", e => {
+      if (!wide.matches || e.button !== 0) return;
+      // положення без повороту: offsetLeft/Top не залежать від transform; у центральної картки ще є зсув translateX(-50%)
+      ox = c.offsetLeft - (c.classList.contains("i5") && !pos[i] ? c.offsetWidth / 2 : 0); oy = c.offsetTop; sx = e.clientX; sy = e.clientY; moved = false;
+      c.style.left = ox + "px"; c.style.top = oy + "px"; c.style.right = c.style.bottom = "auto";
+      c.style.transform = "rotate(0deg) scale(1.03)"; c.style.zIndex = ++z;
+      c.classList.add("drag"); c.setPointerCapture(e.pointerId);
+    });
+    c.addEventListener("pointermove", e => {
+      if (!c.classList.contains("drag")) return;
+      const W = box.clientWidth, H = box.clientHeight;
+      const x = Math.min(W - c.offsetWidth * .4, Math.max(-c.offsetWidth * .6, ox + e.clientX - sx));
+      const y = Math.min(H - 40, Math.max(0, oy + e.clientY - sy));
+      c.style.left = x + "px"; c.style.top = y + "px"; moved = true;
+    });
+    const end = () => {
+      if (!c.classList.contains("drag")) return;
+      c.classList.remove("drag"); c.style.transform = `rotate(${rot(c)}deg)`;
+      if (moved){ pos[i] = [c.offsetLeft / box.clientWidth, c.offsetTop / box.clientHeight]; save(); }
+      else if (!pos[i]) { c.style.left = c.style.top = c.style.right = c.style.bottom = c.style.transform = ""; }
+      reset.hidden = !Object.keys(pos).length;
+    };
+    c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
+  });
+  reset.onclick = () => { pos = {}; save(); apply(); };
+  addEventListener("resize", apply); wide.addEventListener?.("change", apply);
+  apply();
 })();
 
 /* бульбашка стоїть ліворуч і трохи вище обличчя: де саме — рахуємо з object-fit: cover */
