@@ -102,7 +102,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 
 /* другий екран: «Я люблю ідеї…» по центру, навколо — три мої ідеї */
 .ideas{position:relative;height:calc(100dvh - var(--hb));border-top:1px solid var(--rule);scroll-snap-align:start;overflow:hidden;background:var(--bg)}
-.love{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(50vw,900px);margin:0;text-align:center;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,min(3.6vw,5.2vh),64px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
+.love{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);width:min(50vw,900px);margin:0;text-align:center;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,min(3.6vw,5.2vh),64px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
 .love em{font-family:var(--f-body);font-style:italic;font-weight:400;letter-spacing:-.01em}
 .idea{position:absolute;width:min(300px,21vw);margin:0;padding:16px 18px 18px;background:var(--surface);border:1px solid var(--rule);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
 .idea:hover{transform:rotate(0) scale(1.03)}
@@ -111,7 +111,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .idea p{font-family:var(--f-body);font-size:14px;line-height:1.5;margin:0}
 .idea.i1{left:var(--g);top:clamp(24px,7vh,70px);transform:rotate(-2deg)}
 .idea.i2{right:var(--g);top:clamp(40px,12vh,120px);transform:rotate(1.5deg)}
-.idea.i4{right:calc(var(--g) + 2vw);bottom:clamp(20px,6vh,70px);transform:rotate(-1.5deg)}
+.idea.i5{left:50%;top:clamp(16px,3.5vh,40px);transform:translateX(-50%) rotate(.8deg)}
+.idea.i5:hover{transform:translateX(-50%) scale(1.03)}
+.idea.i4{right:var(--g);bottom:clamp(16px,4vh,70px);transform:rotate(-1.5deg)}
 .idea.i3{left:calc(var(--g) + 1vw);bottom:clamp(20px,5vh,60px);transform:rotate(1deg)}
 @media (max-width:900px){.ideas{height:auto;padding:48px var(--g);display:flex;flex-direction:column;gap:20px}
   .love{position:static;transform:none;width:auto;font-size:clamp(28px,7vw,44px);margin-bottom:12px}
@@ -189,6 +191,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   <article class="idea i2"><small>ідея</small><h3>Awe-birth</h3><p>Спеціальні клініки для народження дітей, які дають незвичний і красивий досвід народження.</p></article>
   <article class="idea i3"><small>ідея</small><h3>Міська бібліотека для дітей</h3><p>З великою секцією класних і рідкісних дитячих книг та ігор з усього світу. Такий Cabinet of Child's Curiosity. Можна лишити дитину на кілька годин.</p></article>
   <article class="idea i4"><small>ідея</small><h3>Видавництво</h3><p>Перекладає українською ключові тексти з теорії кібернетики та теорії систем, а також з історії й філософії технологій, інтернету та науки.</p></article>
+  <article class="idea i5"><small>ідея</small><h3>Конструктори приладів</h3><p>Набори для дітей і дорослих, з яких можна зібрати телевізор, телефон, камеру — і зрозуміти, як влаштовані речі. Дуже красиві, в стилі Apple, з поясненнями механіки, ланцюжків виробництва та історії приладу.</p></article>
 </section>
 
 <section class="work" id="projects" aria-label="Проєкти">
