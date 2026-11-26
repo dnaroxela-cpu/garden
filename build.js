@@ -99,7 +99,11 @@ function readFiles(dir, base = dir) {
       const dateShort = dateObj.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short', year: 'numeric' });
       const words = raw.replace(/#+\s/g, '').split(/\s+/).length;
       const readTime = Math.max(1, Math.round(words / 200));
-      results.push({ title, slug, raw, body: bodyOnly, tags, folder, dateStr, dateShort, dateMs: dateObj.getTime(), readTime, rel, full, author, year, fm: frontmatter });
+      // коли нотатку «посаджено» — для шкали «як ріс сад»: властивість date/created, інакше дата створення файлу
+      // (birthtime на Mac), інакше дата зміни. Дата зміни сама по собі не годиться: кожне редагування переносить нотатку в кінець
+      const birth = stat.birthtime && stat.birthtime.getTime() > 0 && stat.birthtime <= mtime ? stat.birthtime : mtime;
+      const bornMs = (fmDate && !isNaN(new Date(fmDate))) ? new Date(fmDate).getTime() : birth.getTime();
+      results.push({ title, slug, raw, body: bodyOnly, tags, folder, dateStr, dateShort, dateMs: dateObj.getTime(), bornMs, readTime, rel, full, author, year, fm: frontmatter });
     }
   }
   return results;
@@ -1675,7 +1679,7 @@ async function buildApp(files, coversCache) {
     const isBook = section(file) === 'Book Reviews';
     return {
       id, title: file.title, folder: section(file), tags: file.tags,
-      excerpt: noteExcerpt(board ? board.intro : file.raw), date: file.dateMs, links: [...links],
+      excerpt: noteExcerpt(board ? board.intro : file.raw), date: file.dateMs, born: file.bornMs, links: [...links],
       book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
       cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
       html,

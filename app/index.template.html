@@ -996,6 +996,7 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
 <script type="application/json" id="films-data">/*FILMS*/</script>
 <script>
 const NOTES=JSON.parse(document.getElementById("data").textContent).sort((a,b)=>b.date-a.date);
+const BORN=n=>n.born||n.date;   // коли нотатку посаджено (для шкали «як ріс сад»); date — остання зміна
 const BY=Object.fromEntries(NOTES.map(n=>[n.id,n]));
 const MEDIA_RE=/^(links|посилання|videos \+ podcasts|articles)$/i;
 const STATUS={"Seeds":"seedling","Book Reviews":"budding","Blog Notes":"evergreen"};
@@ -1821,7 +1822,7 @@ const ALL=(()=>{
   TAGS.forEach(([t])=>nodes.push({id:"#"+t,t:"#"+t,kind:"tag",col:rb(tagHue(t)),r:2}));
   const idx=Object.fromEntries(nodes.map((n,i)=>[n.id,i])),links=[];
   NOTES.forEach(n=>{n.tags.forEach(t=>links.push({a:n.id,b:"#"+t,k:"tag"}));n.links.forEach(l=>idx[l]!=null&&links.push({a:n.id,b:l,k:"link"}))});
-  nodes.forEach(n=>{n.born=n.kind==="note"?BY[n.id].date:Math.min(...NOTES.filter(m=>m.tags.includes(n.id.slice(1))).map(m=>m.date))});
+  nodes.forEach(n=>{n.born=n.kind==="note"?BORN(BY[n.id]):Math.min(...NOTES.filter(m=>m.tags.includes(n.id.slice(1))).map(BORN))});
   nodes.forEach(n=>{const h=hash(n.id);n.x=Math.cos(h%628/100)*(80+h%160);n.y=Math.sin(h%628/100)*(80+h%160);n.ph=h%1000/1000*6.28});
   return{nodes,links};
 })();
@@ -1969,12 +1970,12 @@ renderLegend();
 $("#m-legend").addEventListener("click",e=>{const b=e.target.closest("[data-ft]");if(!b||!bigSim)return;const t=b.dataset.ft;bigSim.focusTag=(!t||bigSim.focusTag===t)?null:t;renderLegend()});
 
 // garden in time: scrub or play from the first note to today
-const T0=Math.min(...NOTES.map(n=>n.date)),T1=Math.max(...NOTES.map(n=>n.date));
-$("#tl-ticks").innerHTML=NOTES.map(n=>`<i data-d="${n.date}" style="left:${(n.date-T0)/(T1-T0)*100}%;background:${n.tags.length?rb(tagHue(n.tags[0])):"var(--muted)"}"></i>`).join("");
+const T0=Math.min(...NOTES.map(BORN)),T1=Math.max(...NOTES.map(BORN));
+$("#tl-ticks").innerHTML=NOTES.map(n=>`<i data-d="${BORN(n)}" style="left:${(BORN(n)-T0)/(T1-T0||1)*100}%;background:${n.tags.length?rb(tagHue(n.tags[0])):"var(--muted)"}"></i>`).join("");
 const TICKS=[...document.querySelectorAll("#tl-ticks i")];
 function setTime(v){if(v>=1000&&!playing&&stageAt==="home"){$("#tl-fill").style.width="100%";$("#t-label").innerHTML="як ріс сад";$("#t-range").value=v;if(bigSim){bigSim.time=Infinity;bigSim.energy=1}TICKS.forEach(i=>i.classList.add("on"));return}
 const t=T0+(T1-T0)*v/1000;$("#tl-fill").style.width=(v/10)+"%";TICKS.forEach(i=>i.classList.toggle("on",+i.dataset.d<=t));if(bigSim){bigSim.tmin=T0;bigSim.tmax=T1;bigSim.time=v>=1000?Infinity:t;bigSim.energy=1}
-  const n=NOTES.filter(m=>m.date<=t).length;$("#t-label").innerHTML=`<b>${new Date(t).toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}</b> · ${n} нотаток`;$("#t-range").value=v}
+  const n=NOTES.filter(m=>BORN(m)<=t).length;$("#t-label").innerHTML=`<b>${new Date(t).toLocaleDateString("uk-UA",{day:"numeric",month:"short"})}</b> · ${n} нотаток`;$("#t-range").value=v}
 $("#t-range").addEventListener("input",e=>{playing=false;setPlayIcon(false);setTime(+e.target.value)});
 let playing=false;
 function setPlayIcon(on){$("#t-icon").setAttribute("d",on?"M2 1h2v8H2zM6 1h2v8H6z":"M2 1l7 4-7 4z");$("#t-play").setAttribute("aria-label",on?"Пауза":"Програти, як ріс сад")}
