@@ -69,7 +69,16 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .bio{font-family:var(--f-body);font-size:clamp(13px,1.75vh,16px);line-height:1.5;max-width:56ch}
 .bio p{margin:0 0 .7em}
 .bio p:last-child{margin:0}
-.bio .lead{font-size:clamp(16px,2.3vh,21px);line-height:1.38}
+.intro{margin:0;font-family:var(--f-body);font-size:clamp(19px,min(2vw,3.1vh),28px);line-height:1.35;max-width:30ch;text-wrap:pretty}
+.svc-tabs{display:flex;gap:22px;margin-bottom:16px}
+.svc-tabs button{all:unset;cursor:pointer;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-bottom:4px;border-bottom:1px solid transparent}
+.svc-tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.svc-tabs button:hover{color:var(--ink)}
+.svc-tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.svc-panels{display:grid}
+.svc-panel{grid-area:1/1;transition:opacity .3s}
+.svc-panel.off{visibility:hidden;opacity:0}
+.svc-panel .bio{font-size:clamp(15px,2.2vh,19px);line-height:1.5}
 .svc figure{margin:0;position:relative;height:100%;overflow:hidden;background:var(--surface)}
 .svc figure img{display:block;width:100%;height:100%;object-fit:cover}
 .svc figcaption{position:absolute;left:var(--g);bottom:20px;right:var(--g);font-size:12px;color:#f4f4ef;text-shadow:0 1px 8px rgba(0,0,0,.55)}
@@ -142,26 +151,32 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 <section class="svc" id="services" aria-label="Послуги">
   <div class="svc-in">
     <div class="svc-txt">
-      <div>
-      <h2>Що я роблю</h2>
-      <ul>
-        <li>вебдизайн <span>— сайти, застосунки, персональні сайти</span></li>
-        <li>арт-дірекшен</li>
-        <li>графічний дизайн</li>
-        <li>фотографія</li>
-        <li>вайб-кодінг</li>
-        <li>дослідження</li>
-        <li>бази даних у Notion</li>
-      </ul>
-      </div>
-      <div>
-      <h2>Про мене</h2>
-      <div class="bio">
-        <p class="lead">Я працюю на перетині дослідження, дизайну й освіти. Зараз я курую кафедру математики, фізики та інженерії в демократичній школі Майбутні.</p>
-        <p>З 2019 року проєктую й курую дизайн, сайти та ідеї — від читацьких груп з філософії науки та технологій до лендингів для українського уряду.</p>
-        <p>За тестом Інституту Ґеллапа шість із моїх десяти найсильніших рис належать до стратегічного мислення: Ideation, Learner, Strategic, Input, Intellection, Futuristic.</p>
-        <p>Бакалаврка філософії Київського національного університету імені Тараса Шевченка.</p>
-      </div>
+      <p class="intro">Я Саша. Працюю на перетині дослідження, дизайну й освіти. Зараз я курую кафедру математики, фізики та інженерії в демократичній школі Майбутні.</p>
+      <div class="svc-tabbed">
+        <div class="svc-tabs" role="tablist" aria-label="Про мене">
+          <button type="button" role="tab" id="t-do" aria-controls="p-do" aria-selected="true">Що я роблю</button>
+          <button type="button" role="tab" id="t-me" aria-controls="p-me" aria-selected="false" tabindex="-1">Про мене</button>
+        </div>
+        <div class="svc-panels">
+          <div class="svc-panel" id="p-do" role="tabpanel" aria-labelledby="t-do">
+          <ul>
+            <li>вебдизайн <span>— сайти, застосунки, персональні сайти</span></li>
+            <li>арт-дірекшен</li>
+            <li>графічний дизайн</li>
+            <li>фотографія</li>
+            <li>вайб-кодінг</li>
+            <li>дослідження</li>
+            <li>бази даних у Notion</li>
+          </ul>
+          </div>
+          <div class="svc-panel off" id="p-me" role="tabpanel" aria-labelledby="t-me" aria-hidden="true">
+            <div class="bio">
+              <p>З 2019 року проєктую й курую дизайн, сайти та ідеї — від читацьких груп з філософії науки та технологій до лендингів для українського уряду.</p>
+              <p>За тестом Інституту Ґеллапа шість із моїх десяти найсильніших рис належать до стратегічного мислення: Ideation, Learner, Strategic, Input, Intellection, Futuristic.</p>
+              <p>Бакалаврка філософії Київського національного університету імені Тараса Шевченка.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <figure id="me"><a class="tg" id="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener" aria-label="Написати мені в Телеграм, @ardnasroxela"><span class="tg-l" aria-hidden="true"><span>написати мені<span class="tg-at"> · @ardnasroxela</span></span><span class="tg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z"/><path d="m10 13 4.5-4.5"/></svg></span></span><span class="tg-msg" id="tgmsg" aria-hidden="true">Привіт! Хочу сайт для свого проєкту…</span></a><img src="project-me.webp" alt="Олександра Майборода за столом у кафе" decoding="async"><figcaption><b>Олександра Майборода</b> · арт-директорка і дослідниця</figcaption></figure>
@@ -378,6 +393,20 @@ function sync(){
 addEventListener("scroll", sync, {passive:true});
 addEventListener("resize", sync);
 sync();
+
+/* вкладки «Що я роблю | Про мене»: панелі лежать в одній клітинці сітки, тож висота не стрибає */
+(() => {
+  const tabs = [...document.querySelectorAll(".svc-tabs [role=tab]")];
+  const pick = t => tabs.forEach(b => {
+    const on = b === t, p = document.getElementById(b.getAttribute("aria-controls"));
+    b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1;
+    p.classList.toggle("off", !on); p.setAttribute("aria-hidden", !on);
+  });
+  tabs.forEach((b, i) => {
+    b.onclick = () => pick(b);
+    b.onkeydown = e => { const d = {ArrowRight:1, ArrowLeft:-1}[e.key]; if (d){ e.preventDefault(); const n = tabs[(i + d + tabs.length) % tabs.length]; pick(n); n.focus(); } };
+  });
+})();
 
 /* бульбашка стоїть ліворуч і трохи вище обличчя: де саме — рахуємо з object-fit: cover */
 (() => {
