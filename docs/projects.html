@@ -7,12 +7,13 @@
 <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@400;500;700&family=Literata:opsz,wght@7..72,400;7..72,500&display=swap">
 <style>
 :root{
   --bg:#f5f5f0;--surface:#ebebe4;--ink:#141414;--muted:#6d6d66;--rule:#dcdcd3;
   --f-display:'Onest',system-ui,sans-serif;
   --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --f-body:'Literata',Georgia,serif;
   --g:clamp(16px,4vw,48px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0e;--surface:#181818;--ink:#f2f2ee;--muted:#8d8d86;--rule:#2a2a2a;color-scheme:dark}}
@@ -25,7 +26,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-mono);overflow:hi
 .bar{position:fixed;inset:0 0 auto 0;z-index:10;display:flex;align-items:center;gap:16px 24px;padding:14px var(--g);border-bottom:1px solid var(--rule);background:var(--bg);font-size:14px}
 .bar a{color:inherit;text-decoration:none}
 .bar a:hover{text-decoration:underline;text-underline-offset:3px}
-.bar h1{font:inherit;margin:0;color:var(--muted)}
+.bar nav{display:flex;gap:18px}
+.bar nav a{color:var(--muted)}
+.bar nav a[aria-current="page"]{color:var(--ink)}
 .bar .sp{flex:1}
 .mode{all:unset;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:50%}
 .mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
@@ -44,6 +47,21 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-mono);overflow:hi
 
 .hint{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;font-size:12px;color:var(--muted);background:var(--bg);border:1px solid var(--rule);border-radius:999px;padding:6px 14px;pointer-events:none;transition:opacity .6s;white-space:nowrap}
 .hint.off{opacity:0}
+
+/* послуги */
+.svc{position:fixed;inset:0;top:61px;overflow:auto;overscroll-behavior:contain;background:var(--bg);z-index:8}
+.svc-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px var(--g);padding:40px var(--g) 64px;align-items:start}
+.svc h2{font-family:var(--f-mono);font-weight:400;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+.svc ul{list-style:none;margin:0 0 48px;padding:0;font-family:var(--f-display);font-weight:500;font-size:clamp(26px,3.2vw,44px);line-height:1.12;letter-spacing:-.015em}
+.svc ul li span{font-weight:400;color:var(--muted)}
+.bio{font-family:var(--f-body);font-size:18px;line-height:1.6;max-width:52ch}
+.bio p{margin:0 0 .9em}
+.bio .lead{font-size:clamp(20px,2vw,24px);line-height:1.45}
+.svc figure{margin:0;position:sticky;top:20px}
+.svc figure img{display:block;width:100%;height:auto;max-height:calc(100dvh - 120px);object-fit:cover;background:var(--surface)}
+.svc figcaption{margin-top:8px;font-size:12px;color:var(--muted)}
+.svc figcaption b{font-weight:500;color:var(--ink)}
+@media (max-width:760px){.svc-in{grid-template-columns:1fr}.svc figure{position:static;order:-1}.svc figure img{max-height:60vh}}
 
 /* для читачів екрана та клавіатури */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -68,7 +86,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-mono);overflow:hi
 <body>
 <header class="bar">
   <a href="index.html">на головну</a>
-  <h1>Проєкти</h1>
+  <nav aria-label="Розділи"><a href="#" data-v="projects" aria-current="page">проєкти</a><a href="#services" data-v="services">послуги</a></nav>
   <span class="sp"></span>
   <button class="mode" id="mode" aria-label="Перемкнути світлу чи темну тему" title="Світла / темна тема">
     <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 6a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
@@ -78,6 +96,31 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-mono);overflow:hi
 <main class="field" id="field" aria-hidden="true"></main>
 <nav class="sr" aria-label="Список проєктів"><ul id="list"></ul></nav>
 <div class="hint" id="hint" aria-hidden="true">тягніть, щоб роздивитися</div>
+
+<section class="svc" id="svc" hidden aria-label="Послуги">
+  <div class="svc-in">
+    <div>
+      <h2>Що я роблю</h2>
+      <ul>
+        <li>графічний дизайн</li>
+        <li>вебдизайн <span>— сайти, застосунки, персональні сайти</span></li>
+        <li>арт-дірекшен</li>
+        <li>фотографія</li>
+        <li>дослідження</li>
+        <li>бази даних у Notion</li>
+      </ul>
+      <h2>Про мене</h2>
+      <div class="bio">
+        <p class="lead">Я арт-директорка з Києва. Працюю на перетині дослідження, дизайну й освіти. Зараз — у демократичній приватній школі, яка робить наголос на математиці й природничих науках.</p>
+        <p>Маю понад п'ять років досвіду у візуальній комунікації та дослідженнях. Зараз я арт-директорка демократичної школи «Майбутні».</p>
+        <p>З 2019 року проєктую й курую дизайн, сайти та ідеї — від читацьких груп з філософії до лендингів для українського уряду.</p>
+        <p>За тестом Інституту Ґеллапа шість із моїх десяти найсильніших рис належать до стратегічного мислення: Ideation, Learner, Strategic, Input, Intellection, Futuristic.</p>
+        <p>Бакалаврка філософії Київського національного університету імені Тараса Шевченка.</p>
+      </div>
+    </div>
+    <figure><img src="sasha.jpg" alt="Олександра Майборода за столом" loading="lazy" decoding="async"><figcaption><b>Олександра Майборода</b> · арт-директорка і дослідниця</figcaption></figure>
+  </div>
+</section>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Проєкт">
   <button class="x" id="lbx">закрити ✕</button>
@@ -210,7 +253,7 @@ field.addEventListener("pointercancel", up);
 
 /* колесо і трекпад — у всі боки */
 addEventListener("wheel", e => {
-  if (lb.classList.contains("on")) return;
+  if (lb.classList.contains("on") || !svc.hidden) return;
   e.preventDefault(); vx = vy = 0;
   const k = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1;
   let dx = e.deltaX * k, dy = e.deltaY * k;
@@ -221,6 +264,7 @@ addEventListener("wheel", e => {
 /* стрілки */
 addEventListener("keydown", e => {
   if (lb.classList.contains("on")){ if (e.key === "Escape") close(); return; }
+  if (!svc.hidden) return;
   const s = e.shiftKey ? 400 : 120;
   const d = {ArrowLeft:[-s,0], ArrowRight:[s,0], ArrowUp:[0,-s], ArrowDown:[0,s]}[e.key];
   if (d && !e.target.closest("button,a,input")){ e.preventDefault(); if (reduce) nudge(d[0], d[1]); else { vx = d[0]/12; vy = d[1]/12; } }
@@ -257,6 +301,19 @@ document.getElementById("mode").onclick = () => {
   r.dataset.theme = dark ? "light" : "dark";
   try{ localStorage.setItem("theme", r.dataset.theme); }catch(e){}
 };
+
+/* вкладки: проєкти / послуги */
+const svc = document.getElementById("svc");
+function route(){
+  const on = location.hash === "#services";
+  svc.hidden = !on; field.hidden = on; if (on) hint.classList.add("off");
+  document.querySelectorAll(".bar nav a").forEach(a => a.toggleAttribute("aria-current", (a.dataset.v === "services") === on));
+  document.querySelector(".bar nav a[aria-current]").setAttribute("aria-current", "page");
+  document.title = (on ? "Послуги" : "Проєкти") + " — Alexandra Maiboroda";
+}
+document.querySelector('.bar nav a[data-v="projects"]').onclick = e => { e.preventDefault(); history.replaceState(null, "", location.pathname + location.search); route(); };
+addEventListener("hashchange", route);
+route();
 
 /* почати з середини плитки */
 scale();
