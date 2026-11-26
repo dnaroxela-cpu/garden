@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Проєкти — Alexandra Maiboroda</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#f5f5f0;--surface:#ebebe4;--ink:#141414;--muted:#6d6d66;--rule:#dcdcd3;
+  --f-display:'Onest',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --g:clamp(16px,4vw,48px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0e;--surface:#181818;--ink:#f2f2ee;--muted:#8d8d86;--rule:#2a2a2a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e0e0e;--surface:#181818;--ink:#f2f2ee;--muted:#8d8d86;--rule:#2a2a2a;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-mono);overflow:hidden;overscroll-behavior:none}
+
+/* хедер — як на сайті */
+.bar{position:fixed;inset:0 0 auto 0;z-index:10;display:flex;align-items:center;gap:16px 24px;padding:14px var(--g);border-bottom:1px solid var(--rule);background:var(--bg);font-size:14px}
+.bar a{color:inherit;text-decoration:none}
+.bar a:hover{text-decoration:underline;text-underline-offset:3px}
+.bar h1{font:inherit;margin:0;color:var(--muted)}
+.bar .sp{flex:1}
+.mode{all:unset;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:50%}
+.mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.mode svg{transition:transform .4s}
+:root[data-theme="dark"] .mode svg{transform:rotate(180deg)}
+
+/* полотно */
+.field{position:fixed;inset:0;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.field.drag{cursor:grabbing}
+.it{position:absolute;left:0;top:0;margin:0;will-change:transform;cursor:pointer}
+.it .m{display:block;width:100%;height:auto;background:var(--surface);pointer-events:none;-webkit-user-drag:none;transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.it figcaption{margin-top:8px;font-size:12px;line-height:1.4;color:var(--muted);max-width:100%}
+.it figcaption b{font-weight:500;color:var(--ink)}
+.field:not(.drag) .it:hover .m{transform:scale(1.02)}
+.field:not(.drag) .it:hover figcaption{color:var(--ink)}
+
+.hint{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;font-size:12px;color:var(--muted);background:var(--bg);border:1px solid var(--rule);border-radius:999px;padding:6px 14px;pointer-events:none;transition:opacity .6s;white-space:nowrap}
+.hint.off{opacity:0}
+
+/* для читачів екрана та клавіатури */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sr:focus-within{position:fixed;left:var(--g);bottom:20px;width:auto;height:auto;clip:auto;z-index:20;background:var(--bg);border:1px solid var(--rule);padding:10px 14px;white-space:normal;max-width:calc(100% - 2*var(--g))}
+.sr ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px}
+.sr button{all:unset;cursor:pointer;font-size:12px}
+.sr button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* відкритий проєкт */
+.lb{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:72px var(--g) 32px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.lb.on{display:grid}
+.lb figure{margin:0;display:flex;flex-direction:column;align-items:center;max-width:100%;max-height:100%}
+.lb .m{display:block;max-width:min(100%,1100px);max-height:calc(100dvh - 160px);width:auto;height:auto;object-fit:contain}
+.lb figcaption{margin-top:12px;font-size:13px;line-height:1.5;color:var(--muted);text-align:center;max-width:60ch}
+.lb figcaption b{font-weight:500;color:var(--ink)}
+.lb figcaption a{color:var(--ink)}
+.lb .x{all:unset;position:fixed;top:64px;right:var(--g);cursor:pointer;font-size:13px;padding:6px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--bg)}
+.lb .x:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a href="index.html">на головну</a>
+  <h1>Проєкти</h1>
+  <span class="sp"></span>
+  <button class="mode" id="mode" aria-label="Перемкнути світлу чи темну тему" title="Світла / темна тема">
+    <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 6a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
+  </button>
+</header>
+
+<main class="field" id="field" aria-hidden="true"></main>
+<nav class="sr" aria-label="Список проєктів"><ul id="list"></ul></nav>
+<div class="hint" id="hint" aria-hidden="true">тягніть, щоб роздивитися</div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Проєкт">
+  <button class="x" id="lbx">закрити ✕</button>
+  <figure id="lbf"></figure>
+</div>
+
+<script>
+/* ПРОЄКТИ. Щоб додати проєкт — додай рядок.
+   src: картинка (або постер для відео), video: відео (необов'язково),
+   x, y: місце на «плитці» TW×TH, w: ширина в пікселях, ratio: висота/ширина,
+   title: назва, note: короткий підпис, link: посилання (необов'язково), text: довший опис у відкритому вигляді (необов'язково). */
+const TW = 1700, TH = 1250;
+const PROJECTS = [
+  {src:"project-5.webp", ratio:1102/1100, x:80,   y:100, w:340, title:"Майбутні", note:"обкладинка"},
+  {src:"project-1.webp", ratio:734/1100,  x:520,  y:40,  w:400, title:"Майбутні", note:"виїзд"},
+  {src:"project-v2.webp", video:"project-v2.mp4", ratio:800/640, x:1020, y:180, w:280, title:"Колаж", note:"анімація"},
+  {src:"project-3.webp", ratio:447/444,   x:1390, y:60,  w:220, title:"Майбутні", note:"відгуки учнів"},
+  {src:"project-4.webp", ratio:1466/1100, x:220,  y:600, w:300, title:"Майбутні", note:"друкований альбом з картками учасників"},
+  {src:"project-v1.webp", video:"project-v1.mp4", ratio:1, x:640, y:480, w:300, title:"Майбутні", note:"шукають людей у команду"},
+  {src:"project-2.webp", ratio:734/1100,  x:1080, y:700, w:420, title:"Майбутні", note:"заняття"},
+];
+
+const field = document.getElementById("field"), hint = document.getElementById("hint");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const CAP = 40, MARGIN = 200;          // місце під підпис і запас за краєм екрана
+let S = 1, camX = 0, camY = 0, vx = 0, vy = 0, dirty = true;
+const live = new Map();                // "i:tx:ty" → елемент
+function scale(){ const s = innerWidth < 700 ? .62 : 1; if (s !== S){ S = s; for (const el of live.values()) el.remove(); live.clear(); } }
+
+function caption(p){ return `<b>${p.title}</b>${p.note ? " · " + p.note : ""}`; }
+
+function media(p, big){
+  if (p.video){
+    const v = document.createElement("video");
+    v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute("playsinline", "");
+    v.poster = p.src; v.preload = big ? "auto" : "metadata";
+    if (!reduce || big){ v.autoplay = true; }
+    v.src = p.video; v.className = "m";
+    if (big && reduce) v.controls = true;
+    return v;
+  }
+  const img = new Image(); img.src = p.src; img.alt = big ? p.title + (p.note ? " — " + p.note : "") : "";
+  img.decoding = "async"; img.draggable = false; img.className = "m";
+  return img;
+}
+
+function make(i){
+  const p = PROJECTS[i], f = document.createElement("figure");
+  f.className = "it"; f.style.width = p.w*S + "px"; f.dataset.i = i;
+  const m = media(p, false); m.width = Math.round(p.w*S); m.height = Math.round(p.w*S * p.ratio);
+  f.append(m);
+  const c = document.createElement("figcaption"); c.innerHTML = caption(p); f.append(c);
+  if (p.video && reduce){ f.onmouseenter = () => m.play().catch(()=>{}); f.onmouseleave = () => m.pause(); }
+  return f;
+}
+
+function render(){
+  const vw = innerWidth, vh = innerHeight, seen = new Set();
+  const tw = TW*S, th = TH*S;
+  PROJECTS.forEach((q, i) => {
+    const p = {x:q.x*S, y:q.y*S, w:q.w*S}, h = p.w * q.ratio + CAP;
+    const tx0 = Math.ceil((camX - MARGIN - p.x - p.w) / tw), tx1 = Math.floor((camX + vw + MARGIN - p.x) / tw);
+    const ty0 = Math.ceil((camY - MARGIN - p.y - h) / th),  ty1 = Math.floor((camY + vh + MARGIN - p.y) / th);
+    for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++){
+      const k = i + ":" + tx + ":" + ty; seen.add(k);
+      let el = live.get(k);
+      if (!el){ el = make(i); live.set(k, el); field.append(el); }
+      el.style.transform = `translate3d(${Math.round(p.x + tx*tw - camX)}px,${Math.round(p.y + ty*th - camY)}px,0)`;
+    }
+  });
+  for (const [k, el] of live) if (!seen.has(k)){ el.remove(); live.delete(k); }
+}
+
+function loop(){
+  if (!dragging && (Math.abs(vx) > .05 || Math.abs(vy) > .05)){
+    camX += vx; camY += vy; vx *= .93; vy *= .93; dirty = true;
+  }
+  if (dirty){ render(); dirty = false; }
+  requestAnimationFrame(loop);
+}
+
+let moved = 0;
+function nudge(dx, dy){
+  camX += dx; camY += dy; dirty = true;
+  moved += Math.abs(dx) + Math.abs(dy);
+  if (moved > 300) hint.classList.add("off");
+}
+
+/* тягнути мишкою / пальцем */
+let dragging = false, lx = 0, ly = 0, lt = 0, travel = 0, downEl = null;
+field.addEventListener("pointerdown", e => {
+  if (e.button !== 0) return;
+  dragging = true; travel = 0; vx = vy = 0; lx = e.clientX; ly = e.clientY; lt = performance.now();
+  downEl = e.target.closest(".it");
+  field.setPointerCapture(e.pointerId);
+});
+field.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  const dx = lx - e.clientX, dy = ly - e.clientY, now = performance.now(), dt = Math.max(1, now - lt);
+  travel += Math.abs(dx) + Math.abs(dy);
+  if (travel > 4) field.classList.add("drag");
+  nudge(dx, dy);
+  vx = .8*vx + .2*(dx / dt * 16); vy = .8*vy + .2*(dy / dt * 16);
+  lx = e.clientX; ly = e.clientY; lt = now;
+});
+function up(e){
+  if (!dragging) return;
+  dragging = false; field.classList.remove("drag");
+  if (performance.now() - lt > 80 || reduce){ vx = vy = 0; }
+  if (travel <= 4 && downEl) open(+downEl.dataset.i);
+  downEl = null;
+}
+field.addEventListener("pointerup", up);
+field.addEventListener("pointercancel", up);
+
+/* колесо і трекпад — у всі боки */
+addEventListener("wheel", e => {
+  if (lb.classList.contains("on")) return;
+  e.preventDefault(); vx = vy = 0;
+  const k = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1;
+  let dx = e.deltaX * k, dy = e.deltaY * k;
+  if (e.shiftKey && !dx){ dx = dy; dy = 0; }
+  nudge(dx, dy);
+}, {passive:false});
+
+/* стрілки */
+addEventListener("keydown", e => {
+  if (lb.classList.contains("on")){ if (e.key === "Escape") close(); return; }
+  const s = e.shiftKey ? 400 : 120;
+  const d = {ArrowLeft:[-s,0], ArrowRight:[s,0], ArrowUp:[0,-s], ArrowDown:[0,s]}[e.key];
+  if (d && !e.target.closest("button,a,input")){ e.preventDefault(); if (reduce) nudge(d[0], d[1]); else { vx = d[0]/12; vy = d[1]/12; } }
+});
+addEventListener("resize", () => { const o = S; scale(); camX *= S/o; camY *= S/o; dirty = true; });
+
+/* відкрити проєкт */
+const lb = document.getElementById("lb"), lbf = document.getElementById("lbf"), lbx = document.getElementById("lbx");
+let back = null;
+function open(i){
+  const p = PROJECTS[i];
+  back = document.activeElement;
+  lbf.replaceChildren(media(p, true));
+  const c = document.createElement("figcaption");
+  c.innerHTML = caption(p) + (p.text ? "<br>" + p.text : "") + (p.link ? `<br><a href="${p.link}" target="_blank" rel="noopener">відкрити ↗</a>` : "");
+  lbf.append(c);
+  lb.classList.add("on"); lbx.focus();
+}
+function close(){ lb.classList.remove("on"); lbf.replaceChildren(); if (back && back.focus) back.focus(); }
+lbx.onclick = close;
+lb.addEventListener("click", e => { if (e.target === lb) close(); });
+
+/* список для клавіатури й читачів екрана */
+const list = document.getElementById("list");
+PROJECTS.forEach((p, i) => {
+  const li = document.createElement("li"), b = document.createElement("button");
+  b.textContent = p.title + (p.note ? " — " + p.note : ""); b.onclick = () => open(i);
+  li.append(b); list.append(li);
+});
+
+/* тема */
+document.getElementById("mode").onclick = () => {
+  const r = document.documentElement, dark = r.dataset.theme === "dark";
+  r.dataset.theme = dark ? "light" : "dark";
+  try{ localStorage.setItem("theme", r.dataset.theme); }catch(e){}
+};
+
+/* почати з середини плитки */
+scale();
+camX = TW*S/2 - innerWidth/2; camY = TH*S/2 - innerHeight/2 + 20;
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
