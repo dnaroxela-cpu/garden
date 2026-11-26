@@ -110,7 +110,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .idea h3{font-family:var(--f-display);font-weight:500;font-size:clamp(17px,1.4vw,20px);line-height:1.15;letter-spacing:-.01em;margin:0 0 8px}
 .idea p{font-family:var(--f-body);font-size:14px;line-height:1.5;margin:0}
 .idea.i1{left:var(--g);top:clamp(24px,7vh,70px);transform:rotate(-2deg)}
-.idea.i2{right:var(--g);top:30%;transform:rotate(1.5deg)}
+.idea.i2{right:var(--g);top:clamp(40px,12vh,120px);transform:rotate(1.5deg)}
+.idea.i4{right:calc(var(--g) + 2vw);bottom:clamp(20px,6vh,70px);transform:rotate(-1.5deg)}
 .idea.i3{left:calc(var(--g) + 1vw);bottom:clamp(20px,5vh,60px);transform:rotate(1deg)}
 @media (max-width:900px){.ideas{height:auto;padding:48px var(--g);display:flex;flex-direction:column;gap:20px}
   .love{position:static;transform:none;width:auto;font-size:clamp(28px,7vw,44px);margin-bottom:12px}
@@ -187,6 +188,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   <article class="idea i1"><small>ідея</small><h3>Бюро ритуальних послуг третьої хвилі</h3><p>Агенція, яка створює трансцендентний, красивий і не пошлий досвід прощання.</p></article>
   <article class="idea i2"><small>ідея</small><h3>Awe-birth</h3><p>Спеціальні клініки для народження дітей, які дають незвичний і красивий досвід народження.</p></article>
   <article class="idea i3"><small>ідея</small><h3>Міська бібліотека для дітей</h3><p>З великою секцією класних і рідкісних дитячих книг та ігор з усього світу. Такий Cabinet of Child's Curiosity. Можна лишити дитину на кілька годин.</p></article>
+  <article class="idea i4"><small>ідея</small><h3>Видавництво</h3><p>Перекладає українською ключові тексти з теорії кібернетики та теорії систем, а також з історії й філософії технологій, інтернету та науки.</p></article>
 </section>
 
 <section class="work" id="projects" aria-label="Проєкти">
@@ -431,7 +433,7 @@ sync();
     "Привіт! Хочу сайт для свого проєкту…",
     "Потрібен арт-дірекшен для кампанії…",
     "Можеш допомогти зібрати базу в Notion?",
-    "Хочу випускний альбом для класу…",
+    "Потрібно створити застосунок для команди…",
     "Є застосунок, якому бракує дизайну…",
     "Маю дивну ідею. Поговоримо?",
   ];
