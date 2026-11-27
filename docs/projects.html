@@ -104,7 +104,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .svc-tabs button{position:relative;height:calc(100% - 5px);display:flex;align-items:center;padding:0 18px;border:1px solid var(--rule);border-bottom:0;border-radius:14px 14px 0 0;background:color-mix(in srgb,var(--surface) 40%,var(--bg));transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
 .svc-tabs button:hover{height:calc(100% - 2px)}
 .svc-tabs button[aria-selected="true"]{background:var(--surface);height:100%;z-index:1;border-bottom-color:transparent}
-.svc-tabs button[aria-selected="true"]::before,.svc-tabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:12px;height:12px;pointer-events:none}
+.svc-tabs button[aria-selected="true"]::before,.svc-tabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:13px;height:12px;pointer-events:none}
 .svc-tabs button[aria-selected="true"]::before{left:-13px;background:radial-gradient(circle at 0 0,transparent 11.5px,var(--rule) 11.5px 12.5px,var(--surface) 12.5px)}
 .svc-tabs button[aria-selected="true"]::after{right:-13px;background:radial-gradient(circle at 100% 0,transparent 11.5px,var(--rule) 11.5px 12.5px,var(--surface) 12.5px)}
 .svc-tabs button:focus-visible{outline-offset:-5px}
@@ -225,7 +225,7 @@ html{scroll-padding-top:calc(var(--hb) + var(--mt))}
 .mtabs{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:end;position:sticky;top:var(--hb);z-index:40;height:var(--mt);padding:9px var(--g) 0;background:var(--surface);border-bottom:1px solid var(--rule)}
 .mtabs button{all:unset;cursor:pointer;position:relative;height:100%;display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:color-mix(in srgb,var(--surface) 70%,var(--rule));border:1px solid var(--rule);border-bottom:0;border-radius:16px 16px 0 0;height:calc(100% - 5px);transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
 .mtabs button[aria-selected="true"]{color:var(--ink);background:var(--bg);margin-bottom:-1px;height:calc(100% + 1px);z-index:1}
-.mtabs button[aria-selected="true"]::before,.mtabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:14px;height:14px;pointer-events:none}
+.mtabs button[aria-selected="true"]::before,.mtabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:15px;height:14px;pointer-events:none}  /* на 1px ширше: заокруглення накриває бічний край вкладки, щоб під кривою не було прямої лінії */
 .mtabs button[aria-selected="true"]::before{left:-15px;background:radial-gradient(circle at 0 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
 .mtabs button[aria-selected="true"]::after{right:-15px;background:radial-gradient(circle at 100% 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
 .mtabs button:focus-visible{outline:2px solid var(--ink);outline-offset:-5px}

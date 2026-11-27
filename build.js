@@ -53,6 +53,9 @@ const SECTIONS = [
   ['Fleeting Notes', 'Seeds'],                // Сад → чернетки
   ['Book Reviews', 'Book Reviews'], ['Blog Notes', 'Blog Notes'], ['Seeds', 'Seeds'], // старі назви
 ];
+// рік видання книжки, якщо в нотатці немає властивості year (краще дописати year у саму нотатку в Obsidian)
+const BOOK_YEARS = { 'Social Construction of What?': 1999 };
+
 function section(file) {
   if (!file.folder) return null;
   const p = file.folder.split(path.sep).join('/'), low = p.toLowerCase();
@@ -1680,7 +1683,7 @@ async function buildApp(files, coversCache) {
     return {
       id, title: file.title, folder: section(file), tags: file.tags,
       excerpt: noteExcerpt(board ? board.intro : file.raw), date: file.dateMs, born: file.bornMs, links: [...links],
-      book: isBook ? ([file.author, file.year].filter(Boolean).join(' · ') || null) : null,
+      book: isBook ? ([file.author, file.year || BOOK_YEARS[file.title.trim()]].filter(Boolean).join(' · ') || null) : null,
       cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
       html,
       board: canvas ? canvasBoard(canvas, { block, noteId }) || undefined : board && board.quotes.length ? {

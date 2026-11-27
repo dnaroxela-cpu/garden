@@ -876,8 +876,8 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
   background:color-mix(in srgb,var(--surface) 70%,var(--rule));border:1px solid var(--rule);border-bottom:0;border-radius:16px 16px 0 0;cursor:pointer;transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
 .folders button:hover{color:var(--ink);height:calc(100% - 2px)}
 .folders button[aria-selected="true"],.folders button[aria-current="true"]{color:var(--ink);background:var(--bg);height:100%;z-index:1}
-.folders button[aria-selected="true"]::before,.folders button[aria-selected="true"]::after,.folders button[aria-current="true"]::before,.folders button[aria-current="true"]::after{content:"";position:absolute;bottom:0;width:14px;height:14px;pointer-events:none}
-.folders button[aria-selected="true"]::before,.folders button[aria-current="true"]::before{left:-15px;background:radial-gradient(circle at 0 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
+.folders button[aria-selected="true"]::before,.folders button[aria-selected="true"]::after,.folders button[aria-current="true"]::before,.folders button[aria-current="true"]::after{content:"";position:absolute;bottom:0;width:15px;height:14px;pointer-events:none}
+.folders button[aria-selected="true"]::before,.folders button[aria-current="true"]::before{left:-15px;/* заходить на бічний край вкладки, щоб під кривою не було прямої лінії */background:radial-gradient(circle at 0 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
 .folders button[aria-selected="true"]::after,.folders button[aria-current="true"]::after{right:-15px;background:radial-gradient(circle at 100% 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
 .folders button:focus-visible{outline:2px solid var(--ink);outline-offset:-5px}
 .folders sup{font-size:9px;letter-spacing:0;vertical-align:.6em;opacity:.7;margin-left:1px}
@@ -920,6 +920,17 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
 .mfilter .mlegend[hidden]{display:none}
 .mfilter .mlegend .ft-x{flex-basis:100%;justify-content:flex-start}
 @media (max-width:700px){.mfilter .mlegend{bottom:auto;top:calc(100% + 8px);right:auto;left:0}}
+/* відкрита нотатка: заголовки й текст — звичайним шрифтом без засічок (Onest), а не моноширинним «друкованим»; заголовки товсті */
+:is(.pane,.note){--f-display:'Onest',system-ui,sans-serif;--f-body:'Onest',system-ui,sans-serif}
+:is(.pane,.note) .prose{font-family:var(--f-body);font-size:17px;line-height:1.6}
+:root :is(.pane,.note) h1,:root[data-dir] :is(.pane,.note) h1{font-family:'Onest',system-ui,sans-serif;font-weight:700;font-size:clamp(28px,3vw,40px);line-height:1.1;letter-spacing:-.02em}
+:root :is(.pane,.note) .prose :is(h1,h2,h3,h4),:root[data-dir] :is(.pane,.note) .prose :is(h1,h2,h3,h4){font-family:'Onest',system-ui,sans-serif;font-weight:700;letter-spacing:-.01em}
+/* Полиця: «розставити» — один фільтр-список, як фільтр тем у Саду */
+.arrsel{display:flex;align-items:center;gap:10px}
+.arrsel select{appearance:none;-webkit-appearance:none;font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;padding:7px 30px 7px 14px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%236d6d66' stroke-width='1.4'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.arrsel select:hover{border-color:var(--ink)}
+.arrsel select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -1620,7 +1631,7 @@ BOOKS.forEach(b=>{const k=Object.keys(READ).find(k=>b.title.startsWith(k)),r=k&&
 BOOKS.forEach((b,i)=>{b.spine=SPINES[i%SPINES.length];b.w=Math.round(24+40*Math.sqrt(words(b)/maxW));b.h=200+hash(b.id)%70;
   const m=(b.book||"").match(/·\s*(\d{4})/);b.year=m?+m[1]:null;b.author=(b.book||"").split("·")[0].trim();const[h,s,l]=hsl(b.spine[0]);b.hue=s<.18?400+l*100:h});
 const ARR={cards:"картками",read:"коли прочитала",color:"кольором",year:"роком видання",topic:"темою",length:"товщиною",timeline:"на шкалі часу"};
-let arrange="cards";try{arrange=localStorage.getItem("shelfArrange3")||arrange}catch(e){}if(!ARR[arrange])arrange="cards";
+let arrange="year";   // Полиця завжди відкривається «роком видання»; вибір у фільтрі не запам'ятовується
 const spineHTML=(b,extra="")=>`<button class="spine" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" style="background:${b.spine[0]};color:${b.spine[1]};width:${b.w}px;height:${b.h}px;${extra}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}${b.year?", "+b.year:""}"><span>${esc(short(b.title).split(/[.:]/)[0])}</span></button>`;
 const coverHTML=b=>`<button class="hcover shelf-now" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" style="background:${b.spine[0]}" title="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}${b.year?", "+b.year:""}"><span class="ph" style="color:${b.spine[1]}">${esc(short(b.title).split(/[.:]/)[0])}</span>${b.cover?`<img src="${esc(b.cover)}" alt="${esc(short(b.title))}" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</button>`;
 function groups(){
@@ -1698,7 +1709,7 @@ function renderBooks(){
   const box=$("#t-books");
   const before=new Map([...box.querySelectorAll(".spine")].map(s=>[s.dataset.book,s.getBoundingClientRect()]));
   const years=BOOKS.filter(b=>b.year).map(b=>b.year);
-  let h=`<div class="shelf-bar"><div class="arr" role="group" aria-label="Розставити книжки"><span class="label">Розставити</span>${Object.entries(ARR).map(([k,v])=>`<button data-arr="${k}" aria-pressed="${k===arrange}">${v}</button>`).join("")}</div>
+  let h=`<div class="shelf-bar"><label class="arrsel"><span class="label">Розставити</span><select id="arrsel">${Object.entries(ARR).map(([k,v])=>`<option value="${k}"${k===arrange?" selected":""}>${v}</option>`).join("")}</select></label>
     <span class="mono">${BOOKS.length} конспектів · ${BOOKS.reduce((s,b)=>s+words(b),0).toLocaleString("uk-UA")} слів · ${Math.min(...years)}–${Math.max(...years)}</span></div>`;
   const cardsHTML=()=>`<div class="agrid">${[...BOOKS].sort((a,b)=>(b.reading-a.reading)||b.readSort-a.readSort).map(b=>{const t=short(b.title).length;
     return `<button class="acard" data-book="${b.id}" aria-expanded="${shelfStack&&shelfStack.ids[0]===b.id}" aria-label="${esc(short(b.title))}${b.author?" — "+esc(b.author):""}"><span class="acover" style="background:${b.spine[0]};color:${b.spine[1]}">
@@ -1717,9 +1728,9 @@ const shelfStack=new Stack($("#shelf-panes"),{closeFirst:true,onEmpty:()=>{docum
 $("#t-books").addEventListener("pointerover",e=>{const sp=e.target.closest(".spine");if(sp)drawThreads(sp)});
 $("#t-books").addEventListener("pointerout",e=>{const sp=e.target.closest(".spine");if(sp&&!sp.contains(e.relatedTarget))drawThreads(null)});
 $("#t-books").addEventListener("focusin",e=>{const sp=e.target.closest(".spine");if(sp)drawThreads(sp)});
+$("#t-books").addEventListener("change",e=>{if(e.target.id==="arrsel"){arrange=e.target.value;renderBooks()}});
 $("#t-books").addEventListener("click",e=>{
   const on=e.target.closest("[data-open-note]");if(on){e.preventDefault();e.stopPropagation();document.body.classList.add("book-open");shelfStack.set([on.dataset.openNote]);return}
-  const a=e.target.closest("[data-arr]");if(a){arrange=a.dataset.arr;try{localStorage.setItem("shelfArrange3",arrange)}catch(err){}renderBooks();return}
   const s=e.target.closest("[data-book]");if(!s)return;
   if(shelfStack.ids[0]===s.dataset.book&&document.body.classList.contains("book-open")){shelfStack.ids=[];document.body.classList.remove("book-open");renderBooks();return}
   document.body.classList.add("book-open");shelfStack.set([s.dataset.book]);});
