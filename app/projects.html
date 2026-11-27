@@ -123,7 +123,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 
 /* другий екран: «Я люблю ідеї…» по центру, навколо — три мої ідеї */
 .ideas{position:relative;height:calc(100dvh - var(--hb));border-top:1px solid var(--rule);scroll-snap-align:start;overflow:hidden;background:var(--bg)}
-.love{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);width:min(50vw,900px);margin:0;text-align:center;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,min(3.6vw,5.2vh),64px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
+.love{position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);width:min(50vw,900px);margin:0;text-align:center;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,min(3.6vw,5.2vh),64px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
 .love em{font-family:var(--f-body);font-style:italic;font-weight:400;letter-spacing:-.01em}
 .idea{position:absolute;width:min(300px,21vw);margin:0;padding:16px 18px 18px;background:var(--surface);border:1px solid var(--rule);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
 .idea:hover{transform:rotate(0) scale(1.03)}
@@ -165,6 +165,18 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .gtip small{display:block;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-bottom:6px}
 .gt::before{content:"";display:inline-block;width:.55em;height:.55em;border-radius:50%;margin:0 .3em .08em .05em;vertical-align:middle;background:var(--gt)}
 .gt[data-d="s"]{--gt:#00945f}.gt[data-d="r"]{--gt:#0a6cbf}.gt[data-d="e"]{--gt:#7b2582}.gt[data-d="i"]{--gt:#e07012}
+/* реакції на ідеї: ряд емодзі з лічильниками під кожною карткою */
+.rx{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px}
+.rx button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 4px;border:1px solid var(--rule);border-radius:999px;background:var(--bg);font-size:12px;line-height:1.2;position:relative;transition:transform .15s,border-color .2s}
+.rx button:hover{transform:translateY(-1px);border-color:var(--ink)}
+.rx button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.rx button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.rx .n{font-family:var(--f-mono);font-size:10px;min-width:1ch}
+.rx .n:empty{display:none}
+.rx-fly{position:fixed;z-index:85;pointer-events:none;font-size:22px;animation:rxfly 1s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes rxfly{to{transform:translate(var(--dx),-90px) scale(1.6) rotate(var(--r));opacity:0}}
+@media (prefers-reduced-motion:reduce){.rx-fly{display:none}}
+
 /* для читачів екрана та клавіатури */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sr:focus-within{position:fixed;left:var(--g);bottom:20px;width:auto;height:auto;clip:auto;z-index:20;background:var(--bg);border:1px solid var(--rule);padding:10px 14px;white-space:normal;max-width:calc(100% - 2*var(--g))}
@@ -244,11 +256,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 </section>
 <section class="ideas" id="ideas" aria-label="Ідеї">
   <p class="love">Я люблю ідеї, бо вони <em>глибокі</em>, бо вони <em>нові</em>, бо вони <em>прояснюють</em>, бо вони <em>суперечливі</em>, бо вони <em>дивні</em></p>
-  <article class="idea i1"><small>ідея</small><h3>Бюро ритуальних послуг третьої хвилі</h3><p>Агенція, яка створює трансцендентний, красивий і не пошлий досвід прощання.</p></article>
-  <article class="idea i2"><small>ідея</small><h3>Awe-birth</h3><p>Спеціальні клініки для народження дітей, які дають незвичний і красивий досвід народження.</p></article>
-  <article class="idea i3"><small>ідея</small><h3>Міська бібліотека для дітей</h3><p>З великою секцією класних і рідкісних дитячих книг та ігор з усього світу. Такий Cabinet of Child's Curiosity. Можна лишити дитину на кілька годин.</p></article>
-  <article class="idea i4"><small>ідея</small><h3>Видавництво про кібернетику</h3><p>Перекладає українською ключові тексти з теорії кібернетики та теорії систем, а також з історії й філософії технологій, інтернету та науки.</p></article>
-  <article class="idea i5"><small>ідея</small><h3>Конструктори приладів</h3><p>Набори для дітей і дорослих, з яких можна зібрати телевізор, телефон, камеру — і зрозуміти, як влаштовані речі. Дуже красиві, в стилі Apple, з поясненнями механіки, ланцюжків виробництва та історії приладу.</p></article>
+  <article class="idea i1"><small>ідея</small><h3>Бюро ритуальних послуг третьої хвилі</h3><p>Агенція, яка створює трансцендентний, красивий і не пошлий досвід прощання.</p><div class="rx" data-idea="i1" role="group" aria-label="Реакції"></div></article>
+  <article class="idea i2"><small>ідея</small><h3>Awe-birth</h3><p>Спеціальні клініки для народження дітей, які дають незвичний і красивий досвід народження.</p><div class="rx" data-idea="i2" role="group" aria-label="Реакції"></div></article>
+  <article class="idea i3"><small>ідея</small><h3>Міська бібліотека для дітей</h3><p>З великою секцією класних і рідкісних дитячих книг та ігор з усього світу. Такий Cabinet of Child's Curiosity. Можна лишити дитину на кілька годин.</p><div class="rx" data-idea="i3" role="group" aria-label="Реакції"></div></article>
+  <article class="idea i4"><small>ідея</small><h3>Видавництво про кібернетику</h3><p>Перекладає українською ключові тексти з теорії кібернетики та теорії систем, а також з історії й філософії технологій, інтернету та науки.</p><div class="rx" data-idea="i4" role="group" aria-label="Реакції"></div></article>
+  <article class="idea i5"><small>ідея</small><h3>Конструктори приладів</h3><p>Набори для дітей і дорослих, з яких можна зібрати телевізор, телефон, камеру — і зрозуміти, як влаштовані речі. Дуже красиві, в стилі Apple, з поясненнями механіки, ланцюжків виробництва та історії приладу.</p><div class="rx" data-idea="i5" role="group" aria-label="Реакції"></div></article>
   <button type="button" class="ideas-reset" id="ideas-reset" hidden>повернути ідеї на місця</button>
 </section>
 
@@ -501,7 +513,7 @@ sync();
   cards.forEach((c, i) => {
     let sx, sy, ox, oy, moved;
     c.addEventListener("pointerdown", e => {
-      if (!wide.matches || e.button !== 0) return;
+      if (!wide.matches || e.button !== 0 || e.target.closest(".rx")) return;
       // положення без повороту: offsetLeft/Top не залежать від transform; у центральної картки ще є зсув translateX(-50%)
       ox = c.offsetLeft - (c.classList.contains("i5") && !pos[i] ? c.offsetWidth / 2 : 0); oy = c.offsetTop; sx = e.clientX; sy = e.clientY; moved = false;
       c.style.left = ox + "px"; c.style.top = oy + "px"; c.style.right = c.style.bottom = "auto";
@@ -606,6 +618,51 @@ sync();
   });
   addEventListener("click", hide); addEventListener("scroll", () => { if (cur && Math.abs(scrollY - sy) > 40) hide(); }, {passive:true});
   addEventListener("keydown", e => { if (e.key === "Escape") hide(); });
+})();
+
+/* реакції: спільні лічильники через безкоштовний сервіс Abacus (abacus.jasoncameron.dev);
+   один браузер — одна реакція кожного виду на ідею (пам'ятається в localStorage "ideas-rx").
+   Якщо сервіс недоступний, реакції лишаються локальними, без чисел */
+(() => {
+  const API = "https://abacus.jasoncameron.dev", NS = "dnaroxela-garden-ideas";
+  const RX = [["heart","❤️","подобається"],["fire","🔥","вогонь"],["shock","😱","шок"],["mind","🤯","вибухнув мозок"],["think","🤔","замислилась"],["eyes","👀","стежу"]];
+  let mine = {}; try { mine = JSON.parse(localStorage.getItem("ideas-rx") || "{}"); } catch(e){}
+  const save = () => { try { localStorage.setItem("ideas-rx", JSON.stringify(mine)); } catch(e){} };
+  const boxes = [...document.querySelectorAll(".rx")];
+  boxes.forEach(box => {
+    const id = box.dataset.idea;
+    box.innerHTML = RX.map(([k, e, t]) => `<button type="button" data-k="${k}" aria-pressed="${!!mine[id+"-"+k]}" title="${t}" aria-label="${t}"><span aria-hidden="true">${e}</span><span class="n"></span></button>`).join("");
+  });
+  const num = (box, k) => box.querySelector(`[data-k="${k}"] .n`);
+  const show = (el, v) => { el.textContent = v > 0 ? v : ""; };
+  function fly(btn, e){
+    const r = btn.getBoundingClientRect(), f = document.createElement("span");
+    f.className = "rx-fly"; f.textContent = btn.firstElementChild.textContent;
+    f.style.left = r.left + r.width/2 - 11 + "px"; f.style.top = r.top - 6 + "px";
+    f.style.setProperty("--dx", (Math.random()*60 - 30) + "px"); f.style.setProperty("--r", (Math.random()*50 - 25) + "deg");
+    document.body.append(f); setTimeout(() => f.remove(), 1000);
+  }
+  document.getElementById("ideas").addEventListener("click", async e => {
+    const btn = e.target.closest(".rx button"); if (!btn) return;
+    const box = btn.closest(".rx"), key = box.dataset.idea + "-" + btn.dataset.k;
+    fly(btn);
+    if (mine[key]) return;                       // уже реагували — лише анімація
+    mine[key] = 1; save(); btn.setAttribute("aria-pressed", "true");
+    const n = num(box, btn.dataset.k); show(n, (+n.textContent || 0) + 1);
+    try { const r = await fetch(`${API}/hit/${NS}/${key}`); if (r.ok) show(n, (await r.json()).value); } catch(err){}
+  });
+  let loaded = false;
+  async function load(){
+    if (loaded) return; loaded = true;
+    await Promise.all(boxes.flatMap(box => RX.map(async ([k]) => {
+      try {
+        const r = await fetch(`${API}/get/${NS}/${box.dataset.idea}-${k}`);
+        show(num(box, k), r.ok ? (await r.json()).value : (mine[box.dataset.idea+"-"+k] ? 1 : 0));
+      } catch(err){ if (mine[box.dataset.idea+"-"+k]) show(num(box, k), 1); }
+    })));
+  }
+  const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)){ load(); io.disconnect(); } }, {rootMargin: "300px"});
+  io.observe(document.getElementById("ideas"));
 })();
 
 /* бульбашка стоїть ліворуч і трохи вище обличчя: де саме — рахуємо з object-fit: cover */
