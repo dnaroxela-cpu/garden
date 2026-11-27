@@ -204,26 +204,27 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .lb figcaption a{color:var(--ink)}
 .lb .x{all:unset;position:fixed;top:64px;right:var(--g);cursor:pointer;font-size:13px;padding:6px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--bg)}
 .lb .x:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-/* на телефоні другий і третій екрани — вкладки «ідеї | проєкти»: смужка липне під хедером, екран ділиться навпіл, лінія ковзає під активною */
-.mtabs{display:none}
-@media (max-width:760px){
-  html{scroll-padding-top:calc(var(--hb) + var(--mt))}
-  :root{--mt:52px}
-  /* смужка — «полиця» кольору поверхні; вкладки з заокругленим верхом, активна зливається з аркушем під нею, низ м'яко розходиться, як у справжньої папки */
-  .mtabs{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:end;position:sticky;top:var(--hb);z-index:40;height:var(--mt);padding:9px var(--g) 0;background:var(--surface);border-bottom:1px solid var(--rule)}
-  .mtabs button{all:unset;cursor:pointer;position:relative;height:100%;display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:color-mix(in srgb,var(--surface) 70%,var(--rule));border:1px solid var(--rule);border-bottom:0;border-radius:16px 16px 0 0;height:calc(100% - 5px);transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
-  .mtabs button[aria-selected="true"]{color:var(--ink);background:var(--bg);margin-bottom:-1px;height:calc(100% + 1px);z-index:1}
-  .mtabs button[aria-selected="true"]::before,.mtabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:14px;height:14px;pointer-events:none}
-  .mtabs button[aria-selected="true"]::before{left:-15px;background:radial-gradient(circle at 0 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
-  .mtabs button[aria-selected="true"]::after{right:-15px;background:radial-gradient(circle at 100% 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
-  .mtabs button:focus-visible{outline:2px solid var(--ink);outline-offset:-5px}
-  .mtabs sup{font-size:9px;letter-spacing:0;vertical-align:.6em;opacity:.7}
-  .mt-off{display:none!important}
-  .mt-in{animation:mtin .45s cubic-bezier(.2,.8,.2,1)}
-  .ideas,.work{border-top:0}
-  .work{height:calc(100dvh - var(--hb) - var(--mt))}
-  .work-top h2{visibility:hidden}
-}
+/* другий і третій екрани — вкладки-папки «ідеї | проєкти»: смужка липне під хедером, неактивний розділ схований */
+html{scroll-padding-top:calc(var(--hb) + var(--mt))}
+:root{--mt:52px}
+/* смужка — «полиця» кольору поверхні; вкладки з заокругленим верхом, активна зливається з аркушем під нею, низ м'яко розходиться, як у справжньої папки */
+.mtabs{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:end;position:sticky;top:var(--hb);z-index:40;height:var(--mt);padding:9px var(--g) 0;background:var(--surface);border-bottom:1px solid var(--rule)}
+.mtabs button{all:unset;cursor:pointer;position:relative;height:100%;display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:color-mix(in srgb,var(--surface) 70%,var(--rule));border:1px solid var(--rule);border-bottom:0;border-radius:16px 16px 0 0;height:calc(100% - 5px);transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
+.mtabs button[aria-selected="true"]{color:var(--ink);background:var(--bg);margin-bottom:-1px;height:calc(100% + 1px);z-index:1}
+.mtabs button[aria-selected="true"]::before,.mtabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:14px;height:14px;pointer-events:none}
+.mtabs button[aria-selected="true"]::before{left:-15px;background:radial-gradient(circle at 0 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
+.mtabs button[aria-selected="true"]::after{right:-15px;background:radial-gradient(circle at 100% 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
+.mtabs button:focus-visible{outline:2px solid var(--ink);outline-offset:-5px}
+.mtabs button[aria-selected="false"]:hover{color:var(--ink);height:calc(100% - 2px)}
+.mtabs sup{font-size:9px;letter-spacing:0;vertical-align:.6em;opacity:.7}
+.mt-off{display:none!important}
+.mt-in{animation:mtin .45s cubic-bezier(.2,.8,.2,1)}
+.ideas,.work{border-top:0}
+.work{height:calc(100dvh - var(--hb) - var(--mt))}
+.work-top h2{visibility:hidden}
+/* на широкому екрані вкладки не на всю ширину, а стоять від лінії сітки, як картотека */
+@media (min-width:761px){.mtabs{grid-template-columns:repeat(2,minmax(0,220px));gap:18px}}
+@media (min-width:901px){.ideas{height:calc(100dvh - var(--hb) - var(--mt))}}
 @keyframes mtin{from{opacity:0;transform:translateY(10px)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.mt-in{animation:none}}
 </style>
@@ -520,16 +521,14 @@ sync();
 /* телефон: «ідеї | проєкти» — вкладки замість двох екранів одне під одним */
 (() => {
   const bar = document.getElementById("mtabs"), tabs = [...bar.querySelectorAll("[role=tab]")];
-  const narrow = matchMedia("(max-width:760px)");
   document.getElementById("mt-n").textContent = String(PROJECTS.length).padStart(2, "0");
   let on = "ideas";
   function apply(anim){
     tabs.forEach(b => {
       const id = b.getAttribute("aria-controls"), sel = id === on, sec = document.getElementById(id);
       b.setAttribute("aria-selected", sel); b.tabIndex = sel ? 0 : -1;
-      sec.classList.toggle("mt-off", narrow.matches && !sel);
-      if (narrow.matches){ sec.setAttribute("role", "tabpanel"); sec.setAttribute("aria-labelledby", b.id); }
-      else { sec.removeAttribute("role"); sec.removeAttribute("aria-labelledby"); }
+      sec.classList.toggle("mt-off", !sel);
+      sec.setAttribute("role", "tabpanel"); sec.setAttribute("aria-labelledby", b.id);
       if (anim && sel){ sec.classList.remove("mt-in"); void sec.offsetWidth; sec.classList.add("mt-in"); }
     });
     bar.dataset.on = on;
@@ -549,13 +548,12 @@ sync();
   // «проєкти» в хедері й адреса #projects / #ideas на телефоні відкривають свою вкладку
   document.addEventListener("click", e => {
     const a = e.target.closest('a[href="#projects"], a[href="#ideas"]');
-    if (!a || !narrow.matches) return;
+    if (!a) return;
     e.preventDefault(); pick(a.getAttribute("href").slice(1));
   });
   if (location.hash === "#projects") on = "projects";
-  narrow.addEventListener?.("change", () => apply(false));
   apply(false);
-  if (location.hash === "#projects" && narrow.matches) requestAnimationFrame(() => pick("projects"));
+  if (location.hash === "#projects") requestAnimationFrame(() => pick("projects"));
 })();
 
 /* вкладки «Що я роблю | Про мене»: панелі лежать в одній клітинці сітки, тож висота не стрибає */
