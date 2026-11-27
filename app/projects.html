@@ -91,8 +91,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .svc-tabs button:hover{color:var(--ink)}
 .svc-tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .svc-panels{display:grid}
-.svc-panel{grid-area:1/1;transition:opacity .3s}
-.svc-panel.off{visibility:hidden;opacity:0}
+/* показується лише активна панель: блок вкладок займає висоту свого тексту й стоїть унизу екрана */
+.svc-panel{grid-area:1/1;animation:pin .3s ease}
+.svc-panel.off{display:none}
+@keyframes pin{from{opacity:0}}
+.svc .bio .bio-h{margin-bottom:.3em}
+.svc .bio ul.bio-list{list-style:none;margin:0 0 .7em;padding:0;font:inherit;letter-spacing:0}
+.bio-list li{padding-left:1.1em;text-indent:-1.1em}
+.bio-list li::before{content:"–";display:inline-block;width:1.1em;text-indent:0}
 .svc-panel .bio{font-size:clamp(15px,2.2vh,19px);line-height:1.5}
 .svc figure{margin:0;position:relative;height:100%;overflow:hidden;background:var(--surface)}
 .svc figure img{display:block;width:100%;height:100%;object-fit:cover}
@@ -215,7 +221,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
           </div>
           <div class="svc-panel off" id="p-me" role="tabpanel" aria-labelledby="t-me" aria-hidden="true">
             <div class="bio">
-              <p>З 2019 року проєктую й курую дизайн, сайти та ідеї — від читацьких груп з філософії науки та технологій до лендингів для українського уряду.</p>
+              <p>Проєктую та курую дизайн, сайти, ідеї — від читацьких груп з філософії науки та технологій до лендингів для українського уряду.</p>
+              <p class="bio-h">Дослідницькі інтереси:</p>
+              <ul class="bio-list">
+                <li>Роль цікавості, подиву та трепету в освіті й повсякденному житті</li>
+                <li>Історія та філософія науки й технологій</li>
+                <li>Техніки роботи з ідеями: навчання, розуміння, (візуальне) мислення, смак</li>
+              </ul>
               <p>Бакалаврка філософії Київського національного університету імені Тараса Шевченка.</p>
             </div>
           </div>
