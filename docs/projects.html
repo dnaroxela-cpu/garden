@@ -84,7 +84,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .bio{font-family:var(--f-body);font-size:clamp(13px,1.75vh,16px);line-height:1.5;max-width:56ch}
 .bio p{margin:0 0 .7em}
 .bio p:last-child{margin:0}
-.intro{margin:0;font-family:var(--f-body);font-size:clamp(19px,min(2vw,3.1vh),28px);line-height:1.35;max-width:30ch;text-wrap:pretty}
+.intro{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,min(2.1vw,3.2vh),30px);line-height:1.3;letter-spacing:-.01em;max-width:30ch;text-wrap:pretty}
 .svc-tabs{display:flex;gap:22px;margin-bottom:16px}
 .svc-tabs button{all:unset;cursor:pointer;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-bottom:4px;border-bottom:1px solid transparent}
 .svc-tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
@@ -139,7 +139,16 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 @media (max-width:900px){.ideas-reset{display:none!important}}
 @media (max-width:900px){.ideas{height:auto;padding:48px var(--g);display:flex;flex-direction:column;gap:20px}
   .love{position:static;transform:none;width:auto;font-size:clamp(28px,7vw,44px);margin-bottom:12px}
-  .idea{position:static;width:auto;transform:none!important}}
+  /* на телефоні картки теж розкидані: різна ширина, нахил, зсув ліворуч/праворуч, трохи накладаються */
+  .ideas{gap:0}
+  .idea{position:static;width:82%;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+  .idea + .idea{margin-top:-10px}
+  .ideas .idea.i1{align-self:flex-start;transform:rotate(-3deg)}
+  .ideas .idea.i2{align-self:flex-end;transform:rotate(2.5deg);width:76%}
+  .ideas .idea.i3{align-self:flex-start;transform:rotate(1.5deg);margin-left:5%}
+  .ideas .idea.i4{align-self:flex-end;transform:rotate(-2deg);width:86%}
+  .ideas .idea.i5{align-self:center;transform:rotate(3deg);width:78%}
+  .ideas .idea:hover,.ideas .idea.i5:hover{transform:rotate(0) scale(1.02);z-index:3;position:relative}}
 @media (prefers-reduced-motion:reduce){.idea{transition:none}}
 
 /* для читачів екрана та клавіатури */
@@ -177,7 +186,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 <section class="svc" id="services" aria-label="Послуги">
   <div class="svc-in">
     <div class="svc-txt">
-      <p class="intro">Я Саша. Працюю на перетині дослідження, дизайну й освіти. Зараз я курую кафедру математики, фізики та інженерії в демократичній школі Майбутні.</p>
+      <p class="intro">Я — Саша. Працюю на перетині дизайну, дослідження й освіти. Курую кафедру математики, фізики та інженерії в демократичній школі Майбутні.</p>
       <div class="svc-tabbed">
         <div class="svc-tabs" role="tablist" aria-label="Про мене">
           <button type="button" role="tab" id="t-do" aria-controls="p-do" aria-selected="true">Що я роблю</button>
