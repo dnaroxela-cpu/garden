@@ -173,9 +173,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .rx button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
 .rx .n{font-family:var(--f-mono);font-size:10px;min-width:1ch}
 .rx .n:empty{display:none}
+.rx button.z{display:none}
+.rx.open button.z{display:inline-flex}
+.rx .add{color:var(--muted);font-family:var(--f-mono);padding:2px 7px}
+.rx .add[aria-expanded="true"]{color:var(--ink);border-color:var(--ink)}
 .rx-fly{position:fixed;z-index:85;pointer-events:none;font-size:22px;animation:rxfly 1s cubic-bezier(.2,.7,.3,1) forwards}
 @keyframes rxfly{to{transform:translate(var(--dx),-90px) scale(1.6) rotate(var(--r));opacity:0}}
 @media (prefers-reduced-motion:reduce){.rx-fly{display:none}}
+
+/* Text Reveal 02: текст прихований, доки GSAP не розіб'є його на слова */
+[data-reveal-02]{visibility:hidden}
+.no-reveal [data-reveal-02]{visibility:visible}
 
 /* для читачів екрана та клавіатури */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -255,7 +263,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   </div>
 </section>
 <section class="ideas" id="ideas" aria-label="Ідеї">
-  <p class="love">Я люблю ідеї, бо вони <em>глибокі</em>, бо вони <em>нові</em>, бо вони <em>прояснюють</em>, бо вони <em>суперечливі</em>, бо вони <em>дивні</em></p>
+  <p class="love" data-reveal-02="words" data-scroll="scrub">Я люблю ідеї, бо вони <em>глибокі</em>, бо вони <em>нові</em>, бо вони <em>прояснюють</em>, бо вони <em>суперечливі</em>, бо вони <em>дивні</em></p>
   <article class="idea i1"><small>ідея</small><h3>Бюро ритуальних послуг третьої хвилі</h3><p>Агенція, яка створює трансцендентний, красивий і не пошлий досвід прощання.</p><div class="rx" data-idea="i1" role="group" aria-label="Реакції"></div></article>
   <article class="idea i2"><small>ідея</small><h3>Awe-birth</h3><p>Спеціальні клініки для народження дітей, які дають незвичний і красивий досвід народження.</p><div class="rx" data-idea="i2" role="group" aria-label="Реакції"></div></article>
   <article class="idea i3"><small>ідея</small><h3>Міська бібліотека для дітей</h3><p>З великою секцією класних і рідкісних дитячих книг та ігор з усього світу. Такий Cabinet of Child's Curiosity. Можна лишити дитину на кілька годин.</p><div class="rx" data-idea="i3" role="group" aria-label="Реакції"></div></article>
@@ -631,10 +639,13 @@ sync();
   const boxes = [...document.querySelectorAll(".rx")];
   boxes.forEach(box => {
     const id = box.dataset.idea;
-    box.innerHTML = RX.map(([k, e, t]) => `<button type="button" data-k="${k}" aria-pressed="${!!mine[id+"-"+k]}" title="${t}" aria-label="${t}"><span aria-hidden="true">${e}</span><span class="n"></span></button>`).join("");
+    box.innerHTML = RX.map(([k, e, t]) => `<button type="button" class="z" data-k="${k}" aria-pressed="${!!mine[id+"-"+k]}" title="${t}" aria-label="${t}"><span aria-hidden="true">${e}</span><span class="n"></span></button>`).join("")
+      + `<button type="button" class="add" aria-expanded="false" aria-label="Додати реакцію" title="додати реакцію">+ ☺</button>`;
   });
   const num = (box, k) => box.querySelector(`[data-k="${k}"] .n`);
-  const show = (el, v) => { el.textContent = v > 0 ? v : ""; };
+  boxes.forEach(box => RX.forEach(([k]) => { if (mine[box.dataset.idea+"-"+k]) box.querySelector(`[data-k="${k}"]`).classList.remove("z"); }));
+  // реакцію видно лише тоді, коли її вже хтось поставив; решта ховається за «+ ☺»
+  const show = (el, v) => { el.textContent = v > 0 ? v : ""; el.parentElement.classList.toggle("z", !(v > 0)); };
   function fly(btn, e){
     const r = btn.getBoundingClientRect(), f = document.createElement("span");
     f.className = "rx-fly"; f.textContent = btn.firstElementChild.textContent;
@@ -643,7 +654,9 @@ sync();
     document.body.append(f); setTimeout(() => f.remove(), 1000);
   }
   document.getElementById("ideas").addEventListener("click", async e => {
-    const btn = e.target.closest(".rx button"); if (!btn) return;
+    const add = e.target.closest(".rx .add");
+    if (add){ const box = add.closest(".rx"), o = !box.classList.contains("open"); box.classList.toggle("open", o); add.setAttribute("aria-expanded", o); add.textContent = o ? "×" : "+ ☺"; return; }
+    const btn = e.target.closest(".rx button[data-k]"); if (!btn) return;
     const box = btn.closest(".rx"), key = box.dataset.idea + "-" + btn.dataset.k;
     fly(btn);
     if (mine[key]) return;                       // уже реагували — лише анімація
@@ -707,6 +720,100 @@ sync();
 scale();
 camX = TW*S/2 - field.clientWidth/2; camY = TH*S/2 - field.clientHeight/2;
 requestAnimationFrame(loop);
+</script>
+<!-- Text Reveal 02 (GSAP + SplitText + ScrollTrigger): слова фрази «Я люблю ідеї…» проявляються з opacity 0.1 у такт прокрутці -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script>
+function textReveal02(scope = document, delay = 0, { ignoreManual = false } = {}) {
+  const CONFIG = {
+    lines: { duration: 0.04, stagger: 0.03, ease: "power1.out" },
+    words: { duration: 0.04, stagger: 0.03, ease: "power1.out" },
+    chars: { duration: 0.04, stagger: 0.03, ease: "power1.out" },
+    scrollStart: "top 85%",
+    // фраза стоїть нижче центру екрана з ідеями: проявляється, поки екран заїжджає, і повністю — коли він став на місце
+    scrubStart: "top 100%",
+    scrubEnd: "top 60%",
+    once: true,
+    markers: false,
+  };
+
+  const allSplitEls = scope.querySelectorAll("[data-reveal-02]");
+  const autoEls = ignoreManual
+    ? [...allSplitEls]
+    : [...allSplitEls].filter((el) => !el.hasAttribute("data-manual"));
+
+  gsap.set(autoEls, { visibility: "visible" });
+
+  allSplitEls.forEach((el) => {
+    const splitType = el.getAttribute("data-reveal-02");
+    const c = CONFIG[splitType];
+    if (!c) return;
+
+    let type, linesClass, wordsClass, charsClass;
+    switch (splitType) {
+      case "lines": type = "lines"; linesClass = "line"; break;
+      case "words": type = "words, lines"; wordsClass = "word"; linesClass = "line"; break;
+      case "chars": type = "chars, words, lines"; charsClass = "char"; wordsClass = "word"; linesClass = "line"; break;
+      default: return;
+    }
+
+    if (!ignoreManual && el.hasAttribute("data-manual")) {
+      SplitText.create(el, {
+        type, autoSplit: true,
+        ...(linesClass && { linesClass }), ...(wordsClass && { wordsClass }), ...(charsClass && { charsClass }),
+      });
+      return;
+    }
+
+    const scrollMode = el.getAttribute("data-scroll");
+    const useScroll = el.hasAttribute("data-scroll");
+    const useScrub = scrollMode === "scrub";
+
+    SplitText.create(el, {
+      type, autoSplit: true,
+      ...(linesClass && { linesClass }), ...(wordsClass && { wordsClass }), ...(charsClass && { charsClass }),
+      onSplit(instance) {
+        const durationValue = parseFloat(el.dataset.duration);
+        const staggerValue = parseFloat(el.dataset.stagger);
+        const delayValue = parseFloat(el.dataset.delay);
+        const duration = Number.isNaN(durationValue) ? c.duration : durationValue;
+        const stagger = Number.isNaN(staggerValue) ? c.stagger : staggerValue;
+        const elDelay = Number.isNaN(delayValue) ? 0 : delayValue;
+        const ease = el.dataset.ease || c.ease;
+
+        const targets = instance[splitType];
+        const once = el.hasAttribute("data-once") ? el.getAttribute("data-once") !== "false" : CONFIG.once;
+
+        const tween = { opacity: 0.1, duration, stagger, delay: useScroll ? elDelay : elDelay + delay, immediateRender: true, ease };
+
+        if (useScrub) {
+          tween.scrollTrigger = {
+            trigger: el, start: CONFIG.scrubStart, end: CONFIG.scrubEnd, scrub: true, markers: CONFIG.markers,
+            ...(once && { onLeave: (self) => self.kill(false) }),
+          };
+        } else if (useScroll) {
+          const start = scrollMode || CONFIG.scrollStart;
+          tween.scrollTrigger = {
+            trigger: el, start: `clamp(${start})`, markers: CONFIG.markers,
+            ...(once ? { once: true } : { toggleActions: "play none none reverse" }),
+          };
+        }
+
+        return gsap.from(targets, tween);
+      },
+    });
+  });
+}
+
+// GSAP не завантажився або вимкнено анімацію — просто показати текст
+if (!window.gsap || !window.SplitText || !window.ScrollTrigger || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.documentElement.classList.add("no-reveal");
+} else {
+  gsap.registerPlugin(SplitText, ScrollTrigger);
+  document.fonts.ready.then(() => textReveal02());
+}
 </script>
 </body>
 </html>
