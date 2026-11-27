@@ -266,6 +266,8 @@ html{scroll-padding-top:calc(var(--hb) + var(--mt))}
 .mtabs button[aria-selected="false"]:hover{height:calc(100% - 3px)}
 .mtabs button[aria-selected="true"]{background:transparent;border-color:transparent;margin-bottom:0;height:100%;text-shadow:0 0 8px var(--bg),0 0 3px var(--bg),0 0 1px var(--bg)}
 .mtabs button[aria-selected="true"]::before,.mtabs button[aria-selected="true"]::after{display:none}
+/* на широкому екрані фото спускається поверх сірої смужки папок і впирається в її нижню лінію (вкладки — в лівій половині, їх воно не закриває) */
+@media (min-width:761px){.svc figure{height:calc(100% + var(--mt));z-index:41}.mt-stuck .svc figure{z-index:1}}  /* смужка прилипла вгорі — вона над фото */
 /* полотно заходить під смужку папок */
 html{scroll-padding-top:var(--hb)}
 .ideas{scroll-margin-top:var(--mt)}
@@ -553,6 +555,7 @@ function sync(){
   const lk = mt.offsetHeight ? mt.dataset.on === "projects" && mt.getBoundingClientRect().top < innerHeight / 2
                              : isLocked() || work.getBoundingClientRect().top < innerHeight / 2;
   document.body.classList.toggle("locked", isLocked());
+  document.body.classList.toggle("mt-stuck", mt.getBoundingClientRect().top <= hb() + 1);
   document.querySelectorAll(".bar nav a[data-v]").forEach(a => {
     if ((a.dataset.v === "projects") === lk) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
