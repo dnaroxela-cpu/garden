@@ -151,6 +151,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   .ideas .idea:hover,.ideas .idea.i5:hover{transform:rotate(0) scale(1.02);z-index:3;position:relative}}
 @media (prefers-reduced-motion:reduce){.idea{transition:none}}
 
+/* таланти Ґеллапа: кружечок кольору домену, як у звіті CliftonStrengths */
+.gt{white-space:nowrap}
+.gt::before{content:"";display:inline-block;width:.55em;height:.55em;border-radius:50%;margin:0 .3em .08em .05em;vertical-align:middle;background:var(--gt)}
+.gt[data-d="s"]{--gt:#00945f}.gt[data-d="r"]{--gt:#0a6cbf}.gt[data-d="e"]{--gt:#7b2582}.gt[data-d="i"]{--gt:#e07012}
 /* для читачів екрана та клавіатури */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sr:focus-within{position:fixed;left:var(--g);bottom:20px;width:auto;height:auto;clip:auto;z-index:20;background:var(--bg);border:1px solid var(--rule);padding:10px 14px;white-space:normal;max-width:calc(100% - 2*var(--g))}
@@ -207,7 +211,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
           <div class="svc-panel off" id="p-me" role="tabpanel" aria-labelledby="t-me" aria-hidden="true">
             <div class="bio">
               <p>З 2019 року проєктую й курую дизайн, сайти та ідеї — від читацьких груп з філософії науки та технологій до лендингів для українського уряду.</p>
-              <p>За тестом Інституту Ґеллапа шість із моїх десяти найсильніших рис належать до стратегічного мислення: Ideation, Learner, Strategic, Input, Intellection, Futuristic.</p>
+              <p>За тестом Інституту Ґеллапа шість із моїх десяти найсильніших талантів належать до стратегічного мислення: <span class="gt" data-d="s" title="стратегічне мислення">Ideation</span>, <span class="gt" data-d="s" title="стратегічне мислення">Learner</span>, <span class="gt" data-d="s" title="стратегічне мислення">Strategic</span>, <span class="gt" data-d="s" title="стратегічне мислення">Input</span>, <span class="gt" data-d="s" title="стратегічне мислення">Intellection</span>, <span class="gt" data-d="s" title="стратегічне мислення">Futuristic</span>. Також у моїй десятці — <span class="gt" data-d="r" title="побудова стосунків">Individualization</span> і <span class="gt" data-d="r" title="побудова стосунків">Relator</span>, <span class="gt" data-d="e" title="виконання">Restorative</span> і <span class="gt" data-d="i" title="вплив">Maximizer</span>.</p>
               <p>Бакалаврка філософії Київського національного університету імені Тараса Шевченка.</p>
             </div>
           </div>
