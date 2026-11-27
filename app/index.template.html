@@ -931,16 +931,16 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%236d6d66' stroke-width='1.4'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .arrsel select:hover{border-color:var(--ink)}
 .arrsel select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-/* стос нотаток: передня ширша й зверху з тінню, решта визирає з-під неї; клік по тій, що визирає, — наперед */
+/* кілька нотаток: дві останні (або активна й сусідня) стоять поруч повністю — обидві гортаються й читаються незалежно;
+   активна трохи ширша, клік по іншій робить ширшою її; старіші згортаються в корінці з назвою, клік по корінцю повертає нотатку */
 .panes.deck{position:relative;display:block;overflow:hidden;scroll-snap-type:none}
-.panes.deck>.pane{position:absolute;top:0;bottom:0;height:100%;border-left:1px solid var(--rule);box-shadow:none;transition:left .5s cubic-bezier(.2,.8,.2,1),width .5s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
-.panes.deck>.pane.front{box-shadow:-14px 0 36px rgba(0,0,0,.09),14px 0 36px rgba(0,0,0,.06);border-right:1px solid var(--rule)}
-.panes.deck>.pane.behind{cursor:pointer}
-.panes.deck>.pane.behind::after{content:"";position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 38%,transparent);transition:background .3s;pointer-events:none}
-.panes.deck>.pane.behind:hover::after{background:color-mix(in srgb,var(--bg) 8%,transparent)}
-.panes.deck>.pane .pane-spine{display:none}
+.panes.deck>.pane{position:absolute;top:0;bottom:0;height:100%;border-left:1px solid var(--rule);box-shadow:none;transition:left .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1)}
 .panes.deck>.pane:first-child{border-left:0}
-.panes.deck>.pane.behind .pane-in{overflow:hidden}
+.panes.deck>.pane .pane-spine{display:none}
+.panes.deck>.pane.mini .pane-in{display:none}
+.panes.deck>.pane.mini .pane-spine{display:block;flex:1;width:100%;border-right:0;background:var(--surface)}
+.panes.deck>.pane.mini .pane-spine:hover{background:color-mix(in srgb,var(--surface) 70%,var(--rule))}
+.panes.deck>.pane.side{cursor:default}
 /* «паспорт» під назвою нотатки */
 .pane h1{margin-bottom:12px}
 .pane .pane-top{justify-content:flex-end;margin-bottom:4px}
@@ -1283,16 +1283,17 @@ class Stack{
       const f=e.target.closest("[data-focus]");if(f){e.stopPropagation();this.render(+f.dataset.focus);return}
       const c=e.target.closest("[data-close]");if(c){e.stopPropagation();this.ids=this.ids.slice(0,+c.dataset.close);if(!this.ids.length){this.onEmpty&&this.onEmpty();this.changed();return}this.render();return}
       const n=e.target.closest("[data-note]");if(n){e.preventDefault();e.stopPropagation();this.openFrom(+n.closest(".pane").dataset.i,n.dataset.note)}});
-    // стос: клік по нотатці, що визирає з-під передньої, піднімає її наперед (а не відкриває посилання в ній)
-    box.addEventListener("click",e=>{const p=e.target.closest(".pane.behind");if(!p||p.parentElement!==box||e.target.closest("[data-close]"))return;e.preventDefault();e.stopPropagation();this.layout(+p.dataset.i)},true);
+    // клік у будь-якому місці вужчої нотатки (крім посилань і кнопок) робить її ширшою, щоб читати зручніше
+    box.addEventListener("click",e=>{const p=e.target.closest(".pane.side");if(!p||p.parentElement!==box||e.target.closest("a,button,input,select,summary,[data-note]")||getSelection().toString())return;this.layout(+p.dataset.i)});
   }
-  // на широкому екрані дві й більше нотаток лежать стосом: передня ширша й зверху, попередні визирають ліворуч, наступні — праворуч
+  // на широкому екрані дві й більше нотаток: активна й сусідня поруч (активна ширша), старіші — корінцями з назвою
   deckOn(){return !narrow()&&this.ids.length>1}
-  layout(a){const box=this.box,panes=[...box.children].filter(p=>p.classList.contains("pane")),n=panes.length,bw=box.clientWidth;
-    const W=Math.round(Math.min(Math.max(bw*.6,520),bw-64*(n-1))),step=n>1?(bw-W)/(n-1):0;
-    this.active=a;
-    panes.forEach((p,i)=>{p.style.width=W+"px";p.style.left=Math.round(i*step)+"px";p.style.zIndex=String(50-Math.abs(i-a));p.classList.toggle("behind",i!==a);p.classList.toggle("front",i===a);p.classList.toggle("before",i<a);p.classList.remove("collapsed");
-      p.setAttribute("aria-hidden",i!==a?"true":"false");p.title=i!==a?"Показати цю нотатку":""});}
+  layout(a){const box=this.box,panes=[...box.children].filter(p=>p.classList.contains("pane")),n=panes.length,bw=box.clientWidth,SP=44;
+    const p0=a>0?a-1:0,p1=p0+1,avail=bw-SP*(n-2),wa=Math.round(avail*.56),wp=avail-wa;
+    this.active=a;let x=0;
+    panes.forEach((p,i)=>{const mini=i<p0||i>p1,w=mini?SP:i===a?wa:wp;
+      p.style.width=w+"px";p.style.left=x+"px";p.style.zIndex="";x+=w;
+      p.classList.toggle("mini",mini);p.classList.toggle("front",i===a);p.classList.toggle("side",!mini&&i!==a);p.classList.remove("collapsed","behind","before");p.removeAttribute("aria-hidden");p.title=""});}
   changed(){this.onChange&&this.onChange(this.ids)}
   set(ids){this.ids=ids;this.render()}
   openFrom(i,id){if(this.ids[i+1]===id){this.render(i+1);return}this.ids=this.ids.slice(0,i+1).concat(id);this.render()}
