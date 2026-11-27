@@ -67,6 +67,9 @@ function noteProps(fm) {
   return out.length ? out : undefined;
 }
 
+// кольорові кружечки-позначки з Obsidian (🔴🔵…) у ==виділеному== тексті на сайті не показуємо
+const MARK_DOTS = /[\u{1F534}\u{1F535}\u{1F7E0}-\u{1F7E4}\u26AA\u26AB]\uFE0F?\s*/gu;
+
 // рік видання книжки, якщо в нотатці немає властивості year (краще дописати year у саму нотатку в Obsidian)
 const BOOK_YEARS = { 'Social Construction of What?': 1999 };
 
@@ -1267,7 +1270,7 @@ async function build() {
   for (const file of files) {
     if (file.title === 'index') continue;
     const withWikilinks = convertWikilinks(file.body, files);
-    const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
+    const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, (m, t) => '<mark>' + t.replace(MARK_DOTS, '') + '</mark>');
     const rawClean = rawFixed.replace(/(?<![#\n]) *#([\p{L}_][\p{L}\p{N}_-]*)/gu, '').replace(/^\s*#([\p{L}_][\p{L}\p{N}_-]*)(\s|$)/gmu, '');
     const fileKey = path.basename(file.slug);
     const { raw: rawWithFootnotes, footnotes } = extractFootnotes(rawClean, fileKey);
@@ -1676,7 +1679,7 @@ async function buildApp(files, coversCache) {
     // у дошці [[#^id|текст]] веде до цитати на дошці
     const qrefs = s => board || canvas ? s.replace(/\[\[#\^([\w-]+)(?:\|([^\]]+))?\]\]/g, (m, q, t) => `<a href="#" data-q="${q}">${t || q}</a>`) : s;
     const withWikilinks = convertWikilinks(qrefs(board ? board.intro : file.body), files);
-    const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, '<mark>$1</mark>');
+    const rawFixed = convertEmbeds(withWikilinks, file).replace(/==([^=]+)==/g, (m, t) => '<mark>' + t.replace(MARK_DOTS, '') + '</mark>');
     const rawClean = rawFixed.replace(/(?<![#\n]) *#([\p{L}_][\p{L}\p{N}_-]*)/gu, '').replace(/^\s*#([\p{L}_][\p{L}\p{N}_-]*)(\s|$)/gmu, '');
     const { raw: withFn, footnotes } = extractFootnotes(rawClean, id, board ? footnoteDefs(file.body).defs : {});
     let html = resolveMdLinks(marked(withFn), files);
@@ -1689,9 +1692,9 @@ async function buildApp(files, coversCache) {
     });
     html = noteLinks(html);
     const inline = s => noteLinks(resolveMdLinks(marked.parseInline(convertWikilinks(s, files)), files))
-      .replace(/==([^=]+)==/g, '<mark>$1</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
+      .replace(/==([^=]+)==/g, (m, t) => '<mark>' + t.replace(MARK_DOTS, '') + '</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
     const block = s => noteLinks(resolveMdLinks(marked(convertEmbeds(convertWikilinks(s, files), file)), files))
-      .replace(/==([^=]+)==/g, '<mark>$1</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
+      .replace(/==([^=]+)==/g, (m, t) => '<mark>' + t.replace(MARK_DOTS, '') + '</mark>').replace(/<a href="http/g, '<a target="_blank" rel="noopener" href="http');
     const noteId = t => { const f = files.find(x => x.title.trim().toLowerCase() === t.trim().toLowerCase()); const s = f && path.basename(f.slug); return s && ids.has(s) ? s : null; };
     const isBook = section(file) === 'Book Reviews';
     return {
