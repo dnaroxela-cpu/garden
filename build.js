@@ -53,6 +53,20 @@ const SECTIONS = [
   ['Fleeting Notes', 'Seeds'],                // Сад → чернетки
   ['Book Reviews', 'Book Reviews'], ['Blog Notes', 'Blog Notes'], ['Seeds', 'Seeds'], // старі назви
 ];
+// додаткові властивості нотатки з Obsidian для «паспорта» під назвою на сайті; службові й ті, що показуються окремо, — без них
+const HIDDEN_PROPS = new Set(['tags', 'tag', 'date', 'created', 'updated', 'modified', 'author', 'year', 'cover', 'image', 'banner',
+  'layout', 'aliases', 'alias', 'cssclasses', 'cssclass', 'publish', 'permalink', 'draft', 'private']);
+function noteProps(fm) {
+  const val = v => v instanceof Date ? v.toISOString().slice(0, 10) : String(v).replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, a, b) => b || a).trim();
+  const out = [];
+  for (const [k, v] of Object.entries(fm || {})) {
+    if (HIDDEN_PROPS.has(k.toLowerCase()) || v == null || v === '' || (typeof v === 'object' && !Array.isArray(v) && !(v instanceof Date))) continue;
+    const s = Array.isArray(v) ? v.filter(x => x != null && typeof x !== 'object').map(val).filter(Boolean).join(', ') : val(v);
+    if (s && s.length <= 200) out.push([k, s]);
+  }
+  return out.length ? out : undefined;
+}
+
 // рік видання книжки, якщо в нотатці немає властивості year (краще дописати year у саму нотатку в Obsidian)
 const BOOK_YEARS = { 'Social Construction of What?': 1999 };
 
@@ -1684,6 +1698,7 @@ async function buildApp(files, coversCache) {
       id, title: file.title, folder: section(file), tags: file.tags,
       excerpt: noteExcerpt(board ? board.intro : file.raw), date: file.dateMs, born: file.bornMs, links: [...links],
       book: isBook ? ([file.author, file.year || BOOK_YEARS[file.title.trim()]].filter(Boolean).join(' · ') || null) : null,
+      props: noteProps(file.fm),
       cover: isBook ? (fmCover(file) || ownCover(id) || coversCache[file.title] || null) : null,
       html,
       board: canvas ? canvasBoard(canvas, { block, noteId }) || undefined : board && board.quotes.length ? {

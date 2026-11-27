@@ -64,9 +64,9 @@ nav{position:relative}
 @media (max-width:600px){
   :root[data-nav="split"] .bar{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;padding-block:12px}
   :root[data-nav="split"] .bar::after{display:none}
-  :root[data-nav="split"] .bar .logo{order:0;margin-right:auto;font-size:12px;white-space:nowrap;flex:none}
+  :root[data-nav="split"] .bar .logo{order:0;margin-right:0;font-size:12px;white-space:nowrap;flex:none}
   .bar.logo-off .logo{opacity:1;translate:0 0;pointer-events:auto}
-  :root[data-nav="split"] .bar nav{order:1;min-width:0;flex:0 1 auto;flex-wrap:nowrap;white-space:nowrap;gap:0 10px;padding-left:0;overflow-x:auto;scrollbar-width:none}
+  :root[data-nav="split"] .bar nav{order:1;min-width:0;flex:0 1 auto;margin-right:auto;flex-wrap:nowrap;white-space:nowrap;gap:0 10px;padding-left:0;overflow-x:auto;scrollbar-width:none}
   :root[data-nav="split"] .bar nav::-webkit-scrollbar{display:none}
   :root[data-nav="split"] .bar nav button{font-size:12px;padding-inline:0;flex:none}
   :root[data-nav="split"] .mode{order:2;margin:0;width:28px;height:28px;flex:none}
@@ -459,7 +459,7 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
 @keyframes coverin{from{opacity:0;transform:translateY(8px) rotate(-2deg)}to{opacity:1;transform:none}}
 /* home keeps only the play button of the timeline; the map page shows the full scrubber, legend and buttons */
 .home-map .tl-track,.home-map .mapctl{display:none}
-@media (hover:none){.home-map .mapctl{display:flex;flex:none}.home-map .mlegend,.home-map #m-motion{display:none}}
+@media (hover:none){.home-map .mapctl{display:flex;flex:none}.home-map #m-motion{display:none}}  /* список тем — у спливному вікні кнопки «теми», тож на дотикових екранах його не ховаємо */
 .home-map .timeline-ctl{padding:6px 14px 6px 6px;border-radius:99px}
 .home-map .maptools{justify-content:flex-start;padding:0 24px 20px}
 .stage{position:absolute;inset:0}
@@ -855,7 +855,7 @@ body.on-home footer.site-foot{display:none}
 .bar .logo{color:var(--ink);font-weight:400}.bar .logo:hover{color:var(--muted)}
 body.on-home .bar .logo{opacity:0;pointer-events:none}
 /* на телефоні на головній невидимий «на головну» не займає місце — меню вміщається цілим, з «Інструментами мислення» */
-@media (max-width:600px){body.on-home .bar .logo{display:none}:root body.on-home .bar nav{padding-left:0;margin-left:auto}}
+@media (max-width:600px){body.on-home .bar .logo{display:none}:root body.on-home .bar nav{padding-left:0;margin-left:0}}  /* на телефоні меню починається зліва */
 /* a quiet ending: a photo from the collection (a different one on each visit) runs full-bleed under the footer — first alone, then with the footer's text and lines on top of it */
 footer.site-foot:has(.foot-photo){--ph:clamp(200px,30vw,440px);position:relative;isolation:isolate;margin-bottom:-64px;padding:var(--ph) 0 64px;
   --ink:#f4f4ef;--muted:rgba(244,244,239,.72);--rule:rgba(244,244,239,.24);color:var(--ink);border-image:none;border-top:0}
@@ -941,6 +941,15 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
 .panes.deck>.pane .pane-spine{display:none}
 .panes.deck>.pane:first-child{border-left:0}
 .panes.deck>.pane.behind .pane-in{overflow:hidden}
+/* «паспорт» під назвою нотатки */
+.pane h1{margin-bottom:12px}
+.pane .pane-top{justify-content:flex-end;margin-bottom:4px}
+.pp{margin:0 0 26px;padding-bottom:16px;border-bottom:1px solid var(--rule);font-family:var(--f-mono);font-size:12.5px;line-height:2;color:var(--muted)}
+.pp>span{white-space:nowrap}
+.pp>span:not(:last-child)::after{content:"\00a0·";color:color-mix(in srgb,var(--muted) 50%,transparent)}
+.pp b{font-weight:400;color:var(--ink)}
+.pp a{color:var(--ink);text-decoration:none;background:var(--rainbow) left bottom/100% 1px no-repeat}
+.pp a:hover{background-size:100% 2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -1241,14 +1250,21 @@ function related(n){
 const linkItem=m=>`<a href="#note" data-note="${m.id}">${esc(short(m.title))}<small>${stl(m)} · ${fmt(m.date)}</small></a>`;
 const PANE_W=()=>innerWidth<720?innerWidth:600, SPINE=40;
 const narrow=()=>innerWidth<720;
+// «паспорт» нотатки: один тихий рядок під назвою — автор · рік (для книжок), коли оновлено, скільки читати, додаткові властивості з Obsidian, теги
+function passportHTML(n){
+  const parts=[];
+  if(n.book)parts.push(`<b>${esc(n.book)}</b>`);
+  parts.push(`оновлено ${fmt(n.date,true)}`,`${Math.max(1,Math.round(words(n)/200))} хв читання`);
+  (n.props||[]).forEach(([k,v])=>parts.push(`${esc(k)}: <b>${esc(v)}</b>`));
+  if(n.tags.length)parts.push(n.tags.map(t=>`<a href="#garden" data-tag="${esc(t)}">#${esc(t)}</a>`).join(" "));
+  return `<p class="pp">${parts.map(x=>`<span>${x}</span>`).join(" ")}</p>`;
+}
 function paneHTML(n,i,closable){
   return `<article class="pane" data-i="${i}">
     <button class="pane-spine" data-focus="${i}" aria-label="Повернутися до «${esc(short(n.title))}»"><span>${esc(short(n.title))}</span></button>
     <div class="pane-in">
-      <div class="pane-top"><div class="crumbs"><a href="#garden" data-go="garden">Сад</a> › ${FOLDER_UA[n.folder]||n.folder}</div>${closable?`<button class="pane-x" data-close="${i}" aria-label="Закрити панель">×</button>`:""}</div>
-      <div class="meta"><span class="g">${glyph(n.status,14)}${stl(n)}</span><span class="mt">оновлено ${fmt(n.date,true)} · ${Math.max(1,Math.round(words(n)/200))} хв читання</span></div>
-      <h1>${esc(short(n.title))}</h1>${n.book?`<p class="byline">${esc(n.book.split("·")[0].trim())}${/·\s*\d{4}/.test(n.book)?` <span>· ${n.book.match(/(\d{4})/)[1]}</span>`:""}</p>`:""}
-      <div class="tags">${n.tags.map(t=>`<a href="#garden" data-tag="${esc(t)}">#${esc(t)}</a>`).join("")}</div>
+      ${closable?`<div class="pane-top"><span></span><button class="pane-x" data-close="${i}" aria-label="Закрити панель">×</button></div>`:""}
+      <h1>${esc(short(n.title))}</h1>${passportHTML(n)}
       ${n.board&&n.board.canvas?`<div class="essay"><div class="prose">${n.html}</div><div class="sn-col" aria-label="На полях"></div></div><section class="themes" data-quotes="${n.id}"></section>`
         :`<div class="prose">${n.html}</div>${n.board?`<div class="board-inline" data-board="${n.id}"></div>`:""}`}
       <div class="pane-foot">
@@ -2060,7 +2076,7 @@ function renderLegend(){const f=bigSim&&bigSim.focusTag;$("#m-legend").innerHTML
   // одна компактна кнопка «теми»: показує вибрану тему, а список тем — у спливному вікні
   $("#m-ftlabel").innerHTML=f?`<i style="background:${rb(tagHue(f))}"></i>#${esc(f)}`:"теми";$("#m-ftbtn").classList.toggle("on",!!f)}
 renderLegend();
-function ftOpen(o){const L=$("#m-legend");L.hidden=!o;$("#m-ftbtn").setAttribute("aria-expanded",o);L.style.transform="";if(o){const r=L.getBoundingClientRect(),pad=12,dx=Math.min(0,innerWidth-pad-r.right)+Math.max(0,pad-r.left);if(dx)L.style.transform=`translateX(${dx}px)`}}  // список тем завжди вміщається в екран
+function ftOpen(o){const L=$("#m-legend");L.hidden=!o;$("#m-ftbtn").setAttribute("aria-expanded",o);L.style.transform="";L.style.top=L.style.bottom="";if(o){const B=$("#m-ftbtn").getBoundingClientRect(),hh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hh"))||60,below=innerHeight-B.bottom,above=B.top-hh,need=L.offsetHeight+16;if(below>=need||below>=above){L.style.top="calc(100% + 8px)";L.style.bottom="auto"}else{L.style.bottom="calc(100% + 8px)";L.style.top="auto"}const r=L.getBoundingClientRect(),pad=20,dx=Math.min(0,innerWidth-pad-r.right)+Math.max(0,pad-r.left);if(dx)L.style.transform=`translateX(${dx}px)`}}  // список тем завжди вміщається в екран
 $("#m-ftbtn").addEventListener("click",e=>{e.stopPropagation();ftOpen($("#m-legend").hidden)});
 document.addEventListener("click",e=>{if(!e.target.closest(".mfilter"))ftOpen(false)});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#m-legend").hidden){ftOpen(false);$("#m-ftbtn").focus()}});
