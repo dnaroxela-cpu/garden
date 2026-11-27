@@ -152,7 +152,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 @media (prefers-reduced-motion:reduce){.idea{transition:none}}
 
 /* таланти Ґеллапа: кружечок кольору домену, як у звіті CliftonStrengths */
-.gt{white-space:nowrap}
+.gt{white-space:nowrap;cursor:help;border-bottom:1px dotted color-mix(in srgb,var(--ink) 35%,transparent)}
+.gt:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:2px}
+.gtip{position:fixed;z-index:80;max-width:280px;padding:10px 12px;background:var(--ink);color:var(--bg);border-radius:8px;font-family:var(--f-display);font-size:14px;line-height:1.4;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.gtip b{display:block;font-weight:500;margin-bottom:3px}
+.gtip small{display:block;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-bottom:6px}
 .gt::before{content:"";display:inline-block;width:.55em;height:.55em;border-radius:50%;margin:0 .3em .08em .05em;vertical-align:middle;background:var(--gt)}
 .gt[data-d="s"]{--gt:#00945f}.gt[data-d="r"]{--gt:#0a6cbf}.gt[data-d="e"]{--gt:#7b2582}.gt[data-d="i"]{--gt:#e07012}
 /* для читачів екрана та клавіатури */
@@ -195,6 +199,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
         <div class="svc-tabs" role="tablist" aria-label="Про мене">
           <button type="button" role="tab" id="t-do" aria-controls="p-do" aria-selected="true">Що я роблю</button>
           <button type="button" role="tab" id="t-me" aria-controls="p-me" aria-selected="false" tabindex="-1">Про мене</button>
+          <button type="button" role="tab" id="t-st" aria-controls="p-st" aria-selected="false" tabindex="-1">Сильні сторони</button>
         </div>
         <div class="svc-panels">
           <div class="svc-panel" id="p-do" role="tabpanel" aria-labelledby="t-do">
@@ -211,8 +216,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
           <div class="svc-panel off" id="p-me" role="tabpanel" aria-labelledby="t-me" aria-hidden="true">
             <div class="bio">
               <p>З 2019 року проєктую й курую дизайн, сайти та ідеї — від читацьких груп з філософії науки та технологій до лендингів для українського уряду.</p>
-              <p>За тестом Інституту Ґеллапа шість із моїх десяти найсильніших талантів належать до стратегічного мислення: <span class="gt" data-d="s" title="стратегічне мислення">Ideation</span>, <span class="gt" data-d="s" title="стратегічне мислення">Learner</span>, <span class="gt" data-d="s" title="стратегічне мислення">Strategic</span>, <span class="gt" data-d="s" title="стратегічне мислення">Input</span>, <span class="gt" data-d="s" title="стратегічне мислення">Intellection</span>, <span class="gt" data-d="s" title="стратегічне мислення">Futuristic</span>. Також у моїй десятці — <span class="gt" data-d="r" title="побудова стосунків">Individualization</span> і <span class="gt" data-d="r" title="побудова стосунків">Relator</span>, <span class="gt" data-d="e" title="виконання">Restorative</span> і <span class="gt" data-d="i" title="вплив">Maximizer</span>.</p>
               <p>Бакалаврка філософії Київського національного університету імені Тараса Шевченка.</p>
+            </div>
+          </div>
+          <div class="svc-panel off" id="p-st" role="tabpanel" aria-labelledby="t-st" aria-hidden="true">
+            <div class="bio">
+              <p>За тестом Інституту Ґеллапа шість із моїх десяти найсильніших талантів належать до стратегічного мислення: <span class="gt" data-d="s" tabindex="0" data-ua="Генератор ідей" data-tip="Захоплення самим процесом мислення: нові концепції, неочевидні зв'язки, нестандартні рішення. Як художник перед чистим полотном, що бачить тисячі можливих картин.">Ideation</span>, <span class="gt" data-d="s" tabindex="0" data-ua="Учень" data-tip="Надихає не стільки результат, скільки сам шлях пізнання. Як мандрівник, що ніколи не сидить на місці.">Learner</span>, <span class="gt" data-d="s" tabindex="0" data-ua="Стратегія" data-tip="Бачити шлях там, де інші бачать глухий кут: швидко розпізнавати закономірності й обирати найкращий маршрут. Як тренер на трибуні, що бачить усю гру.">Strategic</span>, <span class="gt" data-d="s" tabindex="0" data-ua="Внесок" data-tip="Збирати інформацію, ідеї, факти й історії «про всяк випадок» і ставати банком знань для інших. Як губка, що вбирає все навколо.">Input</span>, <span class="gt" data-d="s" tabindex="0" data-ua="Мислення" data-tip="Глибоко думати й залюбки занурюватися в роздуми: обмірковування — теж форма дії. Як аквалангіст, що пірнає глибше.">Intellection</span>, <span class="gt" data-d="s" tabindex="0" data-ua="Майбутнє" data-tip="Жити натхненням від того, що може бути, і малювати картини майбутнього, які кличуть рухатися вперед. Як перші дослідники космосу.">Futuristic</span>. Також у моїй десятці — <span class="gt" data-d="r" tabindex="0" data-ua="Індивідуалізація" data-tip="Бачити унікальність кожної людини й знати, як поєднати різні таланти. Як режисер кастингу, що знаходить кожному його роль.">Individualization</span> і <span class="gt" data-d="r" tabindex="0" data-ua="Відносини" data-tip="Глибина й щирість у стосунках: невелике, але міцне коло людей, яким довіряєш. Як справжній друг.">Relator</span>, <span class="gt" data-d="e" tabindex="0" data-ua="Відновлення" data-tip="Аналізувати, що пішло не так, і знаходити, як це виправити; проблеми не лякають, а надихають. Як детектив.">Restorative</span> і <span class="gt" data-d="i" tabindex="0" data-ua="Максимізатор" data-tip="Зосереджуватися на сильному й перетворювати добре на досконале. Як тренер чемпіонів.">Maximizer</span>.</p>
             </div>
           </div>
         </div>
@@ -558,6 +567,33 @@ sync();
   cv.addEventListener("pointerup", stop); cv.addEventListener("pointercancel", stop);
   addEventListener("keydown", e => { if (e.key === "Escape" && on && !document.getElementById("lb").classList.contains("on")) set(false); });
   addEventListener("resize", () => { if (cv.width) size(); });
+})();
+
+/* підказки до талантів Ґеллапа: наведення, фокус з клавіатури або дотик */
+(() => {
+  const DOM = {s:"стратегічне мислення", r:"побудова стосунків", e:"виконання", i:"вплив"};
+  const tip = document.createElement("div"); tip.className = "gtip"; tip.hidden = true; tip.setAttribute("role", "tooltip"); document.body.append(tip);
+  let cur = null, at = 0, sy = 0;
+  function show(el){
+    if (cur !== el) at = Date.now();
+    cur = el; sy = scrollY;
+    tip.innerHTML = `<small>${DOM[el.dataset.d]}</small><b>${el.textContent} · ${el.dataset.ua}</b>${el.dataset.tip}`;
+    tip.hidden = false;
+    const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    const x = Math.min(innerWidth - w - 12, Math.max(12, r.left + r.width/2 - w/2));
+    const y = r.top - h - 10 > 70 ? r.top - h - 10 : r.bottom + 10;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  const hide = () => { tip.hidden = true; cur = null; };
+  document.querySelectorAll(".gt").forEach(el => {
+    el.addEventListener("mouseenter", () => show(el));
+    el.addEventListener("mouseleave", hide);
+    el.addEventListener("focus", () => show(el));
+    el.addEventListener("blur", hide);
+    el.addEventListener("click", e => { e.stopPropagation(); cur === el && Date.now() - at > 500 ? hide() : show(el); });
+  });
+  addEventListener("click", hide); addEventListener("scroll", () => { if (cur && Math.abs(scrollY - sy) > 40) hide(); }, {passive:true});
+  addEventListener("keydown", e => { if (e.key === "Escape") hide(); });
 })();
 
 /* бульбашка стоїть ліворуч і трохи вище обличчя: де саме — рахуємо з object-fit: cover */
