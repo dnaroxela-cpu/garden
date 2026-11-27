@@ -232,7 +232,6 @@ html{scroll-padding-top:calc(var(--hb) + var(--mt))}
 <body>
 <header class="bar">
   <a href="index.html">на головну</a>
-  <nav aria-label="Розділи"><a href="#services" data-v="services" aria-current="page">послуги</a><a href="#projects" data-v="projects">проєкти</a></nav>
   <span class="sp"></span>
   <nav class="site" aria-label="Сайт"><a href="index.html#garden">сад</a><a href="index.html#map">мапа</a></nav>
   <span class="tools"><button class="chalk-btn" id="chalk-btn" aria-pressed="false" aria-label="Малювати крейдою поверх сторінки" title="Крейда — малювати поверх сторінки (Esc — вийти)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 3.5 20.5 8.5 9 20H4v-5L15.5 3.5Z"/><path d="m13 6 5 5"/></svg></button>
@@ -286,9 +285,9 @@ html{scroll-padding-top:calc(var(--hb) + var(--mt))}
     <figure id="me"><a class="tg" id="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener" aria-label="Написати мені в Телеграм, @ardnasroxela"><span class="tg-l" aria-hidden="true"><span>написати мені<span class="tg-at"> · @ardnasroxela</span></span><span class="tg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z"/><path d="m10 13 4.5-4.5"/></svg></span></span><span class="tg-msg" id="tgmsg" aria-hidden="true">Привіт! Хочу сайт для свого проєкту…</span></a><img src="project-me.webp" alt="Олександра Майборода за столом у кафе" decoding="async"><figcaption><b>Олександра Майборода</b> · арт-директорка і дослідниця</figcaption></figure>
   </div>
 </section>
-<div class="mtabs" id="mtabs" role="tablist" aria-label="Ідеї та проєкти" data-on="ideas">
-  <button type="button" role="tab" id="mt-ideas" aria-controls="ideas" aria-selected="true">ідеї<sup>05</sup></button>
-  <button type="button" role="tab" id="mt-projects" aria-controls="projects" aria-selected="false" tabindex="-1">проєкти<sup id="mt-n"></sup></button>
+<div class="mtabs" id="mtabs" role="tablist" aria-label="Проєкти та ідеї" data-on="projects">
+  <button type="button" role="tab" id="mt-projects" aria-controls="projects" aria-selected="true">проєкти<sup id="mt-n"></sup></button>
+  <button type="button" role="tab" id="mt-ideas" aria-controls="ideas" aria-selected="false" tabindex="-1">ідеї<sup>05</sup></button>
 </div>
 <section class="ideas" id="ideas" aria-label="Ідеї">
   <p class="love" data-reveal-02="words" data-scroll="scrub">Я люблю ідеї, бо вони <em>глибокі</em>, бо вони <em>нові</em>, бо вони <em>прояснюють</em>, бо вони <em>суперечливі</em>, бо вони <em>дивні</em></p>
@@ -331,7 +330,8 @@ const TW = 2800, TH = 2172;
 const PROJECTS = [
   {src:"project-5.webp", ratio:1102/1100, x:55, y:81, w:340, title:"Майбутні", note:"обкладинка"},
   {src:"project-1.webp", ratio:734/1100, x:505, y:59, w:400, title:"Майбутні", note:"виїзд"},
-  {src:"project-10.webp", ratio:620/1200, x:1015, y:90, w:480, title:"Як ми можемо думати", note:"мапа інструментів мислення"},
+  {src:"project-10.webp", ratio:620/1200, x:1015, y:90, w:480, title:"Як ми можемо думати", note:"мапа інструментів мислення", link:"ideas.html",
+   text:"Інтерактивна історія ідей про те, як ми працюємо з інформацією і знаннями: від «As We May Think» Ванівара Буша й картотек до гіпертексту, Вікіпедії, Obsidian та Are.na. Сім ліній — медіа і мислення, гіпертекст і література, нотатки й цифрові сади, посилення інтелекту, мережа і спільне знання, кібернетика, машинний розум — і стрілки того, що на що вплинуло. Можна гортати мапою або списком, як у Finder; зроблено в стилі ранніх Mac і Storyspace."},
   {src:"project-3.webp", ratio:447/444, x:1605, y:46, w:220, title:"Майбутні", note:"відгуки учнів · фотографія і дизайн"},
   {src:"project-8.webp", ratio:716/1100, x:1935, y:49, w:460, title:"Майбутні", note:"сайт Школи тренерства"},
   {src:"project-12.webp", ratio:1496/1000, x:2505, y:108, w:240, title:"Майбутні", note:"виїзд"},
@@ -509,7 +509,7 @@ function sync(){
   const lk = mt.offsetHeight ? mt.dataset.on === "projects" && mt.getBoundingClientRect().top < innerHeight / 2
                              : isLocked() || work.getBoundingClientRect().top < innerHeight / 2;
   document.body.classList.toggle("locked", isLocked());
-  document.querySelectorAll(".bar nav a").forEach(a => {
+  document.querySelectorAll(".bar nav a[data-v]").forEach(a => {
     if ((a.dataset.v === "projects") === lk) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
   document.title = (lk ? "Проєкти" : "Послуги") + " — Alexandra Maiboroda";
@@ -522,7 +522,7 @@ sync();
 (() => {
   const bar = document.getElementById("mtabs"), tabs = [...bar.querySelectorAll("[role=tab]")];
   document.getElementById("mt-n").textContent = String(PROJECTS.length).padStart(2, "0");
-  let on = "ideas";
+  let on = "projects";                  // спершу проєкти, ідеї — друга вкладка
   function apply(anim){
     tabs.forEach(b => {
       const id = b.getAttribute("aria-controls"), sel = id === on, sec = document.getElementById(id);
@@ -551,9 +551,9 @@ sync();
     if (!a) return;
     e.preventDefault(); pick(a.getAttribute("href").slice(1));
   });
-  if (location.hash === "#projects") on = "projects";
+  if (location.hash === "#ideas") on = "ideas";
   apply(false);
-  if (location.hash === "#projects") requestAnimationFrame(() => pick("projects"));
+  if (location.hash === "#projects" || location.hash === "#ideas") requestAnimationFrame(() => pick(on));
 })();
 
 /* вкладки «Що я роблю | Про мене»: панелі лежать в одній клітинці сітки, тож висота не стрибає */

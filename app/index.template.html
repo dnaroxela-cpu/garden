@@ -867,6 +867,26 @@ footer.site-foot:has(.foot-photo) .foot-links{border-left:1px solid var(--rule)}
 footer.site-foot:has(.foot-photo)::before{content:"";position:absolute;left:calc(var(--g)*-1);right:calc(var(--g)*-1);top:var(--ph);height:1px;background:var(--rule)}
 footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
 @media (max-width:900px){footer.site-foot:has(.foot-photo) .foot-links{border-left:0;border-top:1px solid var(--rule)}}
+/* вкладки-папки (як на сторінці «Проєкти»): смужка-полиця кольору поверхні на всю ширину екрана, вкладки із заокругленим верхом;
+   активна — кольору сторінки, зливається з тим, що під нею, а низ м'яко розходиться в боки, як у справжньої папки */
+.folders{display:flex;flex-wrap:nowrap;align-items:flex-end;gap:16px;height:52px;margin:8px calc(var(--g)*-1) 0;width:calc(100% + var(--g)*2);padding:9px var(--g) 0;
+  background:linear-gradient(var(--rule),var(--rule)) left bottom/100% 1px no-repeat,var(--surface);border-top:1px solid var(--rule);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;font-family:var(--f-mono)}
+.folders::-webkit-scrollbar{display:none}
+.folders button{flex:none;position:relative;min-width:150px;height:calc(100% - 5px);padding:0 20px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font:inherit;font-size:12px;letter-spacing:.06em;color:var(--muted);text-decoration:none;
+  background:color-mix(in srgb,var(--surface) 70%,var(--rule));border:1px solid var(--rule);border-bottom:0;border-radius:16px 16px 0 0;cursor:pointer;transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
+.folders button:hover{color:var(--ink);height:calc(100% - 2px)}
+.folders button[aria-selected="true"],.folders button[aria-current="true"]{color:var(--ink);background:var(--bg);height:100%;z-index:1}
+.folders button[aria-selected="true"]::before,.folders button[aria-selected="true"]::after,.folders button[aria-current="true"]::before,.folders button[aria-current="true"]::after{content:"";position:absolute;bottom:0;width:14px;height:14px;pointer-events:none}
+.folders button[aria-selected="true"]::before,.folders button[aria-current="true"]::before{left:-15px;background:radial-gradient(circle at 0 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
+.folders button[aria-selected="true"]::after,.folders button[aria-current="true"]::after{right:-15px;background:radial-gradient(circle at 100% 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
+.folders button:focus-visible{outline:2px solid var(--ink);outline-offset:-5px}
+.folders sup{font-size:9px;letter-spacing:0;vertical-align:.6em;opacity:.7;margin-left:1px}
+.folders .g svg{flex:none}
+.legend.folders{margin-bottom:0}
+.tabs.folders{margin-bottom:28px}
+/* верхня лінія першого рядка Саду — це вже низ смужки з папками */
+#v-garden .folders + .cards > :first-child{border-image:none;border-top-color:transparent}
+@media (max-width:640px){.folders{gap:14px;height:48px}.folders button{min-width:0;padding:0 14px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -878,11 +898,10 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
   <header class="bar">
     <a class="logo" href="#home" data-go="home">на головну</a>
     <nav aria-label="Розділи">
-      <button data-go="garden">Сад</button>
-      <button data-go="shelf">Полиця</button>
-      <button data-go="map">Мапа</button>
-      <button type="button" onclick="location.href='ideas.html'">Інструменти мислення</button>
-      <button type="button" onclick="location.href='projects.html'">Проєкти</button>
+      <button data-go="garden">сад</button>
+      <button data-go="shelf">полиця</button>
+      <button data-go="map">мапа</button>
+      <button type="button" onclick="location.href='projects.html'">проєкти</button>
       
     </nav>
     <span class="crumb" id="crumb" aria-hidden="true"></span>
@@ -938,7 +957,7 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
       <p>Живі нотатки з мого Obsidian-сховища: fleeting notes — швидкі думки й начерки, literature notes — конспекти книжок і матеріалів, permanent notes — те, що вже дозріло. Обери тему або просто блукай.</p>
     </div>
     <div class="chips" id="chips"></div>
-    <div class="legend" id="legend"></div>
+    <div class="legend folders" id="legend" role="tablist" aria-label="Стадія нотаток"></div>
     <div class="cards" id="cards"></div>
   </section>
 
@@ -958,13 +977,13 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
     <div class="head">
       <h1>Полиця</h1>
     </div>
-    <div class="tabs">
-      <button data-tab="books" aria-current="true">Книжки</button>
-      <button data-tab="articles">Статті</button>
+    <div class="tabs folders" role="tablist" aria-label="Полиця">
+      <button data-tab="books" aria-current="true">книжки</button>
+      <button data-tab="articles">статті</button>
       <!-- <button data-tab="want">Хочу прочитати</button> — вкладку поки сховано -->
-      <button data-tab="films">Фільми</button>
-      <button data-tab="series">Серіали</button>
-      <button data-tab="quotes">Цитати</button>
+      <button data-tab="films">фільми</button>
+      <button data-tab="series">серіали</button>
+      <button data-tab="quotes">цитати</button>
       <!-- <button data-tab="media">Посилання</button> — вкладку поки сховано -->
     </div>
     <div id="t-books"></div>
@@ -1143,13 +1162,15 @@ function renderGarden(){
   const GT=Object.entries(GARDEN.flatMap(n=>n.tags).reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]);
   const chips=[["Усі",GARDEN.length],...GT.filter(([t,c])=>c>1||t===tagF)];
   $("#chips").innerHTML=chips.map(([t,c])=>`<button class="chip" aria-pressed="${t===tagF}" data-tagf="${esc(t)}">${t==="Усі"?t:"#"+esc(t)}<i>${c}</i></button>`).join("");
-  $("#legend").innerHTML=Object.entries(STL).map(([k,v])=>`<button class="g" data-st="${k}" aria-pressed="${statusF===k}">${glyph(k)}${v} · ${NOTES.filter(n=>n.status===k).length}</button>`).join("");
+  // стадії — вкладки-папки над списком: «усі» і три стадії
+  $("#legend").innerHTML=`<button role="tab" data-st="" aria-selected="${!statusF}">усі<sup>${GARDEN.length}</sup></button>`+Object.entries(STL).map(([k,v])=>`<button role="tab" class="g" data-st="${k}" aria-selected="${statusF===k}">${glyph(k)}${v}<sup>${NOTES.filter(n=>n.status===k).length}</sup></button>`).join("");
+  const cur=$("#legend [aria-selected=true]"),lg=$("#legend");if(cur&&lg.scrollWidth>lg.clientWidth)lg.scrollLeft=cur.offsetLeft-lg.clientWidth/2+cur.offsetWidth/2;
   const list=GARDEN.filter(n=>(tagF==="Усі"||n.tags.includes(tagF))&&(!statusF||n.status===statusF));
   $("#cards").innerHTML=list.map(n=>`<button class="card" data-note="${n.id}"><div class="top"><span class="g">${glyph(n.status)}${stl(n)}</span><span class="mono">${fmt(n.date)}</span></div><h3>${esc(short(n.title))}</h3><p>${esc(n.excerpt)}</p><span class="mono">${n.tags.map(t=>"#"+t).join(" ")||FOLDER_UA[n.folder]}</span></button>`).join("")||`<p class="empty">Тут поки нічого не росте.</p>`;
 }
 
 $("#chips").addEventListener("click",e=>{const b=e.target.closest("[data-tagf]");if(b){tagF=b.dataset.tagf;renderGarden()}});
-$("#legend").addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(b){statusF=statusF===b.dataset.st?null:b.dataset.st;renderGarden()}});
+$("#legend").addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(b){statusF=b.dataset.st||null;renderGarden()}});
 renderVariants();renderGarden();
 
 
