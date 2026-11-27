@@ -240,6 +240,21 @@ html{scroll-padding-top:calc(var(--hb) + var(--mt))}
 @media (min-width:761px){.mtabs{grid-template-columns:repeat(2,minmax(0,220px));gap:18px}}
 @media (min-width:901px){.ideas{height:calc(100dvh - var(--hb) - var(--mt))}}
 @keyframes mtin{from{opacity:0;transform:translateY(10px)}}
+/* відкритий проєкт: картинка ліворуч, опис праворуч — по лівому краю й зі своєю прокруткою; на телефоні — опис під картинкою, гортається вся картка */
+.lb{overflow:auto}
+.lb figure{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,360px);gap:clamp(24px,3.5vw,56px);align-items:center;width:min(1320px,100%);max-height:100%}
+.lb .m{max-width:100%;max-height:calc(100dvh - 120px);justify-self:end}
+.lb figcaption{margin:0;text-align:left;max-width:none;max-height:calc(100dvh - 120px);overflow:auto;font-size:13px;line-height:1.6}
+.lb figcaption .lb-t{display:block;font-family:'Onest',system-ui,sans-serif;font-weight:500;font-size:20px;line-height:1.2;letter-spacing:-.01em;margin-bottom:4px}
+.lb figcaption .lb-n{display:block}
+.lb figcaption p{margin:14px 0 0;font-family:'Onest',system-ui,sans-serif;font-size:15px;line-height:1.55;color:var(--ink)}
+.lb figcaption a{display:inline-block;margin-top:14px}
+@media (max-width:760px){
+  .lb{place-items:start center;padding:116px var(--g) 32px}
+  .lb figure{grid-template-columns:1fr;max-height:none;gap:16px}
+  .lb .m{justify-self:center;max-height:60dvh}
+  .lb figcaption{max-height:none;overflow:visible}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.mt-in{animation:none}}
 </style>
 </head>
@@ -494,7 +509,7 @@ function open(i){
   back = document.activeElement;
   lbf.replaceChildren(media(p, true));
   const c = document.createElement("figcaption");
-  c.innerHTML = caption(p) + (p.text ? "<br>" + p.text : "") + (p.link ? `<br><a href="${p.link}" target="_blank" rel="noopener">відкрити ↗</a>` : "");
+  c.innerHTML = `<b class="lb-t">${p.title}</b>${p.note ? `<span class="lb-n">${p.note}</span>` : ""}${p.text ? `<p>${p.text}</p>` : ""}${p.link ? `<a href="${p.link}" target="_blank" rel="noopener">відкрити ↗</a>` : ""}`;
   lbf.append(c);
   lb.classList.add("on"); lbx.focus();
 }
