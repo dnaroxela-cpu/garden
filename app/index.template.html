@@ -9,7 +9,7 @@
 <style>html{color-scheme:light;-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=Onest:wght@300;500;700&family=Spectral:ital,wght@0,300;0,500;1,300;1,400&family=Unbounded:wght@300;400;700&family=Geologica:wght@300;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=Onest:wght@300;400;500;700&family=Spectral:ital,wght@0,300;0,500;1,300;1,400&family=Unbounded:wght@300;400;700&family=Geologica:wght@300;500&display=swap">
 <style>
 /* Layout: one quiet top bar, then a two-column section header (big title left, mono blurb right). Neutral paper and ink from the current site; the rainbow is the only accent. */
 :root{
@@ -885,8 +885,25 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
 .legend.folders{margin-bottom:0}
 .tabs.folders{margin-bottom:28px}
 /* верхня лінія першого рядка Саду — це вже низ смужки з папками */
-#v-garden .folders + .cards > :first-child{border-image:none;border-top-color:transparent}
+#v-garden .fbar + .cards > :first-child{border-image:none;border-top-color:transparent}
 @media (max-width:640px){.folders{gap:14px;height:48px}.folders button{min-width:0;padding:0 14px}}
+/* Сад і Полиця: заголовка-«/ Сад» немає (де ми — видно з меню), а від хедера до вкладок — сірий фон, як за папками */
+#v-garden .head h1,#v-shelf .head h1,.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#v-garden .head,#v-shelf .head{width:calc(100% + var(--g)*2);margin-inline:calc(var(--g)*-1);padding:clamp(28px,5vh,56px) var(--g) clamp(20px,3.5vh,36px);background:var(--surface);gap:0}
+#v-shelf .head{padding-block:clamp(16px,3vh,28px) 0}
+#v-garden .head p{font-family:'Onest',system-ui,sans-serif;font-weight:400;font-size:clamp(18px,1.6vw,22px);line-height:1.4;letter-spacing:-.01em;color:var(--ink);max-width:46ch;margin:0;text-wrap:pretty}
+#v-garden .head + .fbar,#v-shelf .head + .folders{margin-top:0;border-top:0}
+/* смужка Саду: папки ліворуч, фільтр тем праворуч */
+.fbar{display:flex;align-items:flex-end;gap:12px;width:calc(100% + var(--g)*2);margin-inline:calc(var(--g)*-1);padding-right:var(--g);background:linear-gradient(var(--rule),var(--rule)) left bottom/100% 1px no-repeat,var(--surface)}
+.fbar .folders{flex:1;min-width:0;width:auto;margin:0;padding-right:16px;background:none;border-top:0}
+.tagsel{flex:none;align-self:center;margin-top:9px;position:relative}
+.tagsel select{appearance:none;-webkit-appearance:none;font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;padding:7px 30px 7px 14px;max-width:min(260px,38vw);text-overflow:ellipsis;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%236d6d66' stroke-width='1.4'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.tagsel select:hover{border-color:var(--ink)}
+.tagsel select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.tagsel.on select{background-color:var(--ink);color:var(--bg);border-color:var(--ink)}
+/* на телефоні фільтр — окремим рядком над папками, щоб не тиснути вкладки */
+@media (max-width:640px){.fbar{flex-wrap:wrap;padding-right:0}.tagsel{order:-1;flex-basis:100%;align-self:auto;margin:0;padding:0 var(--g) 4px}#v-garden .head{padding-bottom:16px}.tagsel select{max-width:100%}.fbar .folders{flex-basis:100%}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -956,8 +973,10 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
       <h1>Сад</h1>
       <p>Живі нотатки з мого Obsidian-сховища: fleeting notes — швидкі думки й начерки, literature notes — конспекти книжок і матеріалів, permanent notes — те, що вже дозріло. Обери тему або просто блукай.</p>
     </div>
-    <div class="chips" id="chips"></div>
-    <div class="legend folders" id="legend" role="tablist" aria-label="Стадія нотаток"></div>
+    <div class="fbar">
+      <div class="legend folders" id="legend" role="tablist" aria-label="Стадія нотаток"></div>
+      <label class="tagsel"><span class="sr">Тема</span><select id="tagsel"></select></label>
+    </div>
     <div class="cards" id="cards"></div>
   </section>
 
@@ -1161,7 +1180,9 @@ function renderGarden(){
   const GARDEN=NOTES.filter(n=>n.status);
   const GT=Object.entries(GARDEN.flatMap(n=>n.tags).reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]);
   const chips=[["Усі",GARDEN.length],...GT.filter(([t,c])=>c>1||t===tagF)];
-  $("#chips").innerHTML=chips.map(([t,c])=>`<button class="chip" aria-pressed="${t===tagF}" data-tagf="${esc(t)}">${t==="Усі"?t:"#"+esc(t)}<i>${c}</i></button>`).join("");
+  // усі теми — один фільтр праворуч від вкладок-папок
+  $("#tagsel").innerHTML=chips.map(([t,c])=>`<option value="${esc(t)}"${t===tagF?" selected":""}>${t==="Усі"?"усі теми":"#"+esc(t)} · ${c}</option>`).join("");
+  $(".tagsel").classList.toggle("on",tagF!=="Усі");
   // стадії — вкладки-папки над списком: «усі» і три стадії
   $("#legend").innerHTML=`<button role="tab" data-st="" aria-selected="${!statusF}">усі<sup>${GARDEN.length}</sup></button>`+Object.entries(STL).map(([k,v])=>`<button role="tab" class="g" data-st="${k}" aria-selected="${statusF===k}">${glyph(k)}${v}<sup>${NOTES.filter(n=>n.status===k).length}</sup></button>`).join("");
   const cur=$("#legend [aria-selected=true]"),lg=$("#legend");if(cur&&lg.scrollWidth>lg.clientWidth)lg.scrollLeft=cur.offsetLeft-lg.clientWidth/2+cur.offsetWidth/2;
@@ -1169,7 +1190,7 @@ function renderGarden(){
   $("#cards").innerHTML=list.map(n=>`<button class="card" data-note="${n.id}"><div class="top"><span class="g">${glyph(n.status)}${stl(n)}</span><span class="mono">${fmt(n.date)}</span></div><h3>${esc(short(n.title))}</h3><p>${esc(n.excerpt)}</p><span class="mono">${n.tags.map(t=>"#"+t).join(" ")||FOLDER_UA[n.folder]}</span></button>`).join("")||`<p class="empty">Тут поки нічого не росте.</p>`;
 }
 
-$("#chips").addEventListener("click",e=>{const b=e.target.closest("[data-tagf]");if(b){tagF=b.dataset.tagf;renderGarden()}});
+$("#tagsel").addEventListener("change",e=>{tagF=e.target.value;renderGarden()});
 $("#legend").addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(b){statusF=b.dataset.st||null;renderGarden()}});
 renderVariants();renderGarden();
 
