@@ -48,7 +48,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .chalk-pal .sw:focus-visible,.chalk-pal .clr:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .chalk-pal .clr{color:var(--muted);padding:0 4px 0 6px;border-left:1px solid var(--rule)}
 .chalk-pal .clr:hover{color:var(--ink)}
-@media (max-width:480px){.bar{gap:10px}.bar nav{gap:10px}}
+@media (max-width:480px){.bar{gap:10px}.bar nav{gap:14px}}
+/* крейда і тема — одна пара: між собою ближче, ніж до посилань */
+.tools{display:flex;align-items:center;gap:2px;margin-left:-11px;margin-right:-4px}
+.chalk-btn,.mode{width:34px;height:34px}
+@media (max-width:760px){.bar nav:not(.site){display:none}}
+@media (max-width:480px){.tools{margin-left:-1px}}
 .mode{all:unset;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:50%}
 .mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .mode svg{transition:transform .4s}
@@ -126,14 +131,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .love{position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);width:min(50vw,900px);margin:0;text-align:center;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,min(3.6vw,5.2vh),64px);line-height:1.08;letter-spacing:-.02em;text-wrap:balance}
 .love em{font-family:var(--f-body);font-style:italic;font-weight:400;letter-spacing:-.01em}
 .idea{position:absolute;width:min(300px,21vw);margin:0;padding:16px 18px 18px;background:var(--surface);border:1px solid var(--rule);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
-.idea:hover{transform:rotate(0) scale(1.03)}
 .idea small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .idea h3{font-family:var(--f-display);font-weight:500;font-size:clamp(17px,1.4vw,20px);line-height:1.15;letter-spacing:-.01em;margin:0 0 8px}
 .idea p{font-family:var(--f-body);font-size:14px;line-height:1.5;margin:0}
 .idea.i1{left:var(--g);top:clamp(24px,7vh,70px);transform:rotate(-2deg)}
 .idea.i2{right:var(--g);top:clamp(40px,12vh,120px);transform:rotate(1.5deg)}
 .idea.i5{left:50%;top:clamp(16px,3.5vh,40px);transform:translateX(-50%) rotate(.8deg)}
-.idea.i5:hover{transform:translateX(-50%) scale(1.03)}
 .idea.i4{right:var(--g);bottom:clamp(16px,4vh,70px);transform:rotate(-1.5deg)}
 .idea.i3{left:calc(var(--g) + 1vw);bottom:clamp(20px,5vh,60px);transform:rotate(1deg)}
 /* картки можна перетягувати (лише на широкому екрані); розкладка пам'ятається в браузері */
@@ -153,8 +156,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   .ideas .idea.i2{align-self:flex-end;transform:rotate(2.5deg);width:76%}
   .ideas .idea.i3{align-self:flex-start;transform:rotate(1.5deg);margin-left:5%}
   .ideas .idea.i4{align-self:flex-end;transform:rotate(-2deg);width:86%}
-  .ideas .idea.i5{align-self:center;transform:rotate(3deg);width:78%}
-  .ideas .idea:hover,.ideas .idea.i5:hover{transform:rotate(0) scale(1.02);z-index:3;position:relative}}
+  .ideas .idea.i5{align-self:center;transform:rotate(3deg);width:78%}}
 @media (prefers-reduced-motion:reduce){.idea{transition:none}}
 
 /* таланти Ґеллапа: кружечок кольору домену, як у звіті CliftonStrengths */
@@ -167,8 +169,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .gt[data-d="s"]{--gt:#00945f}.gt[data-d="r"]{--gt:#0a6cbf}.gt[data-d="e"]{--gt:#7b2582}.gt[data-d="i"]{--gt:#e07012}
 /* реакції на ідеї: ряд емодзі з лічильниками під кожною карткою */
 .rx{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px}
-.rx button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 4px;border:1px solid var(--rule);border-radius:999px;background:var(--bg);font-size:12px;line-height:1.2;position:relative;transition:transform .15s,border-color .2s}
-.rx button:hover{transform:translateY(-1px);border-color:var(--ink)}
+.rx button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 4px;border:1px solid var(--rule);border-radius:999px;background:var(--bg);font-size:12px;line-height:1.2;position:relative;transition:border-color .2s,background .2s,color .2s;-webkit-tap-highlight-color:transparent}
+.rx button:hover{border-color:var(--ink)}
 .rx button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .rx button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
 .rx .n{font-family:var(--f-mono);font-size:10px;min-width:1ch}
@@ -206,15 +208,16 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .mtabs{display:none}
 @media (max-width:760px){
   html{scroll-padding-top:calc(var(--hb) + var(--mt))}
-  :root{--mt:46px}
-  .mtabs{display:grid;grid-template-columns:1fr 1fr;position:sticky;top:var(--hb);z-index:40;height:var(--mt);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-  .mtabs button{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .3s;-webkit-tap-highlight-color:transparent}
-  .mtabs button + button{border-left:1px solid var(--rule)}
-  .mtabs button[aria-selected="true"]{color:var(--ink)}
-  .mtabs button:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
+  :root{--mt:52px}
+  /* смужка — «полиця» кольору поверхні; вкладки з заокругленим верхом, активна зливається з аркушем під нею, низ м'яко розходиться, як у справжньої папки */
+  .mtabs{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:end;position:sticky;top:var(--hb);z-index:40;height:var(--mt);padding:9px var(--g) 0;background:var(--surface);border-bottom:1px solid var(--rule)}
+  .mtabs button{all:unset;cursor:pointer;position:relative;height:100%;display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:color-mix(in srgb,var(--surface) 70%,var(--rule));border:1px solid var(--rule);border-bottom:0;border-radius:16px 16px 0 0;height:calc(100% - 5px);transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
+  .mtabs button[aria-selected="true"]{color:var(--ink);background:var(--bg);margin-bottom:-1px;height:calc(100% + 1px);z-index:1}
+  .mtabs button[aria-selected="true"]::before,.mtabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:14px;height:14px;pointer-events:none}
+  .mtabs button[aria-selected="true"]::before{left:-15px;background:radial-gradient(circle at 0 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
+  .mtabs button[aria-selected="true"]::after{right:-15px;background:radial-gradient(circle at 100% 0,transparent 13.5px,var(--rule) 13.5px 14.5px,var(--bg) 14.5px)}
+  .mtabs button:focus-visible{outline:2px solid var(--ink);outline-offset:-5px}
   .mtabs sup{font-size:9px;letter-spacing:0;vertical-align:.6em;opacity:.7}
-  .mtabs .ink{position:absolute;left:0;bottom:-1px;width:50%;height:2px;background:var(--ink);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
-  .mtabs[data-on="projects"] .ink{transform:translateX(100%)}
   .mt-off{display:none!important}
   .mt-in{animation:mtin .45s cubic-bezier(.2,.8,.2,1)}
   .ideas,.work{border-top:0}
@@ -231,10 +234,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
   <nav aria-label="Розділи"><a href="#services" data-v="services" aria-current="page">послуги</a><a href="#projects" data-v="projects">проєкти</a></nav>
   <span class="sp"></span>
   <nav class="site" aria-label="Сайт"><a href="index.html#garden">сад</a><a href="index.html#map">мапа</a></nav>
-  <button class="chalk-btn" id="chalk-btn" aria-pressed="false" aria-label="Малювати крейдою поверх сторінки" title="Крейда — малювати поверх сторінки (Esc — вийти)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 3.5 20.5 8.5 9 20H4v-5L15.5 3.5Z"/><path d="m13 6 5 5"/></svg></button>
+  <span class="tools"><button class="chalk-btn" id="chalk-btn" aria-pressed="false" aria-label="Малювати крейдою поверх сторінки" title="Крейда — малювати поверх сторінки (Esc — вийти)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 3.5 20.5 8.5 9 20H4v-5L15.5 3.5Z"/><path d="m13 6 5 5"/></svg></button>
   <button class="mode" id="mode" aria-label="Перемкнути світлу чи темну тему" title="Світла / темна тема">
-    <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 6a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
-  </button>
+    <svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><circle cx="14" cy="14" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 6a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>
+  </button></span>
 </header>
 
 <section class="svc" id="services" aria-label="Послуги">
@@ -285,7 +288,6 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 <div class="mtabs" id="mtabs" role="tablist" aria-label="Ідеї та проєкти" data-on="ideas">
   <button type="button" role="tab" id="mt-ideas" aria-controls="ideas" aria-selected="true">ідеї<sup>05</sup></button>
   <button type="button" role="tab" id="mt-projects" aria-controls="projects" aria-selected="false" tabindex="-1">проєкти<sup id="mt-n"></sup></button>
-  <span class="ink" aria-hidden="true"></span>
 </div>
 <section class="ideas" id="ideas" aria-label="Ідеї">
   <p class="love" data-reveal-02="words" data-scroll="scrub">Я люблю ідеї, бо вони <em>глибокі</em>, бо вони <em>нові</em>, бо вони <em>прояснюють</em>, бо вони <em>суперечливі</em>, бо вони <em>дивні</em></p>
@@ -712,6 +714,8 @@ sync();
       + `<button type="button" class="add" aria-expanded="false" aria-label="Додати реакцію" title="додати реакцію">+ ☺</button>`;
   });
   const num = (box, k) => box.querySelector(`[data-k="${k}"] .n`);
+  const label = (btn, on) => { const t = RX.find(r => r[0] === btn.dataset.k)[2]; btn.setAttribute("aria-pressed", on); btn.title = on ? t + " · натисніть ще раз, щоб прибрати" : t; };
+  boxes.forEach(box => box.querySelectorAll("[data-k]").forEach(b => label(b, b.getAttribute("aria-pressed") === "true")));
   boxes.forEach(box => RX.forEach(([k]) => { if (mine[box.dataset.idea+"-"+k]) box.querySelector(`[data-k="${k}"]`).classList.remove("z"); }));
   // реакцію видно лише тоді, коли її вже хтось поставив; решта ховається за «+ ☺»
   const show = (el, v) => { el.textContent = v > 0 ? v : ""; el.parentElement.classList.toggle("z", !(v > 0)); };
@@ -726,21 +730,27 @@ sync();
     const add = e.target.closest(".rx .add");
     if (add){ const box = add.closest(".rx"), o = !box.classList.contains("open"); box.classList.toggle("open", o); add.setAttribute("aria-expanded", o); add.textContent = o ? "×" : "+ ☺"; return; }
     const btn = e.target.closest(".rx button[data-k]"); if (!btn) return;
-    const box = btn.closest(".rx"), key = box.dataset.idea + "-" + btn.dataset.k;
-    fly(btn);
-    if (mine[key]) return;                       // уже реагували — лише анімація
-    mine[key] = 1; save(); btn.setAttribute("aria-pressed", "true");
-    const n = num(box, btn.dataset.k); show(n, (+n.textContent || 0) + 1);
-    try { const r = await fetch(`${API}/hit/${NS}/${key}`); if (r.ok) show(n, (await r.json()).value); } catch(err){}
+    const box = btn.closest(".rx"), key = box.dataset.idea + "-" + btn.dataset.k, n = num(box, btn.dataset.k);
+    // своя реакція: повторний клік її прибирає. Abacus не вміє віднімати, тож знята реакція — хіт окремого лічильника «-un»
+    const had = !!mine[key];
+    if (had) delete mine[key]; else { mine[key] = 1; fly(btn); }
+    save(); label(btn, !had);
+    show(n, Math.max(had ? 0 : 1, (+n.textContent || 0) + (had ? -1 : 1)));
+    try {
+      const r = await fetch(`${API}/hit/${NS}/${key}${had ? "-un" : ""}`);
+      if (r.ok){ const v = (await r.json()).value; if (had) un[key] = v; else tot[key] = v; show(n, (tot[key] || 0) - (un[key] || 0)); }
+    } catch(err){}
   });
   let loaded = false;
+  const tot = {}, un = {};                       // скільки разів реакцію ставили і скільки знімали
+  const get = async key => { try { const r = await fetch(`${API}/get/${NS}/${key}`); return r.ok ? (await r.json()).value : null; } catch(err){ return null; } };
   async function load(){
     if (loaded) return; loaded = true;
     await Promise.all(boxes.flatMap(box => RX.map(async ([k]) => {
-      try {
-        const r = await fetch(`${API}/get/${NS}/${box.dataset.idea}-${k}`);
-        show(num(box, k), r.ok ? (await r.json()).value : (mine[box.dataset.idea+"-"+k] ? 1 : 0));
-      } catch(err){ if (mine[box.dataset.idea+"-"+k]) show(num(box, k), 1); }
+      const key = box.dataset.idea + "-" + k, [a, b] = await Promise.all([get(key), get(key + "-un")]);
+      if (a == null){ show(num(box, k), mine[key] ? 1 : 0); return; }
+      tot[key] = a; un[key] = b || 0;
+      show(num(box, k), Math.max(mine[key] ? 1 : 0, a - un[key]));
     })));
   }
   const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)){ load(); io.disconnect(); } }, {rootMargin: "300px"});
