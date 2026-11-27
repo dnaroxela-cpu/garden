@@ -96,6 +96,20 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .svc-tabs button:hover{color:var(--ink)}
 .svc-tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .svc-panels{display:grid}
+/* «Що я роблю | Про мене | Сильні сторони» — теж папки: активна вкладка сіра й переходить у сіру панель,
+   а та тягнеться до низу екрана й зливається зі смужкою папок «проєкти | ідеї» */
+.svc-txt{--sp:clamp(16px,3.5vh,40px);padding:var(--sp) var(--g)}
+.svc-tabbed{margin:0 calc(var(--g)*-1) calc(var(--sp)*-1)}
+.svc-tabs{gap:10px;margin:0;padding:0 var(--g);height:42px;align-items:flex-end}
+.svc-tabs button{position:relative;height:calc(100% - 5px);display:flex;align-items:center;padding:0 18px;border:1px solid var(--rule);border-bottom:0;border-radius:14px 14px 0 0;background:color-mix(in srgb,var(--surface) 40%,var(--bg));transition:background .35s,color .35s,height .35s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
+.svc-tabs button:hover{height:calc(100% - 2px)}
+.svc-tabs button[aria-selected="true"]{background:var(--surface);height:100%;z-index:1;border-bottom-color:transparent}
+.svc-tabs button[aria-selected="true"]::before,.svc-tabs button[aria-selected="true"]::after{content:"";position:absolute;bottom:0;width:12px;height:12px;pointer-events:none}
+.svc-tabs button[aria-selected="true"]::before{left:-13px;background:radial-gradient(circle at 0 0,transparent 11.5px,var(--rule) 11.5px 12.5px,var(--surface) 12.5px)}
+.svc-tabs button[aria-selected="true"]::after{right:-13px;background:radial-gradient(circle at 100% 0,transparent 11.5px,var(--rule) 11.5px 12.5px,var(--surface) 12.5px)}
+.svc-tabs button:focus-visible{outline-offset:-5px}
+.svc-panels{background:var(--surface);border-top:1px solid var(--rule);margin-top:-1px;padding:clamp(18px,3vh,30px) var(--g) var(--sp)}
+@media (max-width:760px){.svc-tabs{gap:6px;overflow-x:auto;scrollbar-width:none}.svc-tabs::-webkit-scrollbar{display:none}.svc-tabs button{flex:none;padding:0 12px;font-size:11px}.svc-tabs button[aria-selected="true"]::before,.svc-tabs button[aria-selected="true"]::after{display:none}}
 /* показується лише активна панель: блок вкладок займає висоту свого тексту й стоїть унизу екрана */
 .svc-panel{grid-area:1/1;animation:pin .3s ease}
 .svc-panel.off{display:none}
