@@ -64,7 +64,7 @@ function readFiles(dir, base = dir) {
   const results = [];
   const items = fs.readdirSync(dir);
   for (const item of items) {
-    if (item.startsWith('.') || item === 'private' || item === 'templates') continue;
+    if (item.startsWith('.') || item === 'private' || item === 'templates' || item.toLowerCase() === 'efforts') continue;   // Efforts — робочі проєкти, на сайт не йдуть
     const full = path.join(dir, item);
     const stat = fs.statSync(full);
     if (stat.isDirectory()) {
@@ -1522,7 +1522,7 @@ function boardGist(text) {
 // У текстовій картці останній рядок «— Хтось» — підпис джерела, «^id» у кінці — мітка для [[#^id|посилань]] з тексту нотатки.
 function readCanvases(dir, out = {}) {
   for (const item of fs.readdirSync(dir)) {
-    if (item.startsWith('.') || item === 'private' || item === 'templates') continue;
+    if (item.startsWith('.') || item === 'private' || item === 'templates' || item.toLowerCase() === 'efforts') continue;   // Efforts — робочі проєкти, на сайт не йдуть
     const full = path.join(dir, item);
     if (fs.statSync(full).isDirectory()) readCanvases(full, out);
     else if (item.endsWith('.canvas')) {

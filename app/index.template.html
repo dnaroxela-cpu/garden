@@ -517,7 +517,7 @@ body.on-home .bar.over-photo::before{content:"";position:absolute;left:50%;right
   .map-holder{height:72vh;height:72dvh;min-height:0}
   .maptools{flex-direction:column;align-items:stretch;padding:10px 12px;gap:8px}
   .map-holder .maptools{top:0;bottom:auto}
-  .map-holder .mapctl{flex:none;flex-direction:row;justify-content:flex-end;max-width:none}.map-holder .mlegend{display:none}
+  .map-holder .mapctl{flex:none;flex-direction:row;justify-content:flex-end;max-width:none}
   .tl-track{flex:1;width:auto}
   .tlabel{min-width:0;font-size:11px}
   .home-below{grid-template-columns:1fr;margin:40px 0 24px}.home-below>*{padding:24px 0!important}.home-below>:last-child{border-left:0;border-top:1px solid var(--rule)}
@@ -904,6 +904,22 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
 .tagsel.on select{background-color:var(--ink);color:var(--bg);border-color:var(--ink)}
 /* на телефоні фільтр — окремим рядком над папками, щоб не тиснути вкладки */
 @media (max-width:640px){.fbar{flex-wrap:wrap;padding-right:0}.tagsel{order:-1;flex-basis:100%;align-self:auto;margin:0;padding:0 var(--g) 4px}#v-garden .head{padding-bottom:16px}.tagsel select{max-width:100%}.fbar .folders{flex-basis:100%}}
+/* сторінка «Мапа»: мапа на весь екран під хедером, без заголовка й опису — лише тиха підказка про колір і розмір */
+#v-map .head{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;padding:0}
+#v-map .map-holder{height:calc(100vh - var(--hh));height:calc(100dvh - var(--hh));min-height:0;border-top:0}
+.map-note{position:absolute;z-index:3;left:var(--g);top:16px;margin:0;font-size:12px;color:var(--muted);background:color-mix(in srgb,var(--bg) 85%,transparent);padding:4px 10px;border-radius:99px;pointer-events:none}
+@media (max-width:700px){.map-note{top:auto;bottom:14px}}
+/* фільтр тем — одна кнопка, список тем спливає над нею */
+.mfilter{position:relative}
+#m-ftbtn{display:inline-flex;align-items:center;gap:7px}
+#m-ftbtn i,.mlegend i{display:inline-block;width:8px;height:8px;border-radius:50%}
+#m-ftbtn.on{border-color:var(--ink)}
+#m-ftbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
+#m-ftbtn svg{transition:transform .25s}
+.mfilter .mlegend{position:absolute;right:0;bottom:calc(100% + 8px);z-index:6;width:min(380px,calc(100vw - 2*var(--g)));max-height:min(320px,55vh);overflow:auto;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:4px;padding:10px;background:var(--bg);border:1px solid var(--rule);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.1)}
+.mfilter .mlegend[hidden]{display:none}
+.mfilter .mlegend .ft-x{flex-basis:100%;justify-content:flex-start}
+@media (max-width:700px){.mfilter .mlegend{bottom:auto;top:calc(100% + 8px);right:auto;left:0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -946,7 +962,7 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
       <div class="hovercard" id="hovercard" hidden></div>
       <div class="maptools">
         <div class="timeline-ctl"><button class="tplay" id="t-play" aria-label="Програти, як ріс сад"><svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path id="t-icon" d="M2 1l7 4-7 4z" fill="currentColor"/></svg></button><div class="tl-track"><div class="tl-ticks" id="tl-ticks" aria-hidden="true"></div><div class="tl-fill" id="tl-fill" aria-hidden="true"></div><input type="range" id="t-range" min="0" max="1000" value="1000" aria-label="Сад у часі"></div><span class="tlabel mono" id="t-label"></span></div>
-        <div class="mapctl"><div class="mlegend" id="m-legend" role="group" aria-label="Підсвітити тему"></div><div class="mapbtns"><button class="ghost zbtn" id="m-zout" aria-label="Віддалити">−</button><button class="ghost zbtn" id="m-zin" aria-label="Наблизити">+</button><button class="ghost" id="m-motion">рух</button><button class="ghost" id="m-reset" aria-label="Показати все"><span class="rs-l">показати все</span><span class="rs-s" aria-hidden="true">⤢</span></button></div></div>
+        <div class="mapctl"><div class="mapbtns"><div class="mfilter"><button class="ghost" id="m-ftbtn" aria-expanded="false" aria-controls="m-legend"><span id="m-ftlabel">теми</span><svg width="9" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button><div class="mlegend" id="m-legend" role="group" aria-label="Підсвітити тему" hidden></div></div><button class="ghost zbtn" id="m-zout" aria-label="Віддалити">−</button><button class="ghost zbtn" id="m-zin" aria-label="Наблизити">+</button><button class="ghost" id="m-motion">рух</button><button class="ghost" id="m-reset" aria-label="Показати все"><span class="rs-l">показати все</span><span class="rs-s" aria-hidden="true">⤢</span></button></div></div>
       </div>
       </div>
       </div>
@@ -965,7 +981,7 @@ footer.site-foot:has(.foot-photo)>:not(.foot-photo){border-top:0}
       <h1>Мапа</h1>
       <p>Усі нотатки, теги й посилання між ними. Колір — тема, розмір — довжина нотатки. <span class="hint-mouse">Тягни точки, гортай і масштабуй мапу, програй, як ріс сад.</span><span class="hint-touch">Торкнись точки, щоб прочитати, або тегу, щоб відфільтрувати сад. Тягни мапу пальцем, масштабуй двома пальцями чи кнопками − і +. Кнопка ▶ покаже, як ріс сад.</span></p>
     </div>
-    <div class="map-holder" id="map-holder"></div>
+    <div class="map-holder" id="map-holder"><p class="map-note mono">колір — тема · розмір — довжина нотатки</p></div>
   </section>
 
   <section class="view" id="v-garden" hidden>
@@ -2007,9 +2023,15 @@ $("#m-zout").onclick=()=>bigSim&&bigSim.zoom(1/1.4);
 $("#hovercard").addEventListener("click",e=>{if(e.target.closest(".hc-open")&&bigSim&&bigSim.hover){const n=bigSim.hover;bigSim.hover=bigSim.tapped=null;bigSim.open(n)}});
 $("#m-motion").onclick=e=>{MOTION=!MOTION;e.currentTarget.setAttribute("aria-pressed",MOTION);e.currentTarget.textContent=MOTION?"рух увімкнено":"рух вимкнено";bigSim&&(bigSim.energy=1)};
 $("#m-motion").setAttribute("aria-pressed",MOTION);$("#m-motion").textContent=MOTION?"рух увімкнено":"рух вимкнено";
-function renderLegend(){const f=bigSim&&bigSim.focusTag;$("#m-legend").innerHTML=TAGS.filter(t=>t[1]>1).map(([t])=>`<button data-ft="${esc(t)}" aria-pressed="${f===t}"><i style="background:${rb(tagHue(t))}"></i>#${esc(t)}</button>`).join("")+(f?`<button data-ft="" class="ft-x">× усі теми</button>`:"")}
+function renderLegend(){const f=bigSim&&bigSim.focusTag;$("#m-legend").innerHTML=(f?`<button data-ft="" class="ft-x">× усі теми</button>`:"")+TAGS.filter(t=>t[1]>1).map(([t])=>`<button data-ft="${esc(t)}" aria-pressed="${f===t}"><i style="background:${rb(tagHue(t))}"></i>#${esc(t)}</button>`).join("");
+  // одна компактна кнопка «теми»: показує вибрану тему, а список тем — у спливному вікні
+  $("#m-ftlabel").innerHTML=f?`<i style="background:${rb(tagHue(f))}"></i>#${esc(f)}`:"теми";$("#m-ftbtn").classList.toggle("on",!!f)}
 renderLegend();
-$("#m-legend").addEventListener("click",e=>{const b=e.target.closest("[data-ft]");if(!b||!bigSim)return;const t=b.dataset.ft;bigSim.focusTag=(!t||bigSim.focusTag===t)?null:t;renderLegend()});
+function ftOpen(o){const L=$("#m-legend");L.hidden=!o;$("#m-ftbtn").setAttribute("aria-expanded",o);L.style.transform="";if(o){const r=L.getBoundingClientRect(),pad=12,dx=Math.min(0,innerWidth-pad-r.right)+Math.max(0,pad-r.left);if(dx)L.style.transform=`translateX(${dx}px)`}}  // список тем завжди вміщається в екран
+$("#m-ftbtn").addEventListener("click",e=>{e.stopPropagation();ftOpen($("#m-legend").hidden)});
+document.addEventListener("click",e=>{if(!e.target.closest(".mfilter"))ftOpen(false)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#m-legend").hidden){ftOpen(false);$("#m-ftbtn").focus()}});
+$("#m-legend").addEventListener("click",e=>{const b=e.target.closest("[data-ft]");if(!b||!bigSim)return;const t=b.dataset.ft;bigSim.focusTag=(!t||bigSim.focusTag===t)?null:t;renderLegend();ftOpen(false)});
 
 // garden in time: scrub or play from the first note to today
 // шкала зі стиснутими паузами: проміжок між сусідніми датами рахується не довшим за GAP,
