@@ -202,7 +202,27 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
 .lb figcaption a{color:var(--ink)}
 .lb .x{all:unset;position:fixed;top:64px;right:var(--g);cursor:pointer;font-size:13px;padding:6px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--bg)}
 .lb .x:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* на телефоні другий і третій екрани — вкладки «ідеї | проєкти»: смужка липне під хедером, екран ділиться навпіл, лінія ковзає під активною */
+.mtabs{display:none}
+@media (max-width:760px){
+  html{scroll-padding-top:calc(var(--hb) + var(--mt))}
+  :root{--mt:46px}
+  .mtabs{display:grid;grid-template-columns:1fr 1fr;position:sticky;top:var(--hb);z-index:40;height:var(--mt);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .mtabs button{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .3s;-webkit-tap-highlight-color:transparent}
+  .mtabs button + button{border-left:1px solid var(--rule)}
+  .mtabs button[aria-selected="true"]{color:var(--ink)}
+  .mtabs button:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
+  .mtabs sup{font-size:9px;letter-spacing:0;vertical-align:.6em;opacity:.7}
+  .mtabs .ink{position:absolute;left:0;bottom:-1px;width:50%;height:2px;background:var(--ink);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+  .mtabs[data-on="projects"] .ink{transform:translateX(100%)}
+  .mt-off{display:none!important}
+  .mt-in{animation:mtin .45s cubic-bezier(.2,.8,.2,1)}
+  .ideas,.work{border-top:0}
+  .work{height:calc(100dvh - var(--hb) - var(--mt))}
+  .work-top h2{visibility:hidden}
+}
+@keyframes mtin{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.mt-in{animation:none}}
 </style>
 </head>
 <body>
@@ -262,6 +282,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-mono);pa
     <figure id="me"><a class="tg" id="tg" href="https://t.me/ardnasroxela" target="_blank" rel="noopener" aria-label="Написати мені в Телеграм, @ardnasroxela"><span class="tg-l" aria-hidden="true"><span>написати мені<span class="tg-at"> · @ardnasroxela</span></span><span class="tg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3 3 10.5l7 2.5 2.5 7L21 3Z"/><path d="m10 13 4.5-4.5"/></svg></span></span><span class="tg-msg" id="tgmsg" aria-hidden="true">Привіт! Хочу сайт для свого проєкту…</span></a><img src="project-me.webp" alt="Олександра Майборода за столом у кафе" decoding="async"><figcaption><b>Олександра Майборода</b> · арт-директорка і дослідниця</figcaption></figure>
   </div>
 </section>
+<div class="mtabs" id="mtabs" role="tablist" aria-label="Ідеї та проєкти" data-on="ideas">
+  <button type="button" role="tab" id="mt-ideas" aria-controls="ideas" aria-selected="true">ідеї<sup>05</sup></button>
+  <button type="button" role="tab" id="mt-projects" aria-controls="projects" aria-selected="false" tabindex="-1">проєкти<sup id="mt-n"></sup></button>
+  <span class="ink" aria-hidden="true"></span>
+</div>
 <section class="ideas" id="ideas" aria-label="Ідеї">
   <p class="love" data-reveal-02="words" data-scroll="scrub">Я люблю ідеї, бо вони <em>глибокі</em>, бо вони <em>нові</em>, бо вони <em>прояснюють</em>, бо вони <em>суперечливі</em>, бо вони <em>дивні</em></p>
   <article class="idea i1"><small>ідея</small><h3>Бюро ритуальних послуг третьої хвилі</h3><p>Агенція, яка створює трансцендентний, красивий і не пошлий досвід прощання.</p><div class="rx" data-idea="i1" role="group" aria-label="Реакції"></div></article>
@@ -421,7 +446,8 @@ field.addEventListener("pointercancel", () => { dragging = false; downEl = null;
 
 /* колесо і трекпад — у всі боки */
 const work = document.getElementById("projects");
-function isLocked(){ return Math.abs(work.getBoundingClientRect().top - hb()) < 6; }
+function isLocked(){ return !work.classList.contains("mt-off") && Math.abs(work.getBoundingClientRect().top - hb() - mtH()) < 6; }
+function mtH(){ const t = document.getElementById("mtabs"); return t && t.offsetHeight || 0; }
 function hb(){ return document.querySelector(".bar").offsetHeight; }
 field.addEventListener("wheel", e => {
   if (lb.classList.contains("on")) { e.preventDefault(); return; }
@@ -476,7 +502,9 @@ document.getElementById("mode").onclick = () => {
 
 /* вкладки: послуги / проєкти — одна сторінка, полотно під послугами */
 function sync(){
-  const lk = isLocked() || work.getBoundingClientRect().top < innerHeight / 2;
+  const mt = document.getElementById("mtabs");
+  const lk = mt.offsetHeight ? mt.dataset.on === "projects" && mt.getBoundingClientRect().top < innerHeight / 2
+                             : isLocked() || work.getBoundingClientRect().top < innerHeight / 2;
   document.body.classList.toggle("locked", isLocked());
   document.querySelectorAll(".bar nav a").forEach(a => {
     if ((a.dataset.v === "projects") === lk) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
@@ -486,6 +514,47 @@ function sync(){
 addEventListener("scroll", sync, {passive:true});
 addEventListener("resize", sync);
 sync();
+
+/* телефон: «ідеї | проєкти» — вкладки замість двох екранів одне під одним */
+(() => {
+  const bar = document.getElementById("mtabs"), tabs = [...bar.querySelectorAll("[role=tab]")];
+  const narrow = matchMedia("(max-width:760px)");
+  document.getElementById("mt-n").textContent = String(PROJECTS.length).padStart(2, "0");
+  let on = "ideas";
+  function apply(anim){
+    tabs.forEach(b => {
+      const id = b.getAttribute("aria-controls"), sel = id === on, sec = document.getElementById(id);
+      b.setAttribute("aria-selected", sel); b.tabIndex = sel ? 0 : -1;
+      sec.classList.toggle("mt-off", narrow.matches && !sel);
+      if (narrow.matches){ sec.setAttribute("role", "tabpanel"); sec.setAttribute("aria-labelledby", b.id); }
+      else { sec.removeAttribute("role"); sec.removeAttribute("aria-labelledby"); }
+      if (anim && sel){ sec.classList.remove("mt-in"); void sec.offsetWidth; sec.classList.add("mt-in"); }
+    });
+    bar.dataset.on = on;
+    window.ScrollTrigger?.refresh();
+    dispatchEvent(new Event("resize"));     // полотно, крейда й вкладки хедера переміряються
+  }
+  function pick(id){
+    if (id !== on){ on = id; apply(true); }
+    // нова вкладка починається одразу під смужкою, а не посеред сторінки
+    const top = bar.getBoundingClientRect().top + scrollY - hb();
+    requestAnimationFrame(() => scrollTo({top, behavior: reduce ? "auto" : "smooth"}));
+  }
+  tabs.forEach((b, i) => {
+    b.onclick = () => pick(b.getAttribute("aria-controls"));
+    b.onkeydown = e => { const d = {ArrowRight:1, ArrowLeft:-1}[e.key]; if (d){ e.preventDefault(); const n = tabs[(i + d + tabs.length) % tabs.length]; pick(n.getAttribute("aria-controls")); n.focus(); } };
+  });
+  // «проєкти» в хедері й адреса #projects / #ideas на телефоні відкривають свою вкладку
+  document.addEventListener("click", e => {
+    const a = e.target.closest('a[href="#projects"], a[href="#ideas"]');
+    if (!a || !narrow.matches) return;
+    e.preventDefault(); pick(a.getAttribute("href").slice(1));
+  });
+  if (location.hash === "#projects") on = "projects";
+  narrow.addEventListener?.("change", () => apply(false));
+  apply(false);
+  if (location.hash === "#projects" && narrow.matches) requestAnimationFrame(() => pick("projects"));
+})();
 
 /* вкладки «Що я роблю | Про мене»: панелі лежать в одній клітинці сітки, тож висота не стрибає */
 (() => {
